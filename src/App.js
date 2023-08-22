@@ -1,24 +1,32 @@
-import logo from './logo.svg';
-import './App.css';
+import { Box } from "@mui/material";
+import { Route, Routes } from "react-router-dom";
+import Navbar from "./Components/Navbar";
+import Homepage from "./Pages/Homepage";
+import Categories from "./Pages/Categories";
+import CategoriesListing from "./Pages/CategoriesListing";
+import Dashboard from "./Pages/Dashboard";
+import IndividualListing from "./Pages/IndividualListing";
+import Profile from "./Pages/Profile";
+import Search from "./Pages/Search";
+import UpdateProfile from "./Pages/UpdateProfile";
+import Error from "./Pages/Error";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Box>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Homepage />} />
+        <Route path="/categories" element={<Categories />} />
+        <Route path="/categories/:categoryId" element={<CategoriesListing />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/listing/:listingId" element={<IndividualListing />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/search" element={<Search />} />
+        <Route path="/updateprofile" element={<UpdateProfile />} />
+        <Route path="*" element={<Error />} />
+      </Routes>
+    </Box>
   );
 }
 
