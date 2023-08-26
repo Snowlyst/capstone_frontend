@@ -2,9 +2,16 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import { BrowserRouter } from "react-router-dom";
+import { SessionContextProvider } from "@supabase/auth-helpers-react";
+import { createClient } from "@supabase/supabase-js";
 import { UserProvider } from "./Components/UserContext";
 
 import { Auth0Provider } from "@auth0/auth0-react";
+
+const supabase = createClient(
+  `${process.env.REACT_APP_SUPABASE_PROJECT_URL}`,
+  `${process.env.REACT_APP_SUPABASE_PUBLIC_API_KEY}`
+);
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -17,10 +24,12 @@ root.render(
       scope: process.env.REACT_APP_SCOPE,
     }}
   >
-    <UserProvider>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </UserProvider>
+    <SessionContextProvider supabaseClient={supabase}>
+      <UserProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </UserProvider>
+    </SessionContextProvider>
   </Auth0Provider>
 );
