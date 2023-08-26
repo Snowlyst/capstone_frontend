@@ -10,6 +10,7 @@ import Profile from "./Pages/Profile";
 import Search from "./Pages/Search";
 import UpdateProfile from "./Pages/UpdateProfile";
 import Error from "./Pages/Error";
+import JobPost from "./Pages/Employer/JobPost";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/search" element={<Search />} />
         <Route path="/updateprofile" element={<UpdateProfile />} />
+        <Route path="/jobpost" element={<JobPost />} />
         <Route path="*" element={<Error />} />
       </Routes>
     </Box>

@@ -1,10 +1,15 @@
-import { Box } from "@mui/material";
+import { Box, ThemeProvider, Grid } from "@mui/material";
+import "../Assets/Styles/Theme";
+import { theme } from "../Assets/Styles/Theme";
+import "../Assets/Styles/Homepage.css";
 
 function Homepage() {
   return (
-    <Box>
-      <Box>HOMEPAGE</Box>
-    </Box>
+    <Grid Container justify="center">
+      <Box className="hero-image">
+        <Box></Box>
+      </Box>
+    </Grid>
   );
 }
 
