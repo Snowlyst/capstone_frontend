@@ -73,7 +73,7 @@ function Navbar() {
       localStorage.setItem("role", JSON.stringify(user.role));
       loginWithRedirect({
         authorizationParams: {
-          redirect_uri: `${process.env.REACT_APP_REDIRECT_URI_EMPLOYER}`,
+          redirect_uri: `${process.env.REACT_APP_REDIRECT_URI}`,
         },
       });
     }
