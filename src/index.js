@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import { BrowserRouter } from "react-router-dom";
+import { UserProvider } from "./Components/UserContext";
 
 import { Auth0Provider } from "@auth0/auth0-react";
 
@@ -16,8 +17,10 @@ root.render(
       scope: process.env.REACT_APP_SCOPE,
     }}
   >
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <UserProvider>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </UserProvider>
   </Auth0Provider>
 );
