@@ -6,9 +6,7 @@ import "../Assets/Styles/Homepage.css";
 function Homepage() {
   return (
     <Grid Container justify="center">
-      <Box className="hero-image">
-        <Box></Box>
-      </Box>
+      <Box className="hero-image"></Box>
     </Grid>
   );
 }
