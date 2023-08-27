@@ -3,7 +3,7 @@ import { Box } from "@mui/material";
 function Search() {
   return (
     <Box>
-      <Box></Box>
+      <Box>This is the search page</Box>
     </Box>
   );
 }
