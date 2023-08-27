@@ -60,9 +60,7 @@ function Homepage() {
   }, [user, isAuthenticated, getAccessTokenSilently, accessToken]);
   return (
     <Grid Container justify="center">
-      <Box className="hero-image">
-        <Box></Box>
-      </Box>
+      <Box className="hero-image"></Box>
     </Grid>
   );
 }
