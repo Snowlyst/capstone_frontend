@@ -1,56 +1,45 @@
-# Instructions/Help for Auth0
+# Instructions/Help for Styles
 
-## To post to backend with Authentication Key on Frontend add
+## To use Button style
 
-E.g. to add new listing :
+// remember to set
 
-if (isAuthenticated && accessToken !== null) {
-const objToSend = {
-title,
-category,
-condition,
-price,
-description,
-shippingDetails,
-currUser,
-};
+<!-- <Link to="/" style={{ textDecoration: "none" }}> -->
 
-      // Send request to create new listing in backend
-      // please take note of the headers that are included here. The access token is included here.
+followed by the below
 
-      const output = await axios
-        .post(`${BACKEND_URL}/listings`, objToSend, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        })
-        .then((res) => {
-          // Clear form state
-          console.log(output);
-          setTitle("");
-          setCategory("");
-          setCondition("");
-          setPrice(0);
-          setDescription("");
-          setShippingDetails("");
-          // Navigate to listing-specific page after submitting form
-          navigate(`/listings/${res.data.id}`);
-        });
-    } else {
-      loginWithRedirect();
-    }
+                  <Button classes={{ root: "blue" }} variant="contained">
+                   Name
+                  </Button>
+                  <Button classes={{ root: "orange" }} variant="contained">
+                    Name
+                  </Button>
 
-### Codes to add on backend
+### to add link to button
 
-// for new routers, pass in jwtCheck (already imported in index.js on backend)
+<!-- don't use <Link to="/"> -->
 
-const usersRouter = new UsersRouter(usersController, jwtCheck);
+use this [component={Link} to="/route"]
 
-// in the router pass in jwtCheck as props and add this below the code to import the db models (if still unclear refer to Users Router)
+<!-- <Button
+                  classes={{ root: "blue" }}
+                  variant="contained"
+                  component={Link}
+                  to="/search"
+                >
+                  Search Jobs
+                </Button> -->
 
-this.jwtCheck = jwtCheck;
+#### to use grid centered
 
-// then pass it into the specific route you want to ensure only logged in users can access
+use this
+
+<!-- <Grid
+            container
+            spacing={2}
+            direction="row"
+            sx={theme.customStyles.centered.container}
+          > -->
 
 ## Available Scripts
 
