@@ -3,24 +3,16 @@ html {
   margin: 0px;
   padding: 0px;
   box-sizing: border-box;
+  height: 100%;
 }
 
 .hero-image {
-  background-image: url("../Images/heroSvg.svg");
-  display: flex;
-  align-items: baseline;
-  justify-content: center;
-  /* Set a specific height */
-  width: 100%;
+  width: 100vw;
   height: 100vh;
-  /* Position and center the image to scale nicely on all screens */
   background-position: center;
-  background-repeat: no-repeat;
   background-size: cover;
-  position: relative;
-
-  margin: 0;
-  padding: 0;
+  background-repeat: no-repeat;
+  background-image: url("../Images/Vervetest.png");
 }
 
 /* Place text in the middle of the image */

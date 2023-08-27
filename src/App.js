@@ -14,6 +14,7 @@ import JobPost from "./Pages/Employer/JobPost";
 import OnemapApiTest from "./TestPages(TO_BE_DELETED)/OnemapApiTest";
 import PDFReadingTest from "./TestPages(TO_BE_DELETED)/PDFReaderTest";
 import GoogleCalendar from "./TestPages(TO_BE_DELETED)/GoogleCalendarPlanner";
+import FirebaseUpload from "./TestPages(TO_BE_DELETED)/FirebaseUpload";
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
         <Route path="/onemap" element={<OnemapApiTest />} />
         <Route path="/pdf" element={<PDFReadingTest />} />
         <Route path="/googlecalendar" element={<GoogleCalendar />} />
+        <Route path="/firebaseupload" element={<FirebaseUpload />} />
         <Route path="*" element={<Error />} />
       </Routes>
     </Box>
