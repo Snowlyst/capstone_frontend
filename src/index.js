@@ -4,6 +4,8 @@ import App from "./App";
 import { BrowserRouter } from "react-router-dom";
 import { SessionContextProvider } from "@supabase/auth-helpers-react";
 import { createClient } from "@supabase/supabase-js";
+import { UserProvider } from "./Components/UserContext";
+
 import { Auth0Provider } from "@auth0/auth0-react";
 
 const supabase = createClient(
@@ -23,9 +25,11 @@ root.render(
     }}
   >
     <SessionContextProvider supabaseClient={supabase}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <UserProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </UserProvider>
     </SessionContextProvider>
   </Auth0Provider>
 );
