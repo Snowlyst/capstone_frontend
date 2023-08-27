@@ -1,6 +1,45 @@
-# Getting Started with Create React App
+# Instructions/Help for Styles
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## To use Button style
+
+// remember to set
+
+<!-- <Link to="/" style={{ textDecoration: "none" }}> -->
+
+followed by the below
+
+                  <Button classes={{ root: "blue" }} variant="contained">
+                   Name
+                  </Button>
+                  <Button classes={{ root: "orange" }} variant="contained">
+                    Name
+                  </Button>
+
+### to add link to button
+
+<!-- don't use <Link to="/"> -->
+
+use this [component={Link} to="/route"]
+
+<!-- <Button
+                  classes={{ root: "blue" }}
+                  variant="contained"
+                  component={Link}
+                  to="/search"
+                >
+                  Search Jobs
+                </Button> -->
+
+#### to use grid centered
+
+use this
+
+<!-- <Grid
+            container
+            spacing={2}
+            direction="row"
+            sx={theme.customStyles.centered.container}
+          > -->
 
 ## Available Scripts
 

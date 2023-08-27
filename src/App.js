@@ -11,6 +11,10 @@ import Search from "./Pages/Search";
 import UpdateProfile from "./Pages/UpdateProfile";
 import Error from "./Pages/Error";
 import JobPost from "./Pages/Employer/JobPost";
+import OnemapApiTest from "./TestPages(TO_BE_DELETED)/OnemapApiTest";
+import PDFReadingTest from "./TestPages(TO_BE_DELETED)/PDFReaderTest";
+import GoogleCalendar from "./TestPages(TO_BE_DELETED)/GoogleCalendarPlanner";
+import FirebaseUpload from "./TestPages(TO_BE_DELETED)/FirebaseUpload";
 
 function App() {
   return (
@@ -26,6 +30,10 @@ function App() {
         <Route path="/search" element={<Search />} />
         <Route path="/updateprofile" element={<UpdateProfile />} />
         <Route path="/jobpost" element={<JobPost />} />
+        <Route path="/onemap" element={<OnemapApiTest />} />
+        <Route path="/pdf" element={<PDFReadingTest />} />
+        <Route path="/googlecalendar" element={<GoogleCalendar />} />
+        <Route path="/firebaseupload" element={<FirebaseUpload />} />
         <Route path="*" element={<Error />} />
       </Routes>
     </Box>
