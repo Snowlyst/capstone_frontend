@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Grid,
@@ -12,15 +12,28 @@ import {
   FormControl,
   InputLabel,
   IconButton,
+  Tooltip,
+  Button,
+  FormHelperText,
 } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
 import { theme } from "../Assets/Styles/Theme";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import "../Assets/Styles/MemberProfile.css";
+import axios from "axios";
 
 function Profile() {
   // Set States
+  // 1st Row of input in the form.
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [identificationNumber, setIdentificationNumber] = useState("");
+
+  // 2nd row of input in the form.
+  const [mobileNumber, setMobileNumber] = useState("");
+  const [dateOfBirth, setDateOfBirth]= useState("")
   const [cancerDiagnosis, setCancerDiagnosis] = useState("");
+  const [newCancerDiagnosis, setNewCancerDiagnosis] = useState("");
   const [housingType, setHousingType] = useState("");
   const [livingArrangement, setLivingArrangment] = useState("");
   const [currentWorkStatus, setCurrentWorkStatus] = useState("");
@@ -33,12 +46,51 @@ function Profile() {
     useState("");
   const [unemployedTimeFrameToRtw, setUnemployedTimeFrameToRtw] = useState("");
   const [currentHealthStatus, setCurrentHealthStatus] = useState("");
+  const [postalCode, setPostalCode] = useState("");
+  const [displayedAddress, setDisplayedAddress] = useState("");
+  const [address, setAddress] = useState("");
+  const [physicalHealthInterference, setPhysicalHealthInterference] =
+    useState("");
+  const [mentalHealthInterference, setMentalHealthInterference] = useState("");
 
   // Functions to handle input
-  const handleCancerDiagnosisChange = (e) => {
-    setCancerDiagnosis(e.target.value);
+  // 1st Row of input in the form.
+  const handleFirstNameChange = (e) => {
+    setFirstName(e.target.value);
   };
+  const handleLastNameChange = (e) => {
+    setLastName(e.target.value);
+  };
+  const handleIdentificationNumberChange = (e) => {
+    setIdentificationNumber(e.target.value);
+  };
+  // 2nd row of input in the form.
+  const handleMobileNumberChange = (e) => {
+    setMobileNumber(e.target.value);
+  };
+  const handleDateOfBirthChange =(e) =>{
+    setDateOfBirth(e.target.value);
+  };
+  
 
+  const handleNewCancerDiagnosisChange = (e) =>{
+    setNewCancerDiagnosis(e.target.value)
+  }
+ const handleCancerDiagnosisChange = (event) => {
+   const selectedValue = event.target.value;
+   setCancerDiagnosis(selectedValue);
+   if(cancerDiagnosis !== "Others"){
+      setNewCancerDiagnosis("")
+   }
+   
+ };
+   useEffect(() => {
+     console.log("New Cancer Diagnosis", newCancerDiagnosis);
+   }, [newCancerDiagnosis]);
+  useEffect(() => {
+    console.log("Cancer Diagnosis", cancerDiagnosis);
+  }, [cancerDiagnosis]);
+ 
   const handleHousingTypeChange = (e) => {
     setHousingType(e.target.value);
   };
@@ -70,6 +122,37 @@ function Profile() {
   const handleCurrentHealthStatus = (e) => {
     setCurrentHealthStatus(e.target.value);
   };
+  const handlePostalCode = (e) => {
+    setPostalCode(e.target.value);
+  };
+
+  const handlePhysicalHealthInterference = (e) => {
+    setPhysicalHealthInterference(e.target.value);
+  };
+  const handleMentalHealthInterference = (e) => {
+    setMentalHealthInterference(e.target.value);
+  };
+
+  const handleSearchPostal = (e) => {
+    e.preventDefault();
+    const searchQuery = postalCode;
+    axios
+      .get(
+        `https://developers.onemap.sg/commonapi/search?searchVal=${searchQuery}&returnGeom=Y&getAddrDetails=Y`
+      )
+      .then((info) => {
+        const spreadData = info.data.results.map((info, index) => {
+          console.log(info);
+          console.log(info.ADDRESS);
+          setAddress(info.ADDRESS);
+          return <div key={index}>Address: {info.ADDRESS}</div>;
+        });
+        setDisplayedAddress(spreadData);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -78,7 +161,13 @@ function Profile() {
           <Grid item xs={12}>
             {/* Header */}
             <Box textAlign="center" mt={2}>
-              <Typography theme={theme} sx={theme.typography.h4}>
+              <Typography
+                theme={theme}
+                sx={{
+                  ...theme.typography.h2,
+                  fontWeightBold: theme.typography.h2.fontWeightBold,
+                }}
+              >
                 Profile
               </Typography>
               <Typography theme={theme} sx={theme.typography.p}>
@@ -100,6 +189,12 @@ function Profile() {
                     fullWidth
                     margin="normal"
                     variant="outlined"
+                    value={firstName}
+                    onChange={handleFirstNameChange}
+                    error={firstName === ""}
+                    helperText={
+                      firstName === "" ? "First Name is required" : ""
+                    }
                   />
                 </Grid>
                 <Grid item xs={12} md={4}>
@@ -108,6 +203,10 @@ function Profile() {
                     fullWidth
                     margin="normal"
                     variant="outlined"
+                    value={lastName}
+                    onChange={handleLastNameChange}
+                    error={lastName === ""}
+                    helperText={lastName === "" ? "Last Name is required" : ""}
                   />
                 </Grid>
                 <Grid item xs={12} md={3}>
@@ -116,6 +215,14 @@ function Profile() {
                     fullWidth
                     margin="normal"
                     variant="outlined"
+                    value={identificationNumber}
+                    onChange={handleIdentificationNumberChange}
+                    error={identificationNumber === ""}
+                    helperText={
+                      identificationNumber === ""
+                        ? "Identification Number is required"
+                        : ""
+                    }
                   />
                 </Grid>
               </Grid>
@@ -130,6 +237,12 @@ function Profile() {
                     fullWidth
                     margin="normal"
                     variant="outlined"
+                    value={mobileNumber}
+                    onChange={handleMobileNumberChange}
+                    error={mobileNumber === ""}
+                    helperText={
+                      mobileNumber === "" ? "Mobile Number is required" : ""
+                    }
                   />
                 </Grid>
                 <Grid item xs={4} md={2}>
@@ -139,11 +252,21 @@ function Profile() {
                     margin="normal"
                     variant="outlined"
                     placeholder="DD/MM/YYYY"
+                    value={dateOfBirth}
+                    onChange={handleDateOfBirthChange}
+                    error={dateOfBirth === ""}
+                    helperText={
+                      dateOfBirth === "" ? "Date of Birth is required" : ""
+                    }
                   />
                 </Grid>
                 <Grid item xs={4} md={3}>
-                  <Box className="myBox">
-                    <FormControl fullWidth variant="outlined">
+                  <Box className="myBox2">
+                    <FormControl
+                      fullWidth
+                      variant="outlined"
+                      error ={cancerDiagnosis ===""}
+                    >
                       <InputLabel>Cancer Diagnosis</InputLabel>
                       <Select
                         label="Cancer Diagnosis"
@@ -161,6 +284,11 @@ function Profile() {
                         <MenuItem value="Others">Others</MenuItem>
                         <MenuItem value="null"></MenuItem>
                       </Select>
+                      {cancerDiagnosis === "" && (
+                        <FormHelperText>
+                          Cancer Diagnosis is required
+                        </FormHelperText>
+                      )}
                     </FormControl>
                     {cancerDiagnosis === "Others" && (
                       <TextField
@@ -168,6 +296,8 @@ function Profile() {
                         fullWidth
                         margin="normal"
                         variant="outlined"
+                        value ={newCancerDiagnosis}
+                        onChange={handleNewCancerDiagnosisChange}
                       />
                     )}
                   </Box>
@@ -233,16 +363,22 @@ function Profile() {
                     fullWidth
                     margin="normal"
                     variant="outlined"
+                    type="number"
+                    value={postalCode}
+                    onChange={handlePostalCode}
                   />
                 </Grid>
                 <Grid item xs={1} md={0.5}>
                   <Box className="myBox3">
-                    <IconButton
-                      style={{ color: "#FF6B2C" }}
-                      aria-label="search"
-                    >
-                      <SearchOutlinedIcon />
-                    </IconButton>
+                    <Tooltip title="Key in postal code and click the search button to get the address">
+                      <IconButton
+                        style={{ color: "#FF6B2C" }}
+                        aria-label="search"
+                        onClick={handleSearchPostal}
+                      >
+                        <SearchOutlinedIcon />
+                      </IconButton>
+                    </Tooltip>
                   </Box>
                 </Grid>
                 {/* Unit No */}
@@ -265,6 +401,7 @@ function Profile() {
                     fullWidth
                     margin="normal"
                     variant="outlined"
+                    value={address}
                   />
                 </Grid>
                 {/* Housing Type */}
@@ -664,23 +801,105 @@ function Profile() {
                   </Box>
                 </Grid>
                 <Grid item xs={12} md={3}>
-                  <Box className="myBox6">
-                    <TextField
-                      label="Physical health interfered with normal activities?"
-                      fullWidth
-                      margin="normal"
-                      variant="outlined"
-                    />
+                  <Box className="myBox5">
+                    <FormControl fullWidth variant="outlined">
+                      <InputLabel>
+                        Physical health interfered with normal activities?
+                      </InputLabel>
+                      <Select
+                        label="Physical health interfered with normal activities?"
+                        value={physicalHealthInterference}
+                        onChange={handlePhysicalHealthInterference}
+                      >
+                        <MenuItem value="Not at all">Not at all</MenuItem>
+                        <MenuItem value="Slightly">Slightly</MenuItem>
+                        <MenuItem value="Moderately">Moderately</MenuItem>
+                        <MenuItem value="Quite a bit">Quite a bit</MenuItem>
+                        <MenuItem value="Extremely">Extremely</MenuItem>
+                        <MenuItem value="null"></MenuItem>
+                      </Select>
+                    </FormControl>
+                    <Typography
+                      theme={theme}
+                      sx={{
+                        ...theme.typography.p,
+                        fontSize: 10,
+                      }}
+                    >
+                      Physical health interfered with normal activities in the
+                      past 4 weeks.
+                    </Typography>
                   </Box>
                 </Grid>
                 <Grid item xs={12} md={3}>
-                  <Box className="myBox6">
-                    <TextField
-                      label="Mental health interfered with normal activities?"
-                      fullWidth
-                      margin="normal"
-                      variant="outlined"
-                    />
+                  <Box className="myBox5">
+                    <FormControl fullWidth variant="outlined">
+                      <InputLabel>
+                        Mental health interfered with normal activities?
+                      </InputLabel>
+                      <Select
+                        label="Mental health interfered with normal activities?"
+                        value={mentalHealthInterference}
+                        onChange={handleMentalHealthInterference}
+                      >
+                        <MenuItem value="Not at all">Not at all</MenuItem>
+                        <MenuItem value="Slightly">Slightly</MenuItem>
+                        <MenuItem value="Moderately">Moderately</MenuItem>
+                        <MenuItem value="Quite a bit">Quite a bit</MenuItem>
+                        <MenuItem value="Extremely">Extremely</MenuItem>
+                        <MenuItem value="null"></MenuItem>
+                      </Select>
+                    </FormControl>
+                    <Typography
+                      theme={theme}
+                      sx={{
+                        ...theme.typography.p,
+                        fontSize: 10,
+                      }}
+                    >
+                      Mental health interfered with normal activities in the
+                      past 4 weeks.
+                    </Typography>
+                  </Box>
+                </Grid>
+                <Grid item xs={12}>
+                  <Box className="myBox">
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} md={4}>
+                        <TextField
+                          label="Physical barriers to RTW"
+                          variant="outlined"
+                          fullWidth
+                          multiline
+                          rows={4}
+                        />
+                      </Grid>
+                      <Grid item xs={12} md={4}>
+                        <TextField
+                          label="Mental barriers to RTW"
+                          variant="outlined"
+                          fullWidth
+                          multiline
+                          rows={4}
+                        />
+                      </Grid>
+                      <Grid item xs={12} md={4}>
+                        <TextField
+                          label="Additional Information"
+                          variant="outlined"
+                          fullWidth
+                          multiline
+                          rows={4}
+                        />
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Box display="flex" justifyContent="center" py={5}>
+                          <Button className="orange" variant="contained">
+                            Submit
+                          </Button>
+                        </Box>
+                      </Grid>
+                    </Grid>
                   </Box>
                 </Grid>
               </Grid>
