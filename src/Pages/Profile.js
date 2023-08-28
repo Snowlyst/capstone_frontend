@@ -21,6 +21,19 @@ import { theme } from "../Assets/Styles/Theme";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import "../Assets/Styles/MemberProfile.css";
 import axios from "axios";
+import {
+  cancerDiagnosisOptions,
+  housingOptions,
+  familyCompositionOptions,
+  workStatusOptions,
+  occupationOptions,
+  incomeOptions,
+  impactOnFinancesOptions,
+  scaleOptions,
+  timePeriodOptions,
+  healthStatusOptions,
+  distressOptions,
+} from "./MenuItemsOptions";
 
 function Profile() {
   // Set States
@@ -31,27 +44,50 @@ function Profile() {
 
   // 2nd row of input in the form.
   const [mobileNumber, setMobileNumber] = useState("");
-  const [dateOfBirth, setDateOfBirth]= useState("")
+  const [dateOfBirth, setDateOfBirth] = useState("");
   const [cancerDiagnosis, setCancerDiagnosis] = useState("");
   const [newCancerDiagnosis, setNewCancerDiagnosis] = useState("");
+  const [activeTreatment, setActiveTreatment] = useState("");
+  const [activeTreatmentError, setActiveTreatmentError] = useState(true);
+  const [gender, setGender] = useState("");
+  const [genderError, setGenderError] = useState(true);
+
+  // 3rd row of input in the form.
+  const [postalCode, setPostalCode] = useState("");
+  const [unitNumber, setUnitNumber] = useState("");
+  const [displayedAddress, setDisplayedAddress] = useState("");
+  const [address, setAddress] = useState("");
   const [housingType, setHousingType] = useState("");
+  const [newHousingType, setNewHousingType] = useState("");
   const [livingArrangement, setLivingArrangment] = useState("");
+  const [newLivingArrangement, setNewLivingArrangment] = useState("");
+  // 4th row of input in the form.
   const [currentWorkStatus, setCurrentWorkStatus] = useState("");
+  const [newCurrentWorkStatus, setNewCurrentWorkStatus] = useState("");
   const [occupation, setOccupation] = useState("");
+  const [newOccupation, setNewOccupation] = useState("");
   const [monthlySalary, setMonthlySalary] = useState("");
   const [cancerImpactOnFinances, setCancerImpactOnFinances] = useState("");
+
+  const [dateOfLastEmployment, setDateOfLastEmployment] = useState("");
+  // 5th row of input in the form.
   const [employedReadinessScaleToRtw, setEmployedReadinessScaleToRtw] =
     useState("");
   const [unemployedReadinessScaleToRtw, setUnemployedReadinessScaleToRtw] =
     useState("");
   const [unemployedTimeFrameToRtw, setUnemployedTimeFrameToRtw] = useState("");
+  const [newUnemployedTimeFrameToRtw, setNewUnemployedTimeFrameToRtw] =
+    useState("");
+
   const [currentHealthStatus, setCurrentHealthStatus] = useState("");
-  const [postalCode, setPostalCode] = useState("");
-  const [displayedAddress, setDisplayedAddress] = useState("");
-  const [address, setAddress] = useState("");
+
   const [physicalHealthInterference, setPhysicalHealthInterference] =
     useState("");
   const [mentalHealthInterference, setMentalHealthInterference] = useState("");
+  // 6th row of input in the form.
+  const [physicalBarriersToRtw, setPhysicalBarriersToRtw] = useState("");
+  const [mentalBarriersToRtw, setMentalBarriersToRtw] = useState("");
+  const [additionalInformation, setAdditionalInformation]=useState("")
 
   // Functions to handle input
   // 1st Row of input in the form.
@@ -68,70 +104,49 @@ function Profile() {
   const handleMobileNumberChange = (e) => {
     setMobileNumber(e.target.value);
   };
-  const handleDateOfBirthChange =(e) =>{
+  const handleDateOfBirthChange = (e) => {
     setDateOfBirth(e.target.value);
   };
-  
 
-  const handleNewCancerDiagnosisChange = (e) =>{
-    setNewCancerDiagnosis(e.target.value)
-  }
- const handleCancerDiagnosisChange = (event) => {
-   const selectedValue = event.target.value;
-   setCancerDiagnosis(selectedValue);
-   if(cancerDiagnosis !== "Others"){
-      setNewCancerDiagnosis("")
-   }
-   
- };
-   useEffect(() => {
-     console.log("New Cancer Diagnosis", newCancerDiagnosis);
-   }, [newCancerDiagnosis]);
-  useEffect(() => {
-    console.log("Cancer Diagnosis", cancerDiagnosis);
-  }, [cancerDiagnosis]);
- 
-  const handleHousingTypeChange = (e) => {
-    setHousingType(e.target.value);
+  const handleNewCancerDiagnosisChange = (e) => {
+    setNewCancerDiagnosis(e.target.value);
+  };
+  const handleCancerDiagnosisChange = (e) => {
+    const selectedValue = e.target.value;
+    setCancerDiagnosis(selectedValue);
   };
 
-  const handleLivingArrangmentChange = (e) => {
-    setLivingArrangment(e.target.value);
+  console.log(cancerDiagnosis);
+  console.log(newCancerDiagnosis);
+  // useEffect(() => {
+  //   console.log("New Cancer Diagnosis", newCancerDiagnosis);
+  // }, [newCancerDiagnosis]);
+  // useEffect(() => {
+  //   console.log("Cancer Diagnosis", cancerDiagnosis);
+  // }, [cancerDiagnosis]);
+
+  const handleActiveTreatmentChange = (e) => {
+    const value = e.target.value;
+    setActiveTreatment(value);
+    setActiveTreatmentError(false);
   };
-  const handleCurrentWorkStatus = (e) => {
-    setCurrentWorkStatus(e.target.value);
+
+  const handleGenderChange = (e) => {
+    const value = e.target.value;
+    setGender(value);
+    setGenderError(false);
   };
-  const handleOccupation = (e) => {
-    setOccupation(e.target.value);
-  };
-  const handleMonthlySalary = (e) => {
-    setMonthlySalary(e.target.value);
-  };
-  const handleCancerImpactOnFinances = (e) => {
-    setCancerImpactOnFinances(e.target.value);
-  };
-  const handleEmployedReadinessScaleToRtw = (e) => {
-    setEmployedReadinessScaleToRtw(e.target.value);
-  };
-  const handleUnemployedReadinessScaleToRtw = (e) => {
-    setUnemployedReadinessScaleToRtw(e.target.value);
-  };
-  const handleUnemployedTimeFrameToRtw = (e) => {
-    setUnemployedTimeFrameToRtw(e.target.value);
-  };
-  const handleCurrentHealthStatus = (e) => {
-    setCurrentHealthStatus(e.target.value);
-  };
+  // 3rd row of input in the form.
   const handlePostalCode = (e) => {
     setPostalCode(e.target.value);
   };
-
-  const handlePhysicalHealthInterference = (e) => {
-    setPhysicalHealthInterference(e.target.value);
+  const handleUnitNumber = (e) => {
+    setUnitNumber(e.target.value);
   };
-  const handleMentalHealthInterference = (e) => {
-    setMentalHealthInterference(e.target.value);
+  const handleAddress = (e) => {
+    setAddress(e.target.value);
   };
+  console.log(address);
 
   const handleSearchPostal = (e) => {
     e.preventDefault();
@@ -153,6 +168,82 @@ function Profile() {
         console.log(error);
       });
   };
+  const handleHousingTypeChange = (e) => {
+    const selectedValue = e.target.value;
+    setHousingType(selectedValue);
+  };
+
+  const handleNewHousingTypeChange = (e) => {
+    setNewHousingType(e.target.value);
+  };
+  const handleLivingArrangmentChange = (e) => {
+    const selectedValue = e.target.value;
+    setLivingArrangment(selectedValue);
+  };
+  const handleNewLivingArrangmentChange = (e) => {
+    setNewLivingArrangment(e.target.value);
+  };
+  // 4th row of input in the form.
+  const handleCurrentWorkStatus = (e) => {
+    const selectedValue = e.target.value;
+    setCurrentWorkStatus(selectedValue);
+  };
+  const handleNewCurrentWorkStatus = (e) => {
+    setNewCurrentWorkStatus(e.target.value);
+  };
+  const handleOccupation = (e) => {
+    const selectedValue = e.target.value;
+    setOccupation(selectedValue);
+  };
+  const handleNewOccupation = (e) => {
+    setNewOccupation(e.target.value);
+  };
+  const handleMonthlySalary = (e) => {
+    setMonthlySalary(e.target.value);
+  };
+  const handleCancerImpactOnFinances = (e) => {
+    setCancerImpactOnFinances(e.target.value);
+  };
+
+  // 5th row of input in the form.
+  const handleDateOfLastEmployment = (e) => {
+    setDateOfLastEmployment(e.target.value);
+  };
+  const handleUnemployedReadinessScaleToRtw = (e) => {
+    const selectedValue = e.target.value;
+    setUnemployedReadinessScaleToRtw(selectedValue);
+  };
+  const handleUnemployedTimeFrameToRtw = (e) => {
+    const selectedValue = e.target.value;
+    setUnemployedTimeFrameToRtw(selectedValue);
+  };
+  const handleNewUnemployedTimeFrameToRtw = (e) => {
+    setNewUnemployedTimeFrameToRtw(e.target.value);
+  };
+
+  const handleEmployedReadinessScaleToRtw = (e) => {
+    setEmployedReadinessScaleToRtw(e.target.value);
+  };
+  const handleCurrentHealthStatus = (e) => {
+    setCurrentHealthStatus(e.target.value);
+  };
+
+  const handlePhysicalHealthInterference = (e) => {
+    setPhysicalHealthInterference(e.target.value);
+  };
+  const handleMentalHealthInterference = (e) => {
+    setMentalHealthInterference(e.target.value);
+  };
+  // 6th row of input in the form.
+  const handlePhysicalBarriersToRtw =(e)=>{
+    setPhysicalBarriersToRtw(e.target.value)
+  }
+   const handleMentalBarriersToRtw = (e) => {
+     setPhysicalBarriersToRtw(e.target.value);
+   };
+   const handleAdditionalInformation =(e) =>{
+    setAdditionalInformation(e.target.value)
+   }
 
   return (
     <ThemeProvider theme={theme}>
@@ -265,7 +356,7 @@ function Profile() {
                     <FormControl
                       fullWidth
                       variant="outlined"
-                      error ={cancerDiagnosis ===""}
+                      error={cancerDiagnosis === ""}
                     >
                       <InputLabel>Cancer Diagnosis</InputLabel>
                       <Select
@@ -273,16 +364,7 @@ function Profile() {
                         value={cancerDiagnosis}
                         onChange={handleCancerDiagnosisChange}
                       >
-                        <MenuItem value="Breast">Breast</MenuItem>
-                        <MenuItem value="Brain">Brain</MenuItem>
-                        <MenuItem value="Lung">Lung</MenuItem>
-                        <MenuItem value="Colon & Rectum">
-                          Colon & Rectum
-                        </MenuItem>
-                        <MenuItem value="Prostate">Prostate</MenuItem>
-                        <MenuItem value="Head & Neck">Head & Neck</MenuItem>
-                        <MenuItem value="Others">Others</MenuItem>
-                        <MenuItem value="null"></MenuItem>
+                        {cancerDiagnosisOptions}
                       </Select>
                       {cancerDiagnosis === "" && (
                         <FormHelperText>
@@ -296,7 +378,7 @@ function Profile() {
                         fullWidth
                         margin="normal"
                         variant="outlined"
-                        value ={newCancerDiagnosis}
+                        value={newCancerDiagnosis}
                         onChange={handleNewCancerDiagnosisChange}
                       />
                     )}
@@ -307,7 +389,11 @@ function Profile() {
                     <Typography sx={{ fontSize: "small" }}>
                       Active Treatment
                     </Typography>
-                    <RadioGroup row>
+                    <RadioGroup
+                      row
+                      value={activeTreatment}
+                      onChange={handleActiveTreatmentChange}
+                    >
                       <FormControlLabel
                         value="yes"
                         control={<Radio size="small" />}
@@ -325,12 +411,21 @@ function Profile() {
                         }
                       />
                     </RadioGroup>
+                    {activeTreatmentError && (
+                      <FormHelperText error>
+                        Please select an option
+                      </FormHelperText>
+                    )}
                   </Box>
                 </Grid>
                 <Grid item xs={6} md={2}>
                   <Box className="myBox">
                     <Typography sx={{ fontSize: "small" }}>Gender</Typography>
-                    <RadioGroup row>
+                    <RadioGroup
+                      row
+                      value={gender}
+                      onChange={handleGenderChange}
+                    >
                       <FormControlLabel
                         value="male"
                         control={<Radio size="small" />}
@@ -350,6 +445,11 @@ function Profile() {
                         }
                       />
                     </RadioGroup>
+                    {genderError && (
+                      <FormHelperText error>
+                        Please select an option
+                      </FormHelperText>
+                    )}
                   </Box>
                 </Grid>
               </Grid>
@@ -366,6 +466,10 @@ function Profile() {
                     type="number"
                     value={postalCode}
                     onChange={handlePostalCode}
+                    error={postalCode === ""}
+                    helperText={
+                      postalCode === "" ? "Postal Code is required" : ""
+                    }
                   />
                 </Grid>
                 <Grid item xs={1} md={0.5}>
@@ -390,6 +494,12 @@ function Profile() {
                       margin="normal"
                       variant="outlined"
                       placeholder="#"
+                      value={unitNumber}
+                      onChange={handleUnitNumber}
+                      error={unitNumber === ""}
+                      helperText={
+                        unitNumber === "" ? "Unit Number is required" : ""
+                      }
                     />
                   </Box>
                 </Grid>
@@ -402,33 +512,32 @@ function Profile() {
                     margin="normal"
                     variant="outlined"
                     value={address}
+                    onChange={handleAddress}
+                    error={address === ""}
+                    helperText={address === "" ? "Address is required" : ""}
                   />
                 </Grid>
                 {/* Housing Type */}
                 <Grid item xs={6} md={2.5}>
                   <Box className="myBox">
-                    <FormControl fullWidth variant="outlined">
+                    <FormControl
+                      fullWidth
+                      variant="outlined"
+                      error={housingType === ""}
+                    >
                       <InputLabel>Housing Type</InputLabel>
                       <Select
                         label="Housing Type"
                         value={housingType}
                         onChange={handleHousingTypeChange}
                       >
-                        <MenuItem value="HDB 1 Room">HDB 1 Room</MenuItem>
-                        <MenuItem value="HDB 2 Room">HDB 2 Room</MenuItem>
-                        <MenuItem value="HDB 3 Room">HDB 3 Room</MenuItem>
-                        <MenuItem value="HDB 4 Room">HDB 4 Room</MenuItem>
-                        <MenuItem value="HDB 5 Room">HDB 5 Room</MenuItem>
-                        <MenuItem value="HDB Executive & Above">
-                          HDB Executive & Above
-                        </MenuItem>
-                        <MenuItem value="Private Condo">Private Condo</MenuItem>
-                        <MenuItem value="Private Landed">
-                          Private Landed
-                        </MenuItem>
-                        <MenuItem value="Others">Others</MenuItem>
-                        <MenuItem value="null"></MenuItem>
+                        {housingOptions}
                       </Select>
+                      {housingType === "" && (
+                        <FormHelperText>
+                          Housing Type is required
+                        </FormHelperText>
+                      )}
                     </FormControl>
                     {housingType === "Others" && (
                       <TextField
@@ -436,6 +545,8 @@ function Profile() {
                         fullWidth
                         margin="normal"
                         variant="outlined"
+                        value={newHousingType}
+                        onChange={handleNewHousingTypeChange}
                       />
                     )}
                   </Box>
@@ -443,24 +554,24 @@ function Profile() {
                 {/* Living Arrangement */}
                 <Grid item xs={6} md={3}>
                   <Box className="myBox">
-                    <FormControl fullWidth variant="outlined">
+                    <FormControl
+                      fullWidth
+                      variant="outlined"
+                      error={livingArrangement === ""}
+                    >
                       <InputLabel>Living Arrangement</InputLabel>
                       <Select
                         label="Living Arrangment"
                         value={livingArrangement}
                         onChange={handleLivingArrangmentChange}
                       >
-                        <MenuItem value="Alone">Alone</MenuItem>
-                        <MenuItem value="w/spouse only">w/spouse only</MenuItem>
-                        <MenuItem value="w/children only">
-                          w/children only
-                        </MenuItem>
-                        <MenuItem value="w/ spouse & children">
-                          w/ spouse & children
-                        </MenuItem>
-                        <MenuItem value="Others">Others</MenuItem>
-                        <MenuItem value="null"></MenuItem>
+                        {familyCompositionOptions}
                       </Select>
+                      {livingArrangement === "" && (
+                        <FormHelperText>
+                          living Arrangement is required
+                        </FormHelperText>
+                      )}
                     </FormControl>
                     {livingArrangement === "Others" && (
                       <TextField
@@ -468,6 +579,8 @@ function Profile() {
                         fullWidth
                         margin="normal"
                         variant="outlined"
+                        value={newLivingArrangement}
+                        onChange={handleNewLivingArrangmentChange}
                       />
                     )}
                   </Box>
@@ -484,20 +597,22 @@ function Profile() {
               <Grid container spacing={2}>
                 <Grid item xs={12} md={3}>
                   <Box className="myBox">
-                    <FormControl fullWidth variant="outlined">
+                    <FormControl
+                      fullWidth
+                      variant="outlined"
+                      error={currentWorkStatus === ""}
+                    >
                       <InputLabel>Current Work Status</InputLabel>
                       <Select
                         label="Current Work Status"
                         value={currentWorkStatus}
                         onChange={handleCurrentWorkStatus}
                       >
-                        <MenuItem value="Employed">Employed</MenuItem>
-                        <MenuItem value="Unemployed">Unemployed</MenuItem>
-                        <MenuItem value="Unpaid Leave">UNpaid Leave</MenuItem>
-                        <MenuItem value="Paid Leave">Paid Leave</MenuItem>
-                        <MenuItem value="Others">Other work status</MenuItem>
-                        <MenuItem value="null"></MenuItem>
+                        {workStatusOptions}
                       </Select>
+                      {currentWorkStatus === "" && (
+                        <FormHelperText>Work Status is required</FormHelperText>
+                      )}
                     </FormControl>
                     {currentWorkStatus === "Others" && (
                       <TextField
@@ -505,54 +620,30 @@ function Profile() {
                         fullWidth
                         margin="normal"
                         variant="outlined"
+                        value={newCurrentWorkStatus}
+                        onChange={handleNewCurrentWorkStatus}
                       />
                     )}
                   </Box>
                 </Grid>
                 <Grid item xs={12} md={3}>
                   <Box className="myBox">
-                    <FormControl fullWidth variant="outlined">
+                    <FormControl
+                      fullWidth
+                      variant="outlined"
+                      error={occupation === ""}
+                    >
                       <InputLabel>Occupation</InputLabel>
                       <Select
                         label="Occupation"
                         value={occupation}
                         onChange={handleOccupation}
                       >
-                        <MenuItem value="Current General Worker Cleaner">
-                          Current General Worker Cleaner
-                        </MenuItem>
-                        <MenuItem value="Current General Worker Packer">
-                          Current General Worker Packer
-                        </MenuItem>
-                        <MenuItem value="Current General Worker Hawker">
-                          Current General Worker Hawker
-                        </MenuItem>
-                        <MenuItem value="Current Services & Sales">
-                          Current Services & Sales
-                        </MenuItem>
-                        <MenuItem value="Current Admin & Clerical">
-                          Current Admin & Clerical
-                        </MenuItem>
-                        <MenuItem value="Current PMET">Current PMET</MenuItem>
-                        <MenuItem value="Last General Worker Cleaner">
-                          Last General Worker Cleaner
-                        </MenuItem>
-                        <MenuItem value="Last General Worker Packer">
-                          Last General Worker Packer
-                        </MenuItem>
-                        <MenuItem value="Last General Worker Hawker">
-                          Last General Worker Hawker
-                        </MenuItem>
-                        <MenuItem value="Last Services & Sales">
-                          Last Services & Sales
-                        </MenuItem>
-                        <MenuItem value="Last Admin & Clerical">
-                          Last Admin & Clerical
-                        </MenuItem>
-                        <MenuItem value="Current PMET">Last PMET</MenuItem>
-                        <MenuItem value="Others">Others</MenuItem>
-                        <MenuItem value="null"></MenuItem>
+                        {occupationOptions}
                       </Select>
+                      {occupation === "" && (
+                        <FormHelperText>Occupation is required</FormHelperText>
+                      )}
                     </FormControl>
                     {occupation === "Others" && (
                       <TextField
@@ -560,6 +651,8 @@ function Profile() {
                         fullWidth
                         margin="normal"
                         variant="outlined"
+                        value={newOccupation}
+                        onChange={handleNewOccupation}
                       />
                     )}
                     <Typography
@@ -574,46 +667,24 @@ function Profile() {
                 </Grid>
                 <Grid item xs={12} md={3}>
                   <Box className="myBox">
-                    <FormControl fullWidth variant="outlined">
+                    <FormControl
+                      fullWidth
+                      variant="outlined"
+                      error={monthlySalary === ""}
+                    >
                       <InputLabel>Basic Monthly Salary</InputLabel>
                       <Select
                         label="Basic Monthly Salary"
                         value={monthlySalary}
                         onChange={handleMonthlySalary}
                       >
-                        <MenuItem value="Less than $1,000">
-                          Less than $1,000
-                        </MenuItem>
-                        <MenuItem value="$1,000 to $2,000">
-                          $1,000 to $2,000
-                        </MenuItem>
-                        <MenuItem value="$2,001 to $3,000">
-                          $2,001 to $3,000
-                        </MenuItem>
-                        <MenuItem value="$3,001 to $4,000">
-                          $3,001 to $4,000
-                        </MenuItem>
-                        <MenuItem value="$4,001 to $5,000">
-                          $4,001 to $5,000
-                        </MenuItem>
-                        <MenuItem value="$5,001 to $6,000">
-                          $5,001 to $6,000
-                        </MenuItem>
-                        <MenuItem value="$6,001 to $7,000">
-                          $6,001 to $7,000
-                        </MenuItem>
-                        <MenuItem value="$7,001 to $8,000">
-                          $7,001 to $8,000
-                        </MenuItem>
-                        <MenuItem value="$8,001 to $9,000">
-                          $8,001 to $9,000
-                        </MenuItem>
-                        <MenuItem value="$9,001 to $10,000">
-                          $9,001 to $10,000
-                        </MenuItem>
-                        <MenuItem value="Above $10,000">Above $10,000</MenuItem>
-                        <MenuItem value="null"></MenuItem>
+                        {incomeOptions}
                       </Select>
+                      {monthlySalary === "" && (
+                        <FormHelperText>
+                          Monthly Salary is required
+                        </FormHelperText>
+                      )}
                     </FormControl>
                   </Box>
                   <Typography
@@ -626,21 +697,28 @@ function Profile() {
                 </Grid>
                 <Grid item xs={12} md={3}>
                   <Box className="myBox">
-                    <FormControl fullWidth variant="outlined">
+                    <FormControl
+                      fullWidth
+                      variant="outlined"
+                      error={cancerImpactOnFinances === ""}
+                    >
                       <InputLabel>Cancer impact on finances </InputLabel>
                       <Select
                         label="Cancer imapct on finances"
                         value={cancerImpactOnFinances}
                         onChange={handleCancerImpactOnFinances}
                       >
-                        <MenuItem value="Not at all">Not at all</MenuItem>
-                        <MenuItem value="A little">A Little</MenuItem>
-                        <MenuItem value="Some">Some</MenuItem>
-                        <MenuItem value="A lot">A lot</MenuItem>
-                        <MenuItem value="Don't Know">Don't Know</MenuItem>
-                        <MenuItem value="Refused">Refused</MenuItem>
-                        <MenuItem value="null"></MenuItem>
+                        {impactOnFinancesOptions.map((option) => (
+                          <MenuItem key={option} value={option}>
+                            {option}
+                          </MenuItem>
+                        ))}
                       </Select>
+                      {cancerImpactOnFinances === "" && (
+                        <FormHelperText>
+                          Cancer Impact on Finances is required
+                        </FormHelperText>
+                      )}
                     </FormControl>
                   </Box>
                   <Typography
@@ -667,29 +745,34 @@ function Profile() {
                     margin="normal"
                     variant="outlined"
                     placeholder="MM/YYYY"
+                    value={dateOfLastEmployment}
+                    onChange={handleDateOfLastEmployment}
+                    error={dateOfLastEmployment === ""}
+                    helperText={
+                      dateOfLastEmployment === ""
+                        ? "Date of last Employment is required"
+                        : ""
+                    }
                   />
                 </Grid>
                 <Grid item xs={12} md={3}>
                   <Box className="myBox5">
-                    <FormControl fullWidth variant="outlined">
+                    <FormControl
+                      fullWidth
+                      variant="outlined"
+                      error={unemployedReadinessScaleToRtw === ""}
+                    >
                       <InputLabel>Readiness Scale to RTW </InputLabel>
                       <Select
                         label="Readiness Scale to RTW"
                         value={unemployedReadinessScaleToRtw}
                         onChange={handleUnemployedReadinessScaleToRtw}
                       >
-                        <MenuItem value="1">1</MenuItem>
-                        <MenuItem value="2">2</MenuItem>
-                        <MenuItem value="3">3</MenuItem>
-                        <MenuItem value="4">4</MenuItem>
-                        <MenuItem value="5">5</MenuItem>
-                        <MenuItem value="6">6</MenuItem>
-                        <MenuItem value="7">7</MenuItem>
-                        <MenuItem value="8">8</MenuItem>
-                        <MenuItem value="9">9</MenuItem>
-                        <MenuItem value="10">10</MenuItem>
-                        <MenuItem value="null"></MenuItem>
+                        {scaleOptions}
                       </Select>
+                      {unemployedReadinessScaleToRtw === "" && (
+                        <FormHelperText> Input is required</FormHelperText>
+                      )}
                     </FormControl>
                   </Box>
                   <Typography
@@ -702,23 +785,22 @@ function Profile() {
                 </Grid>
                 <Grid item xs={12} md={3}>
                   <Box className="myBox5">
-                    <FormControl fullWidth variant="outlined">
+                    <FormControl
+                      fullWidth
+                      variant="outlined"
+                      error={unemployedTimeFrameToRtw === ""}
+                    >
                       <InputLabel>Time frame to RTW </InputLabel>
                       <Select
                         label="Time Frame to RTW"
                         value={unemployedTimeFrameToRtw}
                         onChange={handleUnemployedTimeFrameToRtw}
                       >
-                        <MenuItem value="3 months">3 months</MenuItem>
-                        <MenuItem value="6 months">6 months</MenuItem>
-                        <MenuItem value="9 months">9 months</MenuItem>
-                        <MenuItem value="12 months">12 months</MenuItem>
-                        <MenuItem value="Not Applicable">
-                          Not Applicable
-                        </MenuItem>
-                        <MenuItem value="Others">Others</MenuItem>
-                        <MenuItem value="null"></MenuItem>
+                        {timePeriodOptions}
                       </Select>
+                      {unemployedTimeFrameToRtw === "" && (
+                        <FormHelperText> Input is required</FormHelperText>
+                      )}
                     </FormControl>
                     {unemployedTimeFrameToRtw === "Others" && (
                       <TextField
@@ -727,6 +809,8 @@ function Profile() {
                         margin="normal"
                         variant="outlined"
                         placeholder="MM/YYYY"
+                        value={newUnemployedTimeFrameToRtw}
+                        onChange={handleNewUnemployedTimeFrameToRtw}
                       />
                     )}
                   </Box>
@@ -743,25 +827,22 @@ function Profile() {
                     If Employed
                   </Typography>
                   <Box className="myBox">
-                    <FormControl fullWidth variant="outlined">
+                    <FormControl
+                      fullWidth
+                      variant="outlined"
+                      error={employedReadinessScaleToRtw === ""}
+                    >
                       <InputLabel>Readiness Scale to RTW </InputLabel>
                       <Select
                         label="Readiness Scale to RTW"
                         value={employedReadinessScaleToRtw}
                         onChange={handleEmployedReadinessScaleToRtw}
                       >
-                        <MenuItem value="1">1</MenuItem>
-                        <MenuItem value="2">2</MenuItem>
-                        <MenuItem value="3">3</MenuItem>
-                        <MenuItem value="4">4</MenuItem>
-                        <MenuItem value="5">5</MenuItem>
-                        <MenuItem value="6">6</MenuItem>
-                        <MenuItem value="7">7</MenuItem>
-                        <MenuItem value="8">8</MenuItem>
-                        <MenuItem value="9">9</MenuItem>
-                        <MenuItem value="10">10</MenuItem>
-                        <MenuItem value="null"></MenuItem>
+                        {scaleOptions}
                       </Select>
+                      {employedReadinessScaleToRtw === "" && (
+                        <FormHelperText> Input is required</FormHelperText>
+                      )}
                     </FormControl>
                   </Box>
                   <Typography
@@ -783,26 +864,34 @@ function Profile() {
                     Self Assessment
                   </Typography>
                   <Box className="myBox">
-                    <FormControl fullWidth variant="outlined">
+                    <FormControl
+                      fullWidth
+                      variant="outlined"
+                      error={currentHealthStatus === ""}
+                    >
                       <InputLabel>Current Health</InputLabel>
                       <Select
                         label="Current Health"
                         value={currentHealthStatus}
                         onChange={handleCurrentHealthStatus}
                       >
-                        <MenuItem value="Excellent">Excellent</MenuItem>
-                        <MenuItem value="Very Good">Very Good</MenuItem>
-                        <MenuItem value="Good">Good</MenuItem>
-                        <MenuItem value="Fair">Fair</MenuItem>
-                        <MenuItem value="Poor">Poor</MenuItem>
-                        <MenuItem value="null"></MenuItem>
+                        {healthStatusOptions}
                       </Select>
+                      {currentHealthStatus === "" && (
+                        <FormHelperText error>
+                          Please select an option
+                        </FormHelperText>
+                      )}
                     </FormControl>
                   </Box>
                 </Grid>
                 <Grid item xs={12} md={3}>
                   <Box className="myBox5">
-                    <FormControl fullWidth variant="outlined">
+                    <FormControl
+                      fullWidth
+                      variant="outlined"
+                      error={physicalHealthInterference === ""}
+                    >
                       <InputLabel>
                         Physical health interfered with normal activities?
                       </InputLabel>
@@ -811,13 +900,13 @@ function Profile() {
                         value={physicalHealthInterference}
                         onChange={handlePhysicalHealthInterference}
                       >
-                        <MenuItem value="Not at all">Not at all</MenuItem>
-                        <MenuItem value="Slightly">Slightly</MenuItem>
-                        <MenuItem value="Moderately">Moderately</MenuItem>
-                        <MenuItem value="Quite a bit">Quite a bit</MenuItem>
-                        <MenuItem value="Extremely">Extremely</MenuItem>
-                        <MenuItem value="null"></MenuItem>
+                        {distressOptions}
                       </Select>
+                      {physicalHealthInterference === "" && (
+                        <FormHelperText error>
+                          Please select an option
+                        </FormHelperText>
+                      )}
                     </FormControl>
                     <Typography
                       theme={theme}
@@ -833,7 +922,11 @@ function Profile() {
                 </Grid>
                 <Grid item xs={12} md={3}>
                   <Box className="myBox5">
-                    <FormControl fullWidth variant="outlined">
+                    <FormControl
+                      fullWidth
+                      variant="outlined"
+                      error={mentalHealthInterference === ""}
+                    >
                       <InputLabel>
                         Mental health interfered with normal activities?
                       </InputLabel>
@@ -842,13 +935,13 @@ function Profile() {
                         value={mentalHealthInterference}
                         onChange={handleMentalHealthInterference}
                       >
-                        <MenuItem value="Not at all">Not at all</MenuItem>
-                        <MenuItem value="Slightly">Slightly</MenuItem>
-                        <MenuItem value="Moderately">Moderately</MenuItem>
-                        <MenuItem value="Quite a bit">Quite a bit</MenuItem>
-                        <MenuItem value="Extremely">Extremely</MenuItem>
-                        <MenuItem value="null"></MenuItem>
+                        {distressOptions}
                       </Select>
+                      {mentalHealthInterference === "" && (
+                        <FormHelperText error>
+                          Please select an option
+                        </FormHelperText>
+                      )}
                     </FormControl>
                     <Typography
                       theme={theme}
@@ -872,6 +965,14 @@ function Profile() {
                           fullWidth
                           multiline
                           rows={4}
+                          value={physicalBarriersToRtw}
+                          onChange={handlePhysicalBarriersToRtw}
+                          error={physicalBarriersToRtw === ""}
+                          helperText={
+                            physicalBarriersToRtw === ""
+                              ? "Input is required, if no input put N/A"
+                              : ""
+                          }
                         />
                       </Grid>
                       <Grid item xs={12} md={4}>
@@ -881,6 +982,14 @@ function Profile() {
                           fullWidth
                           multiline
                           rows={4}
+                          value={mentalBarriersToRtw}
+                          onChange={handleMentalBarriersToRtw}
+                          error={mentalBarriersToRtw === ""}
+                          helperText={
+                            mentalBarriersToRtw === ""
+                              ? "Input is required, if no input put N/A"
+                              : ""
+                          }
                         />
                       </Grid>
                       <Grid item xs={12} md={4}>
@@ -890,6 +999,14 @@ function Profile() {
                           fullWidth
                           multiline
                           rows={4}
+                          value={additionalInformation}
+                          onChange={handleAdditionalInformation}
+                          error={additionalInformation === ""}
+                          helperText={
+                            additionalInformation === ""
+                              ? "Input is required, if no input put N/A"
+                              : ""
+                          }
                         />
                       </Grid>
                       <Grid item xs={12}>
