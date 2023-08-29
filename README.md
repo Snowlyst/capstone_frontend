@@ -41,6 +41,25 @@ use this
             sx={theme.customStyles.centered.container}
           > -->
 
+##### to use font bold / color
+
+use this to make color dark for P tag
+
+<!-- <Typography
+                          textAlign="center"
+                          variant="p"
+                          sx={{
+                            color: theme.typography.darkP.color,
+                          }}
+                        > -->
+
+use this to make font bold
+
+ <!-- <Typography sx={{
+                          color: theme.typography.darkP.color,
+                          fontWeight: theme.typography.h6.fontWeightBold,
+                        }} -->
+
 ## Available Scripts
 
 In the project directory, you can run:

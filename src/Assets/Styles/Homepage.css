@@ -6,21 +6,29 @@ html {
   height: 100%;
 }
 
-.hero-image {
-  width: 100vw;
-  height: 100vh;
+.container {
+  width: 100%;
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
-  background-image: url("../Images/heroSvg.svg");
+  justify-content: flex-end;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 2rem;
 }
 
-/* Place text in the middle of the image */
-/* .hero-text {
-  text-align: center;
+.title {
   position: absolute;
-  top: 50%;
-  left: 50%;
+  top: 24%;
+  left: 28%;
   transform: translate(-50%, -50%);
-  color: white;
-} */
+  z-index: 1;
+}
+
+.subtitle {
+  position: absolute;
+  top: 34%;
+  left: 56%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
