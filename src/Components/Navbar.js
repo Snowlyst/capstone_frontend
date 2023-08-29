@@ -179,9 +179,8 @@ function Navbar() {
                         textAlign="center"
                         variant="p"
                         sx={{
-                          color: (theme) => theme.typography.darkP.color,
-                          fontWeight: (theme) =>
-                            theme.typography.h6.fontWeightBold,
+                          color: theme.typography.darkP.color,
+                          fontWeight: theme.typography.h6.fontWeightBold,
                         }}
                       >
                         {page}
@@ -191,7 +190,7 @@ function Navbar() {
                 </Link>
               ))}
               <Box
-                sx={{ width: "120px", marginLeft: "10vw", marginTop: "1vw" }}
+                sx={{ width: "120px", marginLeft: "16vw", marginTop: "1vw" }}
                 className="verve-logo"
               >
                 <Link to="/">
@@ -257,7 +256,7 @@ function Navbar() {
                             textAlign="center"
                             variant="p"
                             sx={{
-                              color: (theme) => theme.typography.darkP.color,
+                              color: theme.typography.darkP.color,
                             }}
                           >
                             {setting}
