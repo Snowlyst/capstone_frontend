@@ -60,9 +60,25 @@ function Homepage() {
         }
         console.log("Access Token : ", accessToken);
         const currentUser = user;
+        let axiosURL = "";
         if (role === "user") {
           // user db
           currentUser.role = "user";
+          // if (
+          //   isAuthenticated &&
+          //   accessToken !== null &&
+          //   typeof user.email !== "undefined"
+          // ) {
+          //   //login
+          //   // const userInfo = await axios.post(
+          //   //   `${BACKEND_URL}/listings/login`,
+          //   //   user
+          //   // );
+          //   // console.log(userInfo.data.checkedUser);
+          //   // if (userInfo != null) {
+          //   //   setCurrUser(userInfo.data.checkedUser);
+          //   // }
+          // }
           console.log("Role: ", role);
         } else if (role === "employer") {
           // employer db
