@@ -62,7 +62,7 @@ function Categories() {
                       variant="h6"
                       sx={{
                         fontWeight: theme.typography.h6.fontWeightBold,
-                        color: "#FF6B2C",
+                        color: "#0E0140",
                       }}
                     >
                       {category.name}
@@ -110,7 +110,7 @@ function Categories() {
                 variant="h6"
                 sx={{
                   fontWeight: theme.typography.h6.fontWeightBold,
-                  color: "#FF6B2C",
+                  color: "#0E0140",
                 }}
               >
                 {selectedCategory?.name}
