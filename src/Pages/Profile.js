@@ -15,8 +15,8 @@ import {
   Tooltip,
   Button,
   FormHelperText,
+  ThemeProvider,
 } from "@mui/material";
-import { ThemeProvider } from "@mui/material/styles";
 import { theme } from "../Assets/Styles/Theme";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import "../Assets/Styles/MemberProfile.css";
@@ -34,7 +34,8 @@ import {
   healthStatusOptions,
   distressOptions,
 } from "./MenuItemsOptions";
-
+import Swal from "sweetalert2";
+import "sweetalert2/dist/sweetalert2.min.css";
 function Profile() {
   // Set States
   // 1st Row of input in the form.
@@ -47,6 +48,7 @@ function Profile() {
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [cancerDiagnosis, setCancerDiagnosis] = useState("");
   const [newCancerDiagnosis, setNewCancerDiagnosis] = useState("");
+
   const [activeTreatment, setActiveTreatment] = useState("");
   const [activeTreatmentError, setActiveTreatmentError] = useState(true);
   const [gender, setGender] = useState("");
@@ -87,8 +89,46 @@ function Profile() {
   // 6th row of input in the form.
   const [physicalBarriersToRtw, setPhysicalBarriersToRtw] = useState("");
   const [mentalBarriersToRtw, setMentalBarriersToRtw] = useState("");
-  const [additionalInformation, setAdditionalInformation]=useState("")
+  const [additionalInformation, setAdditionalInformation] = useState("");
 
+  const [formData, setFormData] = useState({
+    firstName: firstName,
+    lastName: lastName,
+    identificationNumber: identificationNumber,
+    mobileNumber: mobileNumber,
+    dateOfBirth: dateOfBirth,
+    cancerDiagnosis: cancerDiagnosis,
+    newCancerDiagnosis: newCancerDiagnosis,
+    activeTreatment: activeTreatment,
+    gender: gender,
+    postalCode: postalCode,
+    unitNumber: unitNumber,
+    address: address,
+    housingType: housingType,
+    newHousingType: newHousingType,
+    livingArrangement: livingArrangement,
+    newLivingArrangement: newLivingArrangement,
+    currentWorkStatus: currentWorkStatus,
+    newCurrentWorkStatus: newCurrentWorkStatus,
+    occupation: occupation,
+    newOccupation: newOccupation,
+    monthlySalary: monthlySalary,
+    cancerImpactOnFinances: cancerImpactOnFinances,
+    dateOfLastEmployment: dateOfLastEmployment,
+    employedReadinessScaleToRtw: employedReadinessScaleToRtw,
+    unemployedReadinessScaleToRtw: unemployedReadinessScaleToRtw,
+    unemployedTimeFrameToRtw: unemployedTimeFrameToRtw,
+    newUnemployedTimeFrameToRtw: newUnemployedTimeFrameToRtw,
+    currentHealthStatus: currentHealthStatus,
+    physicalHealthInterference: physicalHealthInterference,
+    mentalHealthInterference: mentalHealthInterference,
+    physicalBarriersToRtw: physicalBarriersToRtw,
+    mentalBarriersToRtw: mentalBarriersToRtw,
+    additionalInformation: additionalInformation,
+  });
+  const gatherFormData = () => {
+    return formData;
+  };
   // Functions to handle input
   // 1st Row of input in the form.
   const handleFirstNameChange = (e) => {
@@ -235,15 +275,62 @@ function Profile() {
     setMentalHealthInterference(e.target.value);
   };
   // 6th row of input in the form.
-  const handlePhysicalBarriersToRtw =(e)=>{
-    setPhysicalBarriersToRtw(e.target.value)
-  }
-   const handleMentalBarriersToRtw = (e) => {
-     setPhysicalBarriersToRtw(e.target.value);
-   };
-   const handleAdditionalInformation =(e) =>{
-    setAdditionalInformation(e.target.value)
-   }
+  const handlePhysicalBarriersToRtw = (e) => {
+    setPhysicalBarriersToRtw(e.target.value);
+  };
+  const handleMentalBarriersToRtw = (e) => {
+    setMentalBarriersToRtw(e.target.value);
+  };
+  const handleAdditionalInformation = (e) => {
+    setAdditionalInformation(e.target.value);
+  };
+  const handleSubmit = () => {
+    const updatedFormData = gatherFormData();
+    const requiredFields = [
+      updatedFormData.firstName,
+      updatedFormData.lastName,
+      updatedFormData.identificationNumber,
+      updatedFormData.mobileNumber,
+      updatedFormData.dateOfBirth,
+      updatedFormData.cancerDiagnosis,
+      updatedFormData.activeTreatment,
+      updatedFormData.gender,
+      updatedFormData,
+      postalCode,
+      updatedFormData.unitNumber,
+      updatedFormData.address,
+      updatedFormData.housingType,
+      updatedFormData.livingArrangement,
+      updatedFormData.currentWorkStatus,
+    ];
+    const areAllFieldsFilled = requiredFields.every((field) => field !== "");
+
+    if (!areAllFieldsFilled) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Please fill in all required fields before submitting.",
+      });
+      return;
+    }
+    console.log("Updated Form Data:", updatedFormData);
+  };
+
+  useEffect(() => {
+    // Fetch user data from the API
+    axios
+      .get("http://localhost:8080/users/personalinfo/3")
+      .then((response) => {
+        const fetchedData = response.data;
+        setFormData(fetchedData);
+        console.log(fetchedData);
+        setFirstName(fetchedData.firstName);
+        setLastName(fetchedData.lastName);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, []);
 
   return (
     <ThemeProvider theme={theme}>
@@ -253,15 +340,16 @@ function Profile() {
             {/* Header */}
             <Box textAlign="center" mt={2}>
               <Typography
-                theme={theme}
+                variant="h2"
                 sx={{
-                  ...theme.typography.h2,
-                  fontWeightBold: theme.typography.h2.fontWeightBold,
+                  fontWeight: theme.typography.h4.fontWeightBold,
                 }}
               >
                 Profile
               </Typography>
-              <Typography theme={theme} sx={theme.typography.p}>
+              <Typography 
+              variant="p"
+              sx={{fontWeight: theme.typography.p}}>
                 Please fill up your particulars. All fields must be filled in
                 before you can join the programs.
               </Typography>
@@ -270,7 +358,7 @@ function Profile() {
           <Grid item xs={12} md={8}>
             {/* Personal Information */}
             <Box mt={4} ml={2}>
-              <Typography theme={theme} sx={theme.typography.h6}>
+              <Typography variant="h5" sx={theme.typography.h5.fontWeightBold}>
                 Personal Information
               </Typography>
               <Grid container spacing={2}>
@@ -591,7 +679,7 @@ function Profile() {
           <Grid item xs={12} md={8}>
             {/* Work Information */}
             <Box mt={4} ml={2}>
-              <Typography theme={theme} sx={theme.typography.h6}>
+              <Typography variant="h5" sx={theme.typography.h5.fontWeightBold}>
                 Work Information
               </Typography>
               <Grid container spacing={2}>
@@ -736,7 +824,10 @@ function Profile() {
             <Box mt={4} ml={2}>
               <Grid container spacing={2}>
                 <Grid item xs={12} md={3}>
-                  <Typography theme={theme} sx={theme.typography.h6}>
+                  <Typography
+                    variant="h5"
+                    sx={theme.typography.h5.fontWeightBold}
+                  >
                     If Unemployed
                   </Typography>
                   <TextField
@@ -823,7 +914,10 @@ function Profile() {
                 </Grid>
                 <Grid item xs={12} md={3}>
                   {/* If Employed */}
-                  <Typography theme={theme} sx={theme.typography.h6}>
+                  <Typography
+                    variant="h5"
+                    sx={theme.typography.h5.fontWeightBold}
+                  >
                     If Employed
                   </Typography>
                   <Box className="myBox">
@@ -860,7 +954,10 @@ function Profile() {
             <Box mt={4} ml={2}>
               <Grid container spacing={2}>
                 <Grid item xs={12} md={3}>
-                  <Typography theme={theme} sx={theme.typography.h6}>
+                  <Typography
+                    variant="h5"
+                    sx={theme.typography.h5.fontWeightBold}
+                  >
                     Self Assessment
                   </Typography>
                   <Box className="myBox">
@@ -1011,7 +1108,11 @@ function Profile() {
                       </Grid>
                       <Grid item xs={12}>
                         <Box display="flex" justifyContent="center" py={5}>
-                          <Button className="orange" variant="contained">
+                          <Button
+                            className="orange"
+                            variant="contained"
+                            onClick={handleSubmit}
+                          >
                             Submit
                           </Button>
                         </Box>
