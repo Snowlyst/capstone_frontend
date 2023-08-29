@@ -17,9 +17,9 @@ import {
   FormHelperText,
   ThemeProvider,
 } from "@mui/material";
-import { theme } from "../Assets/Styles/Theme";
+import { theme } from "../../Assets/Styles/Theme";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
-import "../Assets/Styles/MemberProfile.css";
+import "../../Assets/Styles/MemberProfile.css";
 import axios from "axios";
 import {
   cancerDiagnosisOptions,
