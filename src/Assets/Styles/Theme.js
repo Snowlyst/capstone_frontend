@@ -3,14 +3,7 @@ import "./App.css";
 
 const subtitleFont = "'Kaushan Script', cursive";
 const pFont = "'Roboto', sans-serif";
-
-// to use these themes
-// At top of the file use: import {mainSubtitle} from "location of this file Theme.js"
-// also ensure muiTheme is imported: import { ThemeProvider } from "@mui/material"
-// Wrap the html u wanna use the theme in with this <ThemeProvider theme={functionname}>
-
-// call this for paragraph text using <Typography theme={theme}>.
-// to use different font weight, use e.g. <Typography theme={theme} sx={{fontWeight: theme.typography.fontWeightBold}}> for paragraph text
+const siteFont = "'Aclonica', sans-serif";
 
 export const theme = createTheme({
   typography: {
@@ -22,6 +15,10 @@ export const theme = createTheme({
     },
     h1Cursive: {
       fontFamily: subtitleFont,
+      color: "#0E0140",
+    },
+    h1Title: {
+      fontFamily: siteFont,
       color: "#0E0140",
     },
     h2: {
@@ -40,11 +37,19 @@ export const theme = createTheme({
       fontWeight: 400,
       fontWeightBold: 700,
     },
+    h3Cursive: {
+      fontFamily: subtitleFont,
+      color: "#0E0140",
+    },
     h4: {
       fontFamily: pFont,
       color: "#0E0140",
       fontWeight: 400,
       fontWeightBold: 700,
+    },
+    h4Cursive: {
+      fontFamily: subtitleFont,
+      color: "#0E0140",
     },
     h5: {
       fontFamily: pFont,
@@ -79,6 +84,10 @@ export const theme = createTheme({
         justifyContent: "center",
         alignItems: "center",
       },
+    },
+    categoryBox: {
+      display: "block",
+      margin: "0 auto",
     },
   },
   components: {
