@@ -126,3 +126,24 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+
+
+##### to use font bold / color
+
+use this to make color dark for P tag
+
+<!-- <Typography
+                          textAlign="center"
+                          variant="p"
+                          sx={{
+                            color: theme.typography.darkP.color,
+                          }}
+                        > -->
+
+use this to make font bold
+
+ <!-- <Typography sx={{
+                          color: theme.typography.darkP.color,
+                          fontWeight: theme.typography.h6.fontWeightBold,
+                        }} -->

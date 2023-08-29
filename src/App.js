@@ -6,7 +6,7 @@ import Categories from "./Pages/Categories";
 import CategoriesListing from "./Pages/CategoriesListing";
 import Dashboard from "./Pages/Dashboard";
 import IndividualListing from "./Pages/IndividualListing";
-import Profile from "./Pages/Profile";
+import Profile from "./Pages/User/Profile";
 import Search from "./Pages/Search";
 import UpdateProfile from "./Pages/UpdateProfile";
 import Error from "./Pages/Error";
