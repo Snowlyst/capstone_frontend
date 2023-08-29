@@ -15,6 +15,7 @@ import OnemapApiTest from "./TestPages(TO_BE_DELETED)/OnemapApiTest";
 import PDFReadingTest from "./TestPages(TO_BE_DELETED)/PDFReaderTest";
 import GoogleCalendar from "./TestPages(TO_BE_DELETED)/GoogleCalendarPlanner";
 import FirebaseUpload from "./TestPages(TO_BE_DELETED)/FirebaseUpload";
+import ResumeList from "./Pages/User/ResumeList";
 
 function App() {
   return (
@@ -30,10 +31,13 @@ function App() {
         <Route path="/search" element={<Search />} />
         <Route path="/updateprofile" element={<UpdateProfile />} />
         <Route path="/jobpost" element={<JobPost />} />
+        <Route path="userresumelist" element={<ResumeList />} />
+        {/* These 4 Pages are Test pages, to be deleted near the end */}
         <Route path="/onemap" element={<OnemapApiTest />} />
         <Route path="/pdf" element={<PDFReadingTest />} />
         <Route path="/googlecalendar" element={<GoogleCalendar />} />
         <Route path="/firebaseupload" element={<FirebaseUpload />} />
+        {/* Error Page */}
         <Route path="*" element={<Error />} />
       </Routes>
     </Box>
