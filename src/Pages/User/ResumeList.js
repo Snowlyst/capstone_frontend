@@ -26,6 +26,7 @@ import axios from "axios";
 const STORAGE_KEY = "resumes/";
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
+// temporarily hardcoded lines, line 80 and line 138
 function ResumeList() {
   const [fileAdded, setFileAdded] = useState(null);
   const [displayedResume, setDisplayedResume] = useState([]);
