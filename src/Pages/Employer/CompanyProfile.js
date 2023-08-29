@@ -7,6 +7,7 @@ import {
   Typography,
   Avatar,
   Link,
+  Divider,
 } from "@mui/material";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -16,6 +17,7 @@ import { useParams } from "react-router-dom";
 function CompanyProfile() {
   const [companyId, setCompanyId] = useState(null);
   const [companyData, setCompanyData] = useState("");
+  const [companyJobs, setCompanyJobs] = useState("");
 
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
   const param = useParams();
@@ -30,6 +32,77 @@ function CompanyProfile() {
         .then((info) => {
           console.log(info);
           setCompanyData(info.data[0]);
+          return info.data[0].companyLogo;
+        })
+        .then((logo) => {
+          axios
+            .get(`${BACKEND_URL}/listings/${companyId}`)
+            .then((info) => {
+              console.log(info);
+              setCompanyJobs(
+                info.data.map((info, index) => {
+                  return (
+                    <Box key={index}>
+                      <Grid
+                        container
+                        sx={{
+                          height: "8vh",
+                          width: "10vw",
+                          borderRadius: "20px",
+                          mt: 1.5,
+                          mb: 1.5,
+                        }}
+                      >
+                        <Grid item xs={4}>
+                          <img
+                            alt="Company Logo"
+                            src={
+                              logo ||
+                              "https://firebasestorage.googleapis.com/v0/b/verve-55239.appspot.com/o/images%2Fcat3.png?alt=media&token=2d5c041a-f964-4419-9ba7-5e2566cbf94b"
+                            }
+                            style={{
+                              width: "3.5vw",
+                              height: "3.5vh",
+                              objectFit: "fill",
+                              borderRadius: "40px",
+                              marginTop: "2.2vh",
+                            }}
+                          />
+                        </Grid>
+                        <Grid item xs={8}>
+                          <Box
+                            sx={{ width: "15vw", height: "7vh" }}
+                            overflow="auto"
+                          >
+                            <Typography
+                              sx={{ fontSize: 13, width: "13vw", pl: 3 }}
+                            >
+                              {info.title}
+                            </Typography>
+                          </Box>
+                          <Box>
+                            <Typography
+                              variant="p"
+                              sx={{
+                                fontSize: 12,
+                                ml: 3,
+                                fontWeight: theme.typography.p.fontWeight,
+                              }}
+                            >
+                              {info.employmentType}
+                            </Typography>
+                          </Box>
+                        </Grid>
+                      </Grid>
+                      <Divider />
+                    </Box>
+                  );
+                })
+              );
+            })
+            .catch((error) => {
+              console.log(error);
+            });
         })
         .catch((error) => {
           console.log(error);
@@ -37,6 +110,7 @@ function CompanyProfile() {
     }
   }, []);
 
+  //for consolelogging only, to remove
   useEffect(() => {
     if (companyData) {
       console.log(companyData);
@@ -67,7 +141,21 @@ function CompanyProfile() {
                 ml: "15vw",
               }}
             >
-              <Grid item>ABC</Grid>
+              <Grid item>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    fontWeight: theme.typography.h6.fontWeightBold,
+                    pl: 4,
+                    pt: 1,
+                  }}
+                >
+                  Company Job Listings
+                </Typography>
+                <Stack direction="column" sx={{ pl: 1.5 }}>
+                  {companyJobs ? companyJobs : null}
+                </Stack>
+              </Grid>
             </Grid>
             <Grid
               container
@@ -83,7 +171,10 @@ function CompanyProfile() {
             >
               <Grid item xs={3}>
                 <img
-                  src="https://firebasestorage.googleapis.com/v0/b/verve-55239.appspot.com/o/images%2Fbackground.jpg?alt=media&token=a99c1f17-e9e0-486f-a817-884bff526d54"
+                  src={
+                    companyData.bannerUrl ||
+                    "https://firebasestorage.googleapis.com/v0/b/verve-55239.appspot.com/o/images%2Fbackground.jpg?alt=media&token=a99c1f17-e9e0-486f-a817-884bff526d54"
+                  }
                   alt="Alt"
                   style={{
                     height: "22.4vh",
@@ -104,10 +195,20 @@ function CompanyProfile() {
                   }}
                 >
                   <Grid item xs={3}>
-                    <Avatar
+                    <img
                       alt="Company Logo"
-                      src="https://firebasestorage.googleapis.com/v0/b/verve-55239.appspot.com/o/images%2Fcat3.png?alt=media&token=2d5c041a-f964-4419-9ba7-5e2566cbf94b"
-                      sx={{ width: 100, height: 100, ml: 2, mt: 2 }}
+                      src={
+                        companyData.companyLogo ||
+                        "https://firebasestorage.googleapis.com/v0/b/verve-55239.appspot.com/o/images%2Fcat3.png?alt=media&token=2d5c041a-f964-4419-9ba7-5e2566cbf94b"
+                      }
+                      style={{
+                        width: "8.1vw",
+                        height: "8.1vh",
+                        marginLeft: "1.2vw",
+                        marginTop: "2.7vh",
+                        objectFit: "fill",
+                        borderRadius: "40px",
+                      }}
                     />
                   </Grid>
                   <Grid item xs={5.5} overflow="auto">
@@ -116,59 +217,65 @@ function CompanyProfile() {
                       sx={{
                         fontWeight: theme.typography.h5.fontWeightBold,
                         mt: 1,
+                        ml: 5,
+                        mb: 2.5,
                       }}
                     >
-                      Cat Company
+                      {companyData.companyName || "Cat Company"}
                     </Typography>
+
+                    <Typography
+                      variant="darkP"
+                      sx={{
+                        fontSize: 12,
+                        ml: 5,
+                      }}
+                    >
+                      Established on:
+                    </Typography>
+                    <br />
+                    <Typography
+                      variant="p"
+                      sx={{
+                        fontSize: 12,
+                        ml: 5,
+                      }}
+                    >
+                      {companyData.establishmentDate || "99, 99th Month, 9999"}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={3.5}>
                     <Box
                       component="div"
-                      sx={{ overflow: "auto", height: "95px" }}
+                      sx={{ overflow: "auto", height: "14vh", ml: 1, mr: 0.23 }}
                     >
-                      <Typography
-                        variant="darkP"
-                        sx={{
-                          fontSize: 12,
-                        }}
-                      >
-                        Lorem ipsum dolor sit amt, consectetur adipiscing elit,
-                        sed do eiusmod tempor incididunt ut labore et dolore
-                        magna aliqua. Sed cras ornare arcu dui vivamus arcu
-                        felis bibendum ut. Natoque penatibus et magnis dis
-                        parturient. Magna etiam tempor orci eu lobortis.
-                        Consequat mauris nunc congue nisi vitae. Sed viverra
-                        tellus in hac. Egestas pretium aenean pharetra magna ac
-                        placerat vestibulum lectus mauris. Cras semper auctor
-                        neque vitae tempus quam. Proin sed libero enim sed
-                        faucibus turpis. Turpis massa tincidunt dui ut ornare
-                        lectus sit. Egestas integer eget aliquet nibh praesent
-                        tristique. Lacinia at quis risus sed vulputate odio.
-                        Viverra aliquet eget sit amet tellus cras. Lacus luctus
-                        accumsan tortor posuere ac. Sagittis aliquam malesuada
-                        bibendum arcu. Sed tempus urna et pharetra. Malesuada
-                        pellentesque elit eget gravida cum sociis natoque.
-                        Commodo viverra maecenas accumsan lacus vel facilisis
-                        volutpat. Ultricies lacus sed turpis tincidunt id
-                        aliquet risus feugiat. In est ante in nibh mauris cursus
-                        mattis. Cras pulvinar mattis nunc sed blandit libero
-                        volutpat sed. Vivamus at augue eget arcu dictum varius
-                        duis at. Faucibus in ornare quam viverra orci. Aliquam
-                        sem fringilla ut morbi tincidunt augue interdum velit.
-                        Dolor morbi non arcu risus quis varius quam. Ullamcorper
-                        malesuada proin libero nunc consequat interdum varius.
-                        Libero volutpat sed cras ornare. Fames ac turpis egestas
-                        sed tempus urna. Vitae auctor eu augue ut lectus arcu
-                        bibendum at. Pretium vulputate sapien nec sagittis
-                        aliquam malesuada bibendum.
+                      <Typography variant="darkP" sx={{ fontSize: 13 }}>
+                        Address: <br />
+                        {companyData.address}
                       </Typography>
                     </Box>
                   </Grid>
-                  <Grid item xs={3.5}>
-                    AAA
-                  </Grid>
                 </Grid>
               </Grid>
-              <Grid item xs={6.697}>
-                <Typography>WHERE ARE MY WORDS MAN</Typography>
+              <Divider sx={{ mb: 1 }} />
+              <Grid item sx={{ mt: 1, ml: 3, mr: 3 }}>
+                <Typography
+                  variant="darkP"
+                  sx={{
+                    fontSize: theme.typography.h5.fontSize,
+                    fontWeight: theme.typography.h5.fontWeightBold,
+                  }}
+                >
+                  About Company:
+                  <br />
+                  <Typography
+                    variant="p"
+                    sx={{ fontSize: theme.typography.h6.fontSize }}
+                  >
+                    {companyData.description ||
+                      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."}
+                  </Typography>
+                </Typography>
               </Grid>
             </Grid>
           </Stack>
