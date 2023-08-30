@@ -1,0 +1,40 @@
+.myBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 16px;
+}
+.myBox2 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 16px;
+  margin-left: 16px;
+}
+
+.myBox3 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 32px;
+  margin-right: 72px;
+}
+.myBox4 {
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  margin-right: 16px;
+}
+.myBox5 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 48px;
+}
+.myBox6 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 32px;
+}
+
