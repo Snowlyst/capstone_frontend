@@ -96,6 +96,22 @@ function Homepage() {
   }, [user, isAuthenticated]);
 
   useEffect(() => {
+    if (accessToken !== null) {
+      localStorage.setItem("verveToken", JSON.stringify(accessToken));
+    }
+  }, [accessToken]);
+
+  useEffect(() => {
+    if (currUser !== null || currUser !== "") {
+      localStorage.setItem("verveCurrUser", JSON.stringify(currUser));
+    }
+  }, [currUser]);
+
+  useEffect(() => {
+    console.log(setCurrUser);
+  }, [setCurrUser]);
+
+  useEffect(() => {
     const handleWindowResize = () => {
       setWindowWidth(window.innerWidth);
       setWindowHeight(window.innerHeight);
