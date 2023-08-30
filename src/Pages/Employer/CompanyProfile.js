@@ -57,7 +57,7 @@ function CompanyProfile() {
                             alt="Company Logo"
                             src={
                               logo ||
-                              "https://firebasestorage.googleapis.com/v0/b/verve-55239.appspot.com/o/images%2Fcat3.png?alt=media&token=2d5c041a-f964-4419-9ba7-5e2566cbf94b"
+                              "https://firebasestorage.googleapis.com/v0/b/verve-55239.appspot.com/o/images%2FImage_not_available.png?alt=media&token=0a5a0495-5de3-4fea-93a2-3b4b95b22f64"
                             }
                             style={{
                               width: "3.5vw",
@@ -195,7 +195,7 @@ function CompanyProfile() {
                 <img
                   src={
                     companyData.bannerUrl ||
-                    "https://firebasestorage.googleapis.com/v0/b/verve-55239.appspot.com/o/images%2Fbackground.jpg?alt=media&token=a99c1f17-e9e0-486f-a817-884bff526d54"
+                    "https://firebasestorage.googleapis.com/v0/b/verve-55239.appspot.com/o/images%2FImage_not_available.png?alt=media&token=0a5a0495-5de3-4fea-93a2-3b4b95b22f64"
                   }
                   alt="Alt"
                   style={{
@@ -221,7 +221,7 @@ function CompanyProfile() {
                       alt="Company Logo"
                       src={
                         companyData.companyLogo ||
-                        "https://firebasestorage.googleapis.com/v0/b/verve-55239.appspot.com/o/images%2Fcat3.png?alt=media&token=2d5c041a-f964-4419-9ba7-5e2566cbf94b"
+                        "https://firebasestorage.googleapis.com/v0/b/verve-55239.appspot.com/o/images%2FImage_not_available.png?alt=media&token=0a5a0495-5de3-4fea-93a2-3b4b95b22f64"
                       }
                       style={{
                         width: "8.1vw",
