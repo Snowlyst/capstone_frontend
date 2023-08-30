@@ -41,7 +41,11 @@ function PDFReadingTest() {
 
   return (
     <div>
-      <input type="file" accept=".pdf" onChange={handleFileUpload} />
+      <input
+        type="file"
+        accept=".pdf, image/jpeg, image/png"
+        onChange={handleFileUpload}
+      />
       <div>
         <h2>Extracted Text</h2>
         <p>{extractedText ? extractedText : <div>Nothing here Yet!</div>}</p>

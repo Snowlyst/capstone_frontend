@@ -12,22 +12,46 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { theme } from "../../Assets/Styles/Theme";
 import { useParams } from "react-router-dom";
+//for auth
+import { useUserContext } from "../../Components/UserContext";
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
 function CompanyProfile() {
   const [companyId, setCompanyId] = useState(null);
   const [companyData, setCompanyData] = useState("");
   const [companyJobs, setCompanyJobs] = useState("");
+  const { currUser, setCurrUser } = useUserContext();
+  const [accessToken, setAccessToken] = useState("");
 
-  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
   const param = useParams();
   if (companyId !== param.companyId) {
     setCompanyId(param.companyId);
   }
 
   useEffect(() => {
-    if (companyId) {
+    console.log(currUser);
+    if (currUser === null) {
+      const localAccess = JSON.parse(localStorage.getItem("verveCurrUser"));
+      console.log(localAccess);
+      setCurrUser(localAccess);
+    }
+  }, [currUser]);
+
+  useEffect(() => {
+    if (!accessToken) {
+      const localAccess = JSON.parse(localStorage.getItem("verveToken"));
+      setAccessToken(localAccess);
+    }
+  }, [accessToken]);
+
+  useEffect(() => {
+    if (companyId && accessToken) {
       axios
-        .get(`${BACKEND_URL}/company/${companyId}`)
+        .get(`${BACKEND_URL}/company/${companyId}`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        })
         .then((info) => {
           console.log(info);
           setCompanyData(info.data[0]);
@@ -35,7 +59,11 @@ function CompanyProfile() {
         })
         .then((logo) => {
           axios
-            .get(`${BACKEND_URL}/listings/${companyId}`)
+            .get(`${BACKEND_URL}/listings/${companyId}`, {
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+              },
+            })
             .then((info) => {
               console.log(info);
               setCompanyJobs(
@@ -130,7 +158,7 @@ function CompanyProfile() {
           console.log(error);
         });
     }
-  }, []);
+  }, [accessToken]);
 
   //for consolelogging only, to remove
   useEffect(() => {
