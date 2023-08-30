@@ -28,7 +28,10 @@ html {
 .subtitle {
   position: absolute;
   top: 34%;
-  left: 56%;
   transform: translate(-50%, -50%);
   z-index: 1;
+}
+
+.categoryBoxStyles:hover {
+  box-shadow: 0 0 20px rgba(72, 171, 224, 0.8);
 }

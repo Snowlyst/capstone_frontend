@@ -9,11 +9,11 @@ import {
   Input,
   Stack,
   Button,
-  IconButton,
-  ButtonBase,
 } from "@mui/material";
+import { Link, NavLink } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
+import axios from "axios";
 import { theme } from "../Assets/Styles/Theme";
 import { useUserContext } from "../Components/UserContext";
 import PlaceIcon from "@mui/icons-material/Place";
@@ -42,9 +42,12 @@ function Homepage() {
   const imgHeight = windowHeight >= 900 ? "80%" : "65%";
   const vh = windowHeight >= 950 ? "80vh" : "70vh";
   const { setCurrUser, currUser } = useUserContext();
+  const roles = { user: 1, admin: 2, employer: 3 };
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
   useEffect(() => {
     if (isAuthenticated) {
+      const role = JSON.parse(localStorage.getItem("role"));
       const checkLogin = async () => {
         const accessToken = await getAccessTokenSilently({
           authorizationParams: {
@@ -53,59 +56,44 @@ function Homepage() {
           },
         });
         setAccessToken(accessToken);
-        const role = JSON.parse(localStorage.getItem("role"));
-        // }
-        if (isAuthenticated) {
-          console.log("User: ", user);
-        }
-        console.log("Access Token : ", accessToken);
         const currentUser = user;
-        let axiosURL = "";
-        if (role === "user") {
-          // user db
-          currentUser.role = "user";
-          // if (
-          //   isAuthenticated &&
-          //   accessToken !== null &&
-          //   typeof user.email !== "undefined"
-          // ) {
-          //   //login
-          //   // const userInfo = await axios.post(
-          //   //   `${BACKEND_URL}/listings/login`,
-          //   //   user
-          //   // );
-          //   // console.log(userInfo.data.checkedUser);
-          //   // if (userInfo != null) {
-          //   //   setCurrUser(userInfo.data.checkedUser);
-          //   // }
-          // }
-          console.log("Role: ", role);
-        } else if (role === "employer") {
-          // employer db
-          currentUser.role = "employer";
-          console.log("Role: ", role);
+
+        console.log(role);
+        if (role !== null) {
+          if (role === "user") {
+            currentUser.role = roles.user;
+            console.log(currentUser);
+          } else if (role === "employer") {
+            currentUser.role = roles.employer;
+            console.log("Role: ", role);
+          }
         }
-        // if (
-        //   isAuthenticated &&
-        //   accessToken !== null &&
-        //   typeof user.email !== "undefined"
-        // ) {
-        //   //login
-        //   // const userInfo = await axios.post(
-        //   //   `${BACKEND_URL}/listings/login`,
-        //   //   user
-        //   // );
-        //   // console.log(userInfo.data.checkedUser);
-        //   // if (userInfo != null) {
-        //   //   setCurrUser(userInfo.data.checkedUser);
-        //   // }
-        // }
+
+        console.log(currentUser);
+        if (accessToken !== null && typeof currentUser.email !== "undefined") {
+          try {
+            const userInfo = await axios.post(
+              `${BACKEND_URL}/users/login`,
+              currentUser,
+              {
+                headers: {
+                  Authorization: `Bearer ${accessToken}`,
+                },
+              }
+            );
+            console.log(userInfo.data.checkedUser);
+            if (userInfo != null) {
+              setCurrUser(userInfo.data.checkedUser);
+              console.log(currUser);
+            }
+          } catch (err) {
+            console.log(err);
+          }
+        }
       };
       checkLogin();
-      console.log(user);
-      console.log(accessToken);
     }
-  }, [user, isAuthenticated, getAccessTokenSilently, accessToken]);
+  }, [user, isAuthenticated]);
 
   useEffect(() => {
     const handleWindowResize = () => {
@@ -164,7 +152,11 @@ function Homepage() {
                     className="subtitle"
                     sx={{
                       fontFamily: theme.typography.h3Cursive.fontFamily,
-                      fontSize: windowHeight >= 600 ? "4rem" : "2.5rem",
+                      fontSize:
+                        windowHeight >= 600 && windowWidth >= 980
+                          ? "4rem"
+                          : "2.5rem",
+                      left: windowWidth >= 1400 ? "56%" : "45%",
                     }}
                   >
                     Where Journeys Thrive
@@ -189,6 +181,7 @@ function Homepage() {
               )}
 
               <Box
+                id="line174"
                 style={{
                   width: windowHeight >= 600 ? "50%" : "70%",
                   marginLeft:
@@ -263,7 +256,9 @@ function Homepage() {
             <Box style={{ display: "flex", flex: 1, flexDirection: "column" }}>
               <Grid
                 container
-                spacing={2}
+                rowspacing={1}
+                pt="8px"
+                pb="8px"
                 sx={{
                   backgroundColor: "#0E0140",
                   flex: 1,
@@ -272,58 +267,91 @@ function Homepage() {
                 color="#FFFFFF"
               >
                 <Grid item xs={6} md={2}>
-                  <Box
-                    component="img"
-                    height={windowHeight >= 900 ? "80px" : "60px"}
-                    src={FnB}
-                    alt="F&B"
-                    sx={theme.customStyles.categoryBox}
-                  />
+                  <Link to="/categories/:categoryId">
+                    <Box
+                      component="img"
+                      className="categoryBoxStyles"
+                      height={windowHeight >= 900 ? "80px" : "60px"}
+                      src={FnB}
+                      alt="F&B"
+                      sx={theme.customStyles.categoryBox}
+                    />
+                  </Link>
                 </Grid>
                 <Grid item xs={6} md={2}>
-                  <Box
-                    component="img"
-                    height={windowHeight >= 900 ? "80px" : "60px"}
-                    src={Admin}
-                    alt="Administrative"
-                    sx={theme.customStyles.categoryBox}
-                  />
+                  <Link
+                    to="/categories/:categoryId"
+                    style={{ textDecoration: "none" }}
+                  >
+                    <Box
+                      component="img"
+                      className="categoryBoxStyles"
+                      height={windowHeight >= 900 ? "80px" : "60px"}
+                      src={Admin}
+                      alt="Administrative"
+                      sx={theme.customStyles.categoryBox}
+                    />
+                  </Link>
                 </Grid>
                 <Grid item xs={6} md={2}>
-                  <Box
-                    component="img"
-                    height={windowHeight >= 900 ? "80px" : "60px"}
-                    src={Designer}
-                    alt="Designer"
-                    sx={theme.customStyles.categoryBox}
-                  />
+                  <Link
+                    to="/categories/:categoryId"
+                    style={{ textDecoration: "none" }}
+                  >
+                    <Box
+                      component="img"
+                      className="categoryBoxStyles"
+                      height={windowHeight >= 900 ? "80px" : "60px"}
+                      src={Designer}
+                      alt="Designer"
+                      sx={theme.customStyles.categoryBox}
+                    />
+                  </Link>
                 </Grid>
                 <Grid item xs={6} md={2}>
-                  <Box
-                    component="img"
-                    height={windowHeight >= 900 ? "80px" : "60px"}
-                    src={Technology}
-                    alt="Technology"
-                    sx={theme.customStyles.categoryBox}
-                  />
+                  <Link
+                    to="/categories/:categoryId"
+                    style={{ textDecoration: "none" }}
+                  >
+                    <Box
+                      component="img"
+                      className="categoryBoxStyles"
+                      height={windowHeight >= 900 ? "80px" : "60px"}
+                      src={Technology}
+                      alt="Technology"
+                      sx={theme.customStyles.categoryBox}
+                    />
+                  </Link>
                 </Grid>
                 <Grid item xs={6} md={2}>
-                  <Box
-                    component="img"
-                    height={windowHeight >= 900 ? "80px" : "60px"}
-                    src={Engineering}
-                    alt="Engineering"
-                    sx={theme.customStyles.categoryBox}
-                  />
+                  <Link
+                    to="/categories/:categoryId"
+                    style={{ textDecoration: "none" }}
+                  >
+                    <Box
+                      component="img"
+                      className="categoryBoxStyles"
+                      height={windowHeight >= 900 ? "80px" : "60px"}
+                      src={Engineering}
+                      alt="Engineering"
+                      sx={theme.customStyles.categoryBox}
+                    />
+                  </Link>
                 </Grid>
                 <Grid item xs={6} md={2}>
-                  <Box
-                    component="img"
-                    height={windowHeight >= 900 ? "80px" : "60px"}
-                    src={Education}
-                    alt="Education"
-                    sx={theme.customStyles.categoryBox}
-                  />
+                  <Link
+                    to="/categories/:categoryId"
+                    style={{ textDecoration: "none" }}
+                  >
+                    <Box
+                      component="img"
+                      className="categoryBoxStyles"
+                      height={windowHeight >= 900 ? "80px" : "60px"}
+                      src={Education}
+                      alt="Education"
+                      sx={theme.customStyles.categoryBox}
+                    />
+                  </Link>
                 </Grid>
               </Grid>
             </Box>
