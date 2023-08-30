@@ -5,7 +5,6 @@ import {
   Grid,
   Stack,
   Typography,
-  Avatar,
   Link,
   Divider,
 } from "@mui/material";
@@ -46,8 +45,8 @@ function CompanyProfile() {
                       <Grid
                         container
                         sx={{
-                          height: "8vh",
                           width: "10vw",
+                          height: "10vh",
                           borderRadius: "20px",
                           mt: 1.5,
                           mb: 1.5,
@@ -70,27 +69,50 @@ function CompanyProfile() {
                           />
                         </Grid>
                         <Grid item xs={8}>
-                          <Box
-                            sx={{ width: "15vw", height: "7vh" }}
-                            overflow="auto"
-                          >
-                            <Typography
-                              sx={{ fontSize: 13, width: "13vw", pl: 3 }}
-                            >
-                              {info.title}
-                            </Typography>
-                          </Box>
                           <Box>
-                            <Typography
-                              variant="p"
-                              sx={{
-                                fontSize: 12,
-                                ml: 3,
-                                fontWeight: theme.typography.p.fontWeight,
-                              }}
+                            {/* Link to be Updated with the Job Page Later */}
+                            <Link
+                              href={"#"}
+                              underline="none"
+                              sx={{ color: theme.typography.darkP.color }}
+                              target="_blank"
+                              rel="noreferrer"
                             >
-                              {info.employmentType}
-                            </Typography>
+                              <Box
+                                component="div"
+                                sx={{
+                                  width: "14vw",
+                                  height: "7vh",
+                                  ml: 2,
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                  WebkitLineClamp: "3",
+                                  WebkitBoxOrient: "vertical",
+                                  display: "-webkit-box",
+                                }}
+                              >
+                                {info.title}
+                              </Box>
+                            </Link>
+
+                            <Box>
+                              <Typography
+                                variant="p"
+                                sx={{
+                                  width: "14vw",
+                                  fontSize: 12,
+                                  pl: 2,
+                                  fontWeight: theme.typography.p.fontWeight,
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                  WebkitLineClamp: "1",
+                                  WebkitBoxOrient: "vertical",
+                                  display: "-webkit-box",
+                                }}
+                              >
+                                {info.employmentType}
+                              </Typography>
+                            </Box>
                           </Box>
                         </Grid>
                       </Grid>
@@ -204,54 +226,67 @@ function CompanyProfile() {
                       style={{
                         width: "8.1vw",
                         height: "8.1vh",
-                        marginLeft: "1.2vw",
+                        marginLeft: "2.3vw",
                         marginTop: "2.7vh",
                         objectFit: "fill",
                         borderRadius: "40px",
                       }}
                     />
                   </Grid>
-                  <Grid item xs={5.5} overflow="auto">
+                  <Grid item xs={9}>
                     <Typography
                       variant="h5"
                       sx={{
                         fontWeight: theme.typography.h5.fontWeightBold,
                         mt: 1,
-                        ml: 5,
-                        mb: 2.5,
+                        mb: 1,
+                        wordWrap: "break-word",
+                        overflow: "hidden",
+                        WebkitLineClamp: "2",
+                        WebkitBoxOrient: "vertical",
+                        display: "-webkit-box",
                       }}
                     >
-                      {companyData.companyName || "Cat Company"}
+                      {companyData.companyName || "Here is Company Name"}
                     </Typography>
 
                     <Typography
                       variant="darkP"
                       sx={{
-                        fontSize: 12,
-                        ml: 5,
+                        fontSize: 13,
                       }}
                     >
                       Established on:
+                      <Typography
+                        variant="p"
+                        sx={{
+                          fontSize: 13,
+                          overflow: "hidden",
+                          whiteSpace: "nowrap",
+                          textOverflow: "ellipsis",
+                        }}
+                      >
+                        {companyData.establishmentDate ||
+                          "99, 99th Month, 9999"}
+                      </Typography>
                     </Typography>
-                    <br />
-                    <Typography
-                      variant="p"
-                      sx={{
-                        fontSize: 12,
-                        ml: 5,
-                      }}
-                    >
-                      {companyData.establishmentDate || "99, 99th Month, 9999"}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={3.5}>
+
                     <Box
                       component="div"
-                      sx={{ overflow: "auto", height: "14vh", ml: 1, mr: 0.23 }}
+                      sx={{
+                        overflow: "hidden",
+                        whiteSpace: "nowrap",
+                        textOverflow: "ellipsis",
+                        mr: 0.23,
+                        mt: 0.3,
+                      }}
                     >
-                      <Typography variant="darkP" sx={{ fontSize: 13 }}>
-                        Address: <br />
-                        {companyData.address}
+                      <Typography variant="darkp" sx={{ fontSize: 13 }}>
+                        Address:{" "}
+                        <Typography variant="p">
+                          {companyData.address ||
+                            "KEK ROAD VOLUME 1 HIGH ROAD HAHAHAHAHAHA"}
+                        </Typography>
                       </Typography>
                     </Box>
                   </Grid>
@@ -270,7 +305,14 @@ function CompanyProfile() {
                   <br />
                   <Typography
                     variant="p"
-                    sx={{ fontSize: theme.typography.h6.fontSize }}
+                    sx={{
+                      fontSize: theme.typography.h6.fontSize,
+                      overflow: "auto",
+                      textOverflow: "ellipsis",
+                      WebkitLineClamp: "8",
+                      WebkitBoxOrient: "vertical",
+                      display: "-webkit-box",
+                    }}
                   >
                     {companyData.description ||
                       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."}
