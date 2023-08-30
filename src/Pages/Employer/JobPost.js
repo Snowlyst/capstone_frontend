@@ -17,7 +17,9 @@ function JobPost() {
 
   const getData = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/proxy/linkedin");
+      const response = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}//proxy/linkedin`
+      );
       const html = response.data;
       console.log(html);
       setHtmlContent(html);
