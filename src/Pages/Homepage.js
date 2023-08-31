@@ -47,7 +47,7 @@ function Homepage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      const role = JSON.parse(localStorage.getItem("role"));
+      const role = JSON.parse(localStorage.getItem("verveRole"));
       const checkLogin = async () => {
         const accessToken = await getAccessTokenSilently({
           authorizationParams: {
@@ -62,7 +62,7 @@ function Homepage() {
         if (role !== null) {
           if (role === "user") {
             currentUser.role = roles.user;
-            console.log(currentUser);
+            console.log("Role is: ", currentUser);
           } else if (role === "employer") {
             currentUser.role = roles.employer;
             console.log("Role: ", role);
@@ -84,7 +84,6 @@ function Homepage() {
             console.log(userInfo.data.checkedUser);
             if (userInfo != null) {
               setCurrUser(userInfo.data.checkedUser);
-              console.log(currUser);
             }
           } catch (error) {
             console.log(error);
@@ -94,6 +93,10 @@ function Homepage() {
       checkLogin();
     }
   }, [user, isAuthenticated]);
+
+  useEffect(() => {
+    console.log(currUser);
+  }, [currUser]);
 
   useEffect(() => {
     if (accessToken !== null) {
