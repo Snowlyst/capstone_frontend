@@ -5,8 +5,7 @@ import { BrowserRouter } from "react-router-dom";
 import { SessionContextProvider } from "@supabase/auth-helpers-react";
 import { createClient } from "@supabase/supabase-js";
 import { UserProvider } from "./Components/UserContext";
-
-import { Auth0Provider } from "@auth0/auth0-react";
+import { Auth0ProviderWithNavigate } from "./Components/Auth0";
 
 const supabase = createClient(
   `${process.env.REACT_APP_SUPABASE_PROJECT_URL}`,
@@ -15,21 +14,21 @@ const supabase = createClient(
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <Auth0Provider
-    domain={process.env.REACT_APP_DOMAIN}
-    clientId={process.env.REACT_APP_CLIENTID}
-    authorizationParams={{
-      redirect_uri: window.location.origin,
-      audience: process.env.REACT_APP_AUDIENCE,
-      scope: process.env.REACT_APP_SCOPE,
-    }}
-  >
-    <SessionContextProvider supabaseClient={supabase}>
-      <UserProvider>
-        <BrowserRouter>
+  <BrowserRouter>
+    <Auth0ProviderWithNavigate
+      domain={process.env.REACT_APP_DOMAIN}
+      clientId={process.env.REACT_APP_CLIENTID}
+      authorizationParams={{
+        redirect_uri: window.location.origin,
+        audience: process.env.REACT_APP_AUDIENCE,
+        scope: process.env.REACT_APP_SCOPE,
+      }}
+    >
+      <SessionContextProvider supabaseClient={supabase}>
+        <UserProvider>
           <App />
-        </BrowserRouter>
-      </UserProvider>
-    </SessionContextProvider>
-  </Auth0Provider>
+        </UserProvider>
+      </SessionContextProvider>
+    </Auth0ProviderWithNavigate>
+  </BrowserRouter>
 );
