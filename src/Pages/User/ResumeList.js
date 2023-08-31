@@ -442,7 +442,16 @@ function ResumeList() {
           >
             Current Resumes
           </Typography>
-          {displayedResume.length !== 0 ? displayedResume : <div>nth yet</div>}
+          {displayedResume.length !== 0 ? (
+            displayedResume
+          ) : (
+            <Typography
+              variant="p"
+              sx={{ fontSize: theme.typography.h6.fontSize }}
+            >
+              No Resumes Available Yet!
+            </Typography>
+          )}
         </Grid>
       </ThemeProvider>
     </Box>

@@ -41,7 +41,7 @@ function Homepage() {
   const imgWidth = windowWidth >= 980 ? "auto" : "auto";
   const imgHeight = windowHeight >= 900 ? "80%" : "65%";
   const vh = windowHeight >= 950 ? "80vh" : "70vh";
-  const { setCurrUser, currUser } = useUserContext();
+  const { currUser, setCurrUser } = useUserContext();
   const roles = { user: 1, admin: 2, employer: 3 };
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -86,8 +86,8 @@ function Homepage() {
               setCurrUser(userInfo.data.checkedUser);
               console.log(currUser);
             }
-          } catch (err) {
-            console.log(err);
+          } catch (error) {
+            console.log(error);
           }
         }
       };

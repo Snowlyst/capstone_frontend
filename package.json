@@ -8,7 +8,7 @@
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.14.6",
     "@mui/lab": "^5.0.0-alpha.141",
-    "@mui/material": "^5.14.5",
+    "@mui/material": "^5.14.7",
     "@mui/x-date-pickers": "^6.12.0",
     "@supabase/auth-helpers-react": "^0.4.2",
     "@supabase/supabase-js": "^2.33.1",
