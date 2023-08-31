@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import {
   Card,
@@ -7,15 +7,15 @@ import {
   Grid,
   Box,
   ThemeProvider,
-  Modal,
-  Backdrop,
-  Fade,
+  Button,
 } from "@mui/material";
 import { theme } from "../Assets/Styles/Theme";
+import { useNavigate } from "react-router-dom";
 
 function Categories() {
+  const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedCategoryId, setSelectedCategoryId] = useState("");
 
   useEffect(() => {
     axios
@@ -29,11 +29,11 @@ function Categories() {
   }, []);
 
   const handleCardClick = (category) => {
-    setSelectedCategory(category);
+    setSelectedCategoryId(category.id);
   };
 
-  const handleCloseModal = () => {
-    setSelectedCategory(null);
+  const handleTitleClick = (categoryId) => {
+    navigate(`/categories/${categoryId}`);
   };
 
   return (
@@ -58,15 +58,17 @@ function Categories() {
                   onClick={() => handleCardClick(category)}
                 >
                   <CardContent>
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontWeight: theme.typography.h6.fontWeightBold,
-                        color: "#0E0140",
-                      }}
-                    >
-                      {category.name}
-                    </Typography>
+                    <Button onClick={() => handleTitleClick(category.id)}>
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          fontWeight: theme.typography.h6.fontWeightBold,
+                          color: "#0E0140",
+                        }}
+                      >
+                        {category.name}
+                      </Typography>
+                    </Button>
                     <Typography
                       variant="body2"
                       sx={{
@@ -86,44 +88,6 @@ function Categories() {
             ))}
           </Grid>
         </Box>
-        <Modal
-          open={selectedCategory !== null}
-          onClose={handleCloseModal}
-          closeAfterTransition
-        >
-          <Fade in={selectedCategory !== null}>
-            <Box
-              sx={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                bgcolor: "background.paper",
-                boxShadow: 24,
-                p: 4,
-                width: "80%",
-                maxHeight: "80%",
-                overflowY: "auto",
-              }}
-            >
-              <Typography
-                variant="h6"
-                sx={{
-                  fontWeight: theme.typography.h6.fontWeightBold,
-                  color: "#0E0140",
-                }}
-              >
-                {selectedCategory?.name}
-              </Typography>
-              <Typography
-                variant="p"
-                sx={{ fontWeight: theme.typography.p, color: "#0E0140" }}
-              >
-                {selectedCategory?.description}
-              </Typography>
-            </Box>
-          </Fade>
-        </Modal>
       </Box>
     </ThemeProvider>
   );

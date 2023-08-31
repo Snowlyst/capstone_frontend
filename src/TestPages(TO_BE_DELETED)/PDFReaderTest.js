@@ -40,7 +40,7 @@ function PDFReadingTest() {
   };
 
   return (
-    <div>
+    <div style={{ margin: "20px" }}>
       <input
         type="file"
         accept=".pdf, image/jpeg, image/png"
