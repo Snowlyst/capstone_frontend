@@ -96,8 +96,11 @@ function ResumeList() {
       getDownloadURL(fullStorageRef).then((url) => {
         setFileAdded(null);
         console.log(url);
-        //temporarily hardcoded id
-        const userId = 1;
+        const userId = currUser.id;
+        if (!currUser) {
+          Swal.fire("Error!", "Cannot find user", "error");
+          return;
+        }
         const dataToSend = {
           resumeName: fileAdded.name,
           resumeDescription: "None for now! Add one?",
@@ -173,8 +176,9 @@ function ResumeList() {
   // on launch get user resume details
   useEffect(() => {
     //temporarily hardcoded user
-    const userId = 1;
-    if (accessToken) {
+
+    if (accessToken && currUser) {
+      const userId = currUser.id;
       axios
         .get(`${BACKEND_URL}/resumes/${userId}`, {
           headers: {
