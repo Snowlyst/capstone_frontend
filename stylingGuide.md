@@ -2,7 +2,10 @@
 
 ## To use Button style
 
-// remember to set
+Orange Button - Submit
+Blue Button - edit etc
+
+// to use a button remember to set this style if you are using Link to wrap it. if using onclick, then dont need to set this.
 
 <!-- <Link to="/" style={{ textDecoration: "none" }}> -->
 
@@ -59,3 +62,13 @@ use this to make font bold
                           color: theme.typography.darkP.color,
                           fontWeight: theme.typography.h6.fontWeightBold,
                         }} -->
+
+use this to make error font (similar to mui error field font in red)
+
+<!-- <Typography
+                            variant="p"
+                            sx={{
+                              color: theme.typography.error.color,
+                              fontSize: theme.typography.error.fontSize,
+                            }}
+                          > -->
