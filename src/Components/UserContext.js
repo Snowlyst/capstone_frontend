@@ -1,4 +1,5 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
+import axios from "axios";
 
 const UserContext = createContext();
 
@@ -8,10 +9,28 @@ export function useUserContext() {
 
 export function UserProvider({ children }) {
   const [currUser, setCurrUser] = useState(null);
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get(`${process.env.REACT_APP_BACKEND_URL}/listings/categories`)
+      .then((response) => {
+        setCategories(response.data);
+        console.log("categories from context: ", categories);
+      })
+      .catch((error) => {
+        console.error("Error fetching categories:", error);
+      });
+    // other api calls if needed
+  }, []);
+
+  const contextValue = {
+    currUser,
+    setCurrUser,
+    categories,
+  };
 
   return (
-    <UserContext.Provider value={{ currUser, setCurrUser }}>
-      {children}
-    </UserContext.Provider>
+    <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>
   );
 }
