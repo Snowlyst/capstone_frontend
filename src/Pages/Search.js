@@ -56,12 +56,8 @@ function Search() {
 
   //useEffects for access cookies n stuff
   useEffect(() => {
-    if (!currUser) {
-      const localAccess = JSON.parse(localStorage.getItem("verveCurrUser"));
-      console.log(localAccess);
-      setCurrUser(localAccess);
-    }
-  }, [currUser]);
+    console.log(currUser);
+  }, []);
 
   useEffect(() => {
     if (!accessToken) {
