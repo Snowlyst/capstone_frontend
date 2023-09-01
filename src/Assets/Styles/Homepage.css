@@ -6,20 +6,21 @@ html {
   height: 100%;
 }
 
-.container {
+.container2 {
   width: 100%;
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
   justify-content: flex-end;
+  align-items: top;
   display: flex;
   flex-direction: column;
-  padding-bottom: 2rem;
+  padding-bottom: 3rem;
 }
 
 .title {
   position: absolute;
-  top: 24%;
+  top: 18%;
   left: 28%;
   transform: translate(-50%, -50%);
   z-index: 1;
@@ -27,7 +28,7 @@ html {
 
 .subtitle {
   position: absolute;
-  top: 34%;
+  top: 26%;
   transform: translate(-50%, -50%);
   z-index: 1;
 }
