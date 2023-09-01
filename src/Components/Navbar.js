@@ -21,59 +21,73 @@ import { theme } from "../Assets/Styles/Theme";
 import { Link } from "react-router-dom";
 import logo from "../Assets/Images/logo.png";
 import { useAuth0 } from "@auth0/auth0-react";
+import { useEffect } from "react";
 import { useUserContext } from "../Components/UserContext";
 
 function Navbar() {
   const { logout, loginWithRedirect, isAuthenticated } = useAuth0();
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
-  const { setCurrUser, currUser } = useUserContext();
+  const { currUser, setCurrUser } = useUserContext();
 
   // const navigate = useNavigate();
 
   const pages = ["Job Search", "Company Profiles", "Programs"];
-  const settings = ["Profile", "Chat", "Dashboard", "Logout"];
-  const settingsNotUser = ["User", "Employer"];
+  const settings = isAuthenticated
+    ? ["Profile", "Chat", "Dashboard", "Logout"]
+    : ["User", "Employer"];
 
   // to retrieve currUser from local storage and to set it for context
-  // useEffect(() => {
-  //   console.log(currUser);
-  //   if (currUser === null) {
-  //     const localAccess = JSON.parse(localStorage.getItem("currUser"));
-  //     console.log(localAccess);
-  //     setCurrUser(localAccess);
-  //   }
-  // }, [currUser]);
+  useEffect(() => {
+    console.log(currUser);
+    // const checkLogin =  () => {
+    if (currUser === null && isAuthenticated) {
+      const localAccess = JSON.parse(localStorage.getItem("verveCurrUser"));
+      console.log(localAccess);
+      setCurrUser(localAccess);
+    }
+  }, []);
 
   // checks if user is logged in or not to display user menu
   // const login = currUser !== null ? true : false;
 
   // handle user menu click
-  const handleUserMenu = (page) => {
+  const handleUserMenu = async (page) => {
     let user = {};
     if (page === "Logout") {
-      logout({ returnTo: process.env.REACT_APP_REDIRECT_URI });
+      logout({
+        logoutParams: {
+          returnTo: window.location.origin,
+        },
+      });
       setAnchorElUser(null);
-      // setCurrUser(null);
-      // localStorage.removeItem("Token");
-      // localStorage.removeItem("currUser");
+      setCurrUser(null);
+      localStorage.removeItem("verveRole");
+      localStorage.removeItem("verveToken");
+      localStorage.removeItem("verveCurrUser");
     } else if (page === "User") {
       setAnchorElUser(null);
       user.role = "user";
       setCurrUser(user);
-      localStorage.setItem("role", JSON.stringify(user.role));
-      loginWithRedirect({
+      localStorage.setItem("verveRole", JSON.stringify(user.role));
+      await loginWithRedirect({
+        appState: {
+          returnTo: "/profile",
+        },
         authorizationParams: {
-          redirect_uri: `${process.env.REACT_APP_REDIRECT_URI}`,
+          screen_hint: "Login/Register",
         },
       });
     } else if (page === "Employer") {
       setAnchorElUser(null);
       user.role = "employer";
-      localStorage.setItem("role", JSON.stringify(user.role));
-      loginWithRedirect({
+      localStorage.setItem("verveRole", JSON.stringify(user.role));
+      await loginWithRedirect({
+        appState: {
+          returnTo: "/dashboard",
+        },
         authorizationParams: {
-          redirect_uri: `${process.env.REACT_APP_REDIRECT_URI}`,
+          screen_hint: "Login/Register",
         },
       });
     }
@@ -245,33 +259,30 @@ function Navbar() {
                 open={Boolean(anchorElUser)}
                 onClose={() => setAnchorElUser(null)}
               >
-                {isAuthenticated
-                  ? settings.map((setting) => (
-                      <MenuItem
-                        key={setting}
-                        onClick={() => handleUserMenu(setting)}
-                      >
-                        <ThemeProvider theme={theme}>
-                          <Typography
-                            textAlign="center"
-                            variant="p"
-                            sx={{
-                              color: theme.typography.darkP.color,
-                            }}
-                          >
-                            {setting}
-                          </Typography>
-                        </ThemeProvider>
-                      </MenuItem>
-                    ))
-                  : settingsNotUser.map((setting) => (
-                      <MenuItem
-                        key={setting}
-                        onClick={() => handleUserMenu(setting)}
-                      >
-                        <Typography textAlign="center">{setting}</Typography>
-                      </MenuItem>
-                    ))}
+                {settings.map((setting) => (
+                  <Link
+                    to={setting.toLowerCase()}
+                    key={setting}
+                    style={{ textDecoration: "none" }}
+                  >
+                    <MenuItem
+                      key={setting}
+                      onClick={() => handleUserMenu(setting)}
+                    >
+                      <ThemeProvider theme={theme}>
+                        <Typography
+                          textAlign="center"
+                          variant="p"
+                          sx={{
+                            color: theme.typography.darkP.color,
+                          }}
+                        >
+                          {setting}
+                        </Typography>
+                      </ThemeProvider>
+                    </MenuItem>
+                  </Link>
+                ))}
               </Menu>
             </Box>
           </Toolbar>
