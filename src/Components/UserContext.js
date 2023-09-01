@@ -25,13 +25,23 @@ export function UserProvider({ children }) {
     // get location
 
     axios
-      .get(`${process.env.REACT_APP_BACKEND_URL}/listings/categories/sorted`)
+      .get(`${process.env.REACT_APP_BACKEND_URL}/company/location`)
       .then((response) => {
-        console.log("Location from context: ", response.data);
+        console.log("Locations from context: ", response.data);
         setLocation(response.data);
       })
       .catch((error) => {
         console.log("Error fetching locations: ", error);
+      });
+
+    axios
+      .get(`${process.env.REACT_APP_BACKEND_URL}/company/`)
+      .then((response) => {
+        console.log("List of Companies from context: ", response.data);
+        setLocation(response.data);
+      })
+      .catch((error) => {
+        console.log("Error fetching companies: ", error);
       });
   }, []);
 
