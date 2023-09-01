@@ -23,9 +23,13 @@ import {
 } from "firebase/storage";
 import Swal from "sweetalert2";
 import axios from "axios";
+//for auth
+import { useUserContext } from "../../Components/UserContext";
+
 const STORAGE_KEY = "resumes/";
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
+// temporarily hardcoded lines, line 80 and line 138
 function ResumeList() {
   const [fileAdded, setFileAdded] = useState(null);
   const [displayedResume, setDisplayedResume] = useState([]);
@@ -35,6 +39,24 @@ function ResumeList() {
   const [openModal, setOpenModal] = useState(false);
   const [resumeId, setResumeId] = useState(0);
   const [refreshState, setRefreshState] = useState(0);
+  const { currUser, setCurrUser } = useUserContext();
+  const [accessToken, setAccessToken] = useState("");
+
+  useEffect(() => {
+    console.log(currUser);
+    if (currUser === null) {
+      const localAccess = JSON.parse(localStorage.getItem("verveCurrUser"));
+      console.log(localAccess);
+      setCurrUser(localAccess);
+    }
+  }, [currUser]);
+
+  useEffect(() => {
+    if (!accessToken) {
+      const localAccess = JSON.parse(localStorage.getItem("verveToken"));
+      setAccessToken(localAccess);
+    }
+  }, [accessToken]);
 
   const style = {
     position: "absolute",
@@ -74,15 +96,22 @@ function ResumeList() {
       getDownloadURL(fullStorageRef).then((url) => {
         setFileAdded(null);
         console.log(url);
-        //temporarily hardcoded id
-        const userId = 1;
+        const userId = currUser.id;
+        if (!currUser) {
+          Swal.fire("Error!", "Cannot find user", "error");
+          return;
+        }
         const dataToSend = {
           resumeName: fileAdded.name,
           resumeDescription: "None for now! Add one?",
           resumeUrl: url,
         };
         axios
-          .post(`${BACKEND_URL}/resumes/${userId}`, dataToSend)
+          .post(`${BACKEND_URL}/resumes/${userId}`, dataToSend, {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          })
           .then((info) => {
             console.log(info);
             Swal.fire("Success!", "Your posting was successful.", "success");
@@ -101,26 +130,40 @@ function ResumeList() {
     console.log(resumeDescription);
     console.log(resumeUrl);
     console.log(resumeId);
-    axios
-      .put(`${BACKEND_URL}/resumes/${resumeId}`, {
-        resumeName: resumeName,
-        resumeDescription: resumeDescription,
-        resumeUrl: resumeUrl,
-      })
-      .then((response) => {
-        console.log(response);
-        Swal.fire("Success!", "Your edit was successful.", "success");
-        handleCloseModal();
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    if (accessToken) {
+      axios
+        .put(
+          `${BACKEND_URL}/resumes/${resumeId}`,
+          {
+            resumeName: resumeName,
+            resumeDescription: resumeDescription,
+            resumeUrl: resumeUrl,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        )
+        .then((response) => {
+          console.log(response);
+          Swal.fire("Success!", "Your edit was successful.", "success");
+          handleCloseModal();
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
   };
   // delete 1 resume fn
   const handleDelete = () => {
     console.log(resumeId);
     axios
-      .delete(`${BACKEND_URL}/resumes/${resumeId}`)
+      .delete(`${BACKEND_URL}/resumes/${resumeId}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
       .then((info) => {
         console.log(info);
         handleCloseModal();
@@ -132,150 +175,164 @@ function ResumeList() {
 
   // on launch get user resume details
   useEffect(() => {
-    //temporarily hardcoded user
-    const userId = 1;
-    axios
-      .get(`${BACKEND_URL}/resumes/${userId}`)
-      .then((info) => {
-        console.log(info);
-        setDisplayedResume(
-          info.data.output.map((information, index) => {
-            const createdTime = new Date(
-              information.createdAt
-            ).toLocaleDateString();
-            const updatedTime = new Date(
-              information.updatedAt
-            ).toLocaleDateString();
-            return (
-              <Grid
-                key={index}
-                container
-                justifyContent="center"
-                backgroundColor="white"
-                sx={{
-                  height: "8vh",
-                  width: "65vw",
-                  borderRadius: "20px",
-                  mt: 1.5,
-                  mb: 1.5,
-                }}
-              >
-                <Grid item xs={0.3} />
-                <Grid item xs={5.7} sx={{ pt: 1 }}>
-                  <Stack direction="column">
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontWeight: theme.typography.h6.fontWeight,
+    if (accessToken && currUser) {
+      const userId = currUser.id;
+      axios
+        .get(`${BACKEND_URL}/resumes/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        })
+        .then((info) => {
+          console.log(info);
+          setDisplayedResume(
+            info.data.output.map((information, index) => {
+              const createdTime = new Date(
+                information.createdAt
+              ).toLocaleDateString();
+              const updatedTime = new Date(
+                information.updatedAt
+              ).toLocaleDateString();
+              return (
+                <Grid
+                  key={index}
+                  container
+                  justifyContent="center"
+                  backgroundColor="white"
+                  sx={{
+                    height: "8vh",
+                    width: "65vw",
+                    borderRadius: "20px",
+                    mt: 1.5,
+                    mb: 1.5,
+                  }}
+                >
+                  <Grid item xs={0.3} />
+                  <Grid item xs={5.7} sx={{ pt: 1 }}>
+                    <Stack direction="column">
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          fontWeight: theme.typography.h6.fontWeight,
+                        }}
+                      >
+                        <Link
+                          href={information.resumeUrl}
+                          underline="none"
+                          sx={{ color: theme.typography.darkP.color }}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {information.resumeTitle}
+                        </Link>
+                      </Typography>
+                      <Typography variant="p" sx={{ fontSize: 14 }}>
+                        {information.resumeDescription}
+                      </Typography>
+                    </Stack>
+                  </Grid>
+                  <Grid item xs={2}>
+                    <Stack direction="column" sx={{ mt: 1 }}>
+                      <Typography variant="p" sx={{ mb: 1 }}>
+                        Date Edited
+                      </Typography>
+                      <Typography variant="darkP">{updatedTime}</Typography>
+                    </Stack>
+                  </Grid>
+                  <Grid item xs={2}>
+                    <Stack direction="column" sx={{ mt: 1 }}>
+                      <Typography variant="p" sx={{ mb: 1 }}>
+                        Date Created
+                      </Typography>
+                      <Typography variant="darkP">{createdTime}</Typography>
+                    </Stack>
+                  </Grid>
+                  <Grid item xs={2} sx={{ mt: 2.1 }}>
+                    <Button
+                      variant="contained"
+                      component="span"
+                      style={{ backgroundColor: "#0E0140", color: "white" }}
+                      onClick={() => {
+                        handleOpenModal();
+                        setResumeName(information.resumeTitle);
+                        setResumeUrl(information.resumeUrl);
+                        setResumeDescription(information.resumeDescription);
+                        setResumeId(information.id);
                       }}
                     >
-                      <Link
-                        href={information.resumeUrl}
-                        underline="none"
-                        sx={{ color: theme.typography.darkP.color }}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        {information.resumeTitle}
-                      </Link>
-                    </Typography>
-                    <Typography variant="p" sx={{ fontSize: 14 }}>
-                      {information.resumeDescription}
-                    </Typography>
-                  </Stack>
+                      <EditIcon />
+                      Edit
+                    </Button>
+                    <Modal open={openModal} onClose={() => handleCloseModal()}>
+                      <Box sx={style}>
+                        <Typography variant="h6">
+                          Edit Resume Details
+                        </Typography>
+                        <TextField
+                          label="Name"
+                          value={resumeName}
+                          onChange={(e) => setResumeName(e.target.value)}
+                          fullWidth
+                          margin="normal"
+                        />
+                        <TextField
+                          label="Description"
+                          value={resumeDescription}
+                          onChange={(e) => setResumeDescription(e.target.value)}
+                          fullWidth
+                          margin="normal"
+                        />
+                        <TextField
+                          label="URL"
+                          value={resumeUrl}
+                          onChange={(e) => setResumeUrl(e.target.value)}
+                          fullWidth
+                          margin="normal"
+                        />
+                        <Stack direction="row" spacing={21}>
+                          <Button
+                            variant="contained"
+                            component="span"
+                            style={{
+                              backgroundColor: "#0E0140",
+                              color: "white",
+                            }}
+                            onClick={handleEdit}
+                          >
+                            Submit
+                          </Button>{" "}
+                          <Button
+                            variant="contained"
+                            component="span"
+                            style={{
+                              backgroundColor: "#0E0140",
+                              color: "white",
+                            }}
+                            onClick={handleDelete}
+                          >
+                            Delete
+                          </Button>
+                        </Stack>
+                      </Box>
+                    </Modal>
+                  </Grid>
                 </Grid>
-                <Grid item xs={2}>
-                  <Stack direction="column" sx={{ mt: 1 }}>
-                    <Typography variant="p" sx={{ mb: 1 }}>
-                      Date Edited
-                    </Typography>
-                    <Typography variant="darkP">{updatedTime}</Typography>
-                  </Stack>
-                </Grid>
-                <Grid item xs={2}>
-                  <Stack direction="column" sx={{ mt: 1 }}>
-                    <Typography variant="p" sx={{ mb: 1 }}>
-                      Date Created
-                    </Typography>
-                    <Typography variant="darkP">{createdTime}</Typography>
-                  </Stack>
-                </Grid>
-                <Grid item xs={2} sx={{ mt: 2.1 }}>
-                  <Button
-                    variant="contained"
-                    component="span"
-                    style={{ backgroundColor: "#0E0140", color: "white" }}
-                    onClick={() => {
-                      handleOpenModal();
-                      setResumeName(information.resumeTitle);
-                      setResumeUrl(information.resumeUrl);
-                      setResumeDescription(information.resumeDescription);
-                      setResumeId(information.id);
-                    }}
-                  >
-                    <EditIcon />
-                    Edit
-                  </Button>
-                  <Modal open={openModal} onClose={() => handleCloseModal()}>
-                    <Box sx={style}>
-                      <Typography variant="h6">Edit Resume Details</Typography>
-                      <TextField
-                        label="Name"
-                        value={resumeName}
-                        onChange={(e) => setResumeName(e.target.value)}
-                        fullWidth
-                        margin="normal"
-                      />
-                      <TextField
-                        label="Description"
-                        value={resumeDescription}
-                        onChange={(e) => setResumeDescription(e.target.value)}
-                        fullWidth
-                        margin="normal"
-                      />
-                      <TextField
-                        label="URL"
-                        value={resumeUrl}
-                        onChange={(e) => setResumeUrl(e.target.value)}
-                        fullWidth
-                        margin="normal"
-                      />
-                      <Stack direction="row" spacing={21}>
-                        <Button
-                          variant="contained"
-                          component="span"
-                          style={{
-                            backgroundColor: "#0E0140",
-                            color: "white",
-                          }}
-                          onClick={handleEdit}
-                        >
-                          Submit
-                        </Button>{" "}
-                        <Button
-                          variant="contained"
-                          component="span"
-                          style={{
-                            backgroundColor: "#0E0140",
-                            color: "white",
-                          }}
-                          onClick={handleDelete}
-                        >
-                          Delete
-                        </Button>
-                      </Stack>
-                    </Box>
-                  </Modal>
-                </Grid>
-              </Grid>
-            );
-          })
-        );
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, [openModal, resumeDescription, resumeName, resumeUrl, refreshState]);
+              );
+            })
+          );
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  }, [
+    openModal,
+    resumeDescription,
+    resumeName,
+    resumeUrl,
+    refreshState,
+    accessToken,
+  ]);
 
   return (
     <Box>
@@ -387,7 +444,16 @@ function ResumeList() {
           >
             Current Resumes
           </Typography>
-          {displayedResume.length !== 0 ? displayedResume : <div>nth yet</div>}
+          {displayedResume.length !== 0 ? (
+            displayedResume
+          ) : (
+            <Typography
+              variant="p"
+              sx={{ fontSize: theme.typography.h6.fontSize }}
+            >
+              No Resumes Available Yet!
+            </Typography>
+          )}
         </Grid>
       </ThemeProvider>
     </Box>

@@ -9,6 +9,8 @@ import {
   Input,
   Stack,
   Button,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { Link, NavLink } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -29,12 +31,13 @@ import Education from "../Assets/Images/Buttons/Education.png";
 import Engineering from "../Assets/Images/Buttons/Engineering.png";
 import Technology from "../Assets/Images/Buttons/Technology.png";
 import "../Assets/Styles/Homepage.css";
+import { useNavigate } from "react-router-dom";
 
 function Homepage() {
   const [accessToken, setAccessToken] = useState(null);
   const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
-  const [location, setLocation] = useState(null);
-  const [type, setType] = useState(null);
+  const [location, setLocation] = useState(6);
+  const [type, setType] = useState("Full Time");
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [windowHeight, setWindowHeight] = useState(window.innerHeight);
   const imageUrl = windowWidth >= 650 ? desktop : mobile;
@@ -44,6 +47,7 @@ function Homepage() {
   const { currUser, setCurrUser } = useUserContext();
   const roles = { user: 1, admin: 2, employer: 3 };
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -85,8 +89,8 @@ function Homepage() {
             if (userInfo != null) {
               setCurrUser(userInfo.data.checkedUser);
             }
-          } catch (err) {
-            console.log(err);
+          } catch (error) {
+            console.log(error);
           }
         }
       };
@@ -137,6 +141,17 @@ function Homepage() {
     };
   }, []);
 
+  const handleChange = (e, index) => {
+    if (index === 0) {
+      setLocation(e.target.value);
+    } else setType(e.target.value);
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    navigate(`/search?location=${location}&type=${type}`);
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <Box
@@ -144,10 +159,10 @@ function Homepage() {
           height: windowHeight >= 600 ? "90vh" : "88.2vh",
         }}
       >
-        <Grid Container justify="center" spacing={3}>
+        <Grid container justify="center" spacing={3}>
           <Grid item xs={12}>
             <Box
-              className="container"
+              className="container2"
               component="div"
               sx={{
                 minHeight: `${vh}`,
@@ -172,24 +187,29 @@ function Homepage() {
                     sx={{
                       fontFamily: theme.typography.h3Cursive.fontFamily,
                       fontSize:
-                        windowHeight >= 600 && windowWidth >= 980
+                        windowHeight >= 600 && windowWidth >= 920
                           ? "4rem"
                           : "2.5rem",
-                      left: windowWidth >= 1400 ? "56%" : "45%",
+                      left:
+                        windowWidth >= 1000
+                          ? "60%"
+                          : windowWidth >= 930
+                          ? "50%"
+                          : "43%",
                     }}
                   >
                     Where Journeys Thrive
                   </Typography>
                   <Box
                     component="img"
-                    src={people} // Set the path to your overlay image
+                    src={people}
                     alt="People"
                     width={imgWidth}
                     height={imgHeight}
                     style={{
                       position: "absolute",
-                      top: windowHeight >= 600 ? "40%" : "36%", // Adjust vertically
-                      left: windowHeight >= 550 ? "53%" : "50%", // Adjust horizontally
+                      top: windowHeight >= 600 ? "40%" : "36%",
+                      left: windowHeight >= 550 ? "53%" : "50%",
                       transform: "translate(-50%, -50%)",
                       zIndex: 1,
                     }}
@@ -215,10 +235,10 @@ function Homepage() {
                 }}
               >
                 <Stack
-                  spacing={2}
                   direction={windowWidth >= 767 ? "row" : "column"}
+                  spacing={2}
                 >
-                  <FormControl variant="standard">
+                  <FormControl variant="standard" sx={{ minWidth: "200px" }}>
                     <InputLabel htmlFor="location-input">
                       <Typography
                         variant="h6"
@@ -227,20 +247,26 @@ function Homepage() {
                         Location
                       </Typography>
                     </InputLabel>
-                    <Input
-                      id="location-input"
+                    <Select
+                      labelId="employmentLocationLabel"
+                      label="Employment Location"
+                      id="employmentLocation"
                       value={location}
-                      onChange={(e) => setLocation(e.target.location)}
-                      startAdornment={
-                        <InputAdornment position="start">
-                          <PlaceIcon sx={{ color: "#0E0140" }} />
-                        </InputAdornment>
-                      }
-                    />
+                      onChange={(e) => handleChange(e, 0)}
+                    >
+                      <MenuItem value={6}>
+                        <em>Any</em>
+                      </MenuItem>
+                      <MenuItem value={1}>Central</MenuItem>
+                      <MenuItem value={2}>East</MenuItem>
+                      <MenuItem value={4}>North-East</MenuItem>
+                      <MenuItem value={3}>North</MenuItem>
+                      <MenuItem value={5}>West</MenuItem>
+                    </Select>
                   </FormControl>
 
                   {/* Second Text Field (Behind the First Text Field) */}
-                  <FormControl variant="standard">
+                  <FormControl variant="standard" sx={{ minWidth: "200px" }}>
                     <InputLabel htmlFor="type-input">
                       <Typography
                         variant="h6"
@@ -249,21 +275,24 @@ function Homepage() {
                         Type
                       </Typography>
                     </InputLabel>
-                    <Input
-                      id="type-input"
+                    <Select
+                      labelId="employmentTypeLabel"
+                      label="Employment Type"
+                      id="employmentType"
                       value={type}
-                      onChange={(e) => setType(e.target.value)}
-                      startAdornment={
-                        <InputAdornment position="start">
-                          <WorkHistoryIcon sx={{ color: "#0E0140" }} />
-                        </InputAdornment>
-                      }
-                    />
+                      onChange={(e) => handleChange(e, 1)}
+                    >
+                      <MenuItem value="Full Time">Full-Time</MenuItem>
+                      <MenuItem value="Part Time">Part-Time</MenuItem>
+                      <MenuItem value="Contract">Contract</MenuItem>
+                      <MenuItem value="Remote">Remote</MenuItem>
+                    </Select>
                   </FormControl>
                   <Button
                     classes={{ root: "orange" }}
                     variant="contained"
                     startIcon={<SearchIcon />}
+                    onClick={handleSearch}
                   >
                     Search
                   </Button>
