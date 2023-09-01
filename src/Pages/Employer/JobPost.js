@@ -13,7 +13,7 @@ import {
 import { stateFromHTML } from "draft-js-import-html";
 import "draft-js/dist/Draft.css";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
-import Select from "react-select";
+import reactSelect from "react-select";
 import makeAnimated from "react-select/animated";
 // import { styled } from "@mui/material/styles";
 import {
@@ -24,7 +24,7 @@ import {
   TextField,
   IconButton,
   Tooltip,
-  // Select,
+  Select,
   FormControl,
   InputLabel,
   MenuItem,
@@ -424,7 +424,7 @@ function JobPost() {
                           </FormHelperText>
                         </FormControl>
                       </Grid>
-                      <Select
+                      <reactSelect
                         closeMenuOnSelect={false}
                         components={animatedComponents}
                         options={categoryOptions}
