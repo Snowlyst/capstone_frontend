@@ -28,6 +28,7 @@ import { useUserContext } from "../Components/UserContext";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { styled } from "@mui/material/styles";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import { useLocation } from "react-router-dom";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -47,7 +48,13 @@ function Search() {
   // this state for displaying the found results
   const [jobsDisplay, setJobsDisplay] = useState([]);
   const [searchDone, setSearchDone] = useState(false);
+  // these stuff for getting params if linked from homepage
+  const portedLocationQuery = new URLSearchParams(useLocation().search).get(
+    "location"
+  );
+  const portedTypeQuery = new URLSearchParams(useLocation().search).get("type");
 
+  //useEffects for access cookies n stuff
   useEffect(() => {
     if (!currUser) {
       const localAccess = JSON.parse(localStorage.getItem("verveCurrUser"));
@@ -64,6 +71,134 @@ function Search() {
   }, [accessToken]);
 
   useEffect(() => {
+    if (portedLocationQuery && portedTypeQuery && accessToken) {
+      const dataToSend = {
+        typeQuery: portedTypeQuery,
+        locationQuery: portedLocationQuery,
+      };
+      axios
+        .post(`${BACKEND_URL}/listings/search/mount`, dataToSend, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        })
+        .then((info) => {
+          console.log(info);
+          setJobsDisplay(
+            info.data.map((info, index) => {
+              return (
+                <Grid
+                  key={index}
+                  container
+                  justifyContent="center"
+                  backgroundColor="white"
+                  sx={{
+                    height: "10vh",
+                    width: "45vw",
+                    borderRadius: "20px",
+                    mt: 1.5,
+                    mb: 1.5,
+                  }}
+                >
+                  <Grid item xs={1.3}>
+                    <Link
+                      href={`/companyprofile/${info.companyId}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {
+                        <img
+                          alt="Company Logo"
+                          src={
+                            info.company_profile_info.companyLogo ||
+                            "https://firebasestorage.googleapis.com/v0/b/verve-55239.appspot.com/o/images%2FImage_not_available.png?alt=media&token=0a5a0495-5de3-4fea-93a2-3b4b95b22f64"
+                          }
+                          style={{
+                            width: "4vw",
+                            height: "4vh",
+                            objectFit: "fill",
+                            borderRadius: "40px",
+                            marginTop: "2.2vh",
+                            marginLeft: "0.2vw",
+                          }}
+                        />
+                      }
+                    </Link>
+                  </Grid>
+                  <Grid item xs={4.7} sx={{ pt: 1 }}>
+                    <Stack direction="column">
+                      <Box
+                        sx={{
+                          height: "7vh",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          WebkitLineClamp: "3",
+                          WebkitBoxOrient: "vertical",
+                          display: "-webkit-box",
+                        }}
+                      >
+                        <Typography
+                          variant="darkP"
+                          sx={{
+                            fontWeight: theme.typography.h6.fontWeight,
+                          }}
+                        >
+                          {info.title}
+                        </Typography>
+                      </Box>
+                      <Box
+                        sx={{
+                          height: "3vh",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          WebkitLineClamp: "1",
+                          WebkitBoxOrient: "vertical",
+                          display: "-webkit-box",
+                        }}
+                      >
+                        <Typography variant="p" sx={{ fontSize: 14 }}>
+                          {info.company_profile_info.companyName}
+                        </Typography>
+                      </Box>
+                    </Stack>
+                  </Grid>
+                  <Grid item xs={2}>
+                    <Stack direction="column" sx={{ mt: 1 }}>
+                      <Typography variant="p" sx={{ mb: 1 }}>
+                        {info.employmentType}
+                      </Typography>
+                    </Stack>
+                  </Grid>
+                  <Grid item xs={2}>
+                    <Stack direction="column" sx={{ mt: 1 }}>
+                      <Typography variant="p" sx={{ mb: 1 }}>
+                        {info.location.name}
+                      </Typography>
+                    </Stack>
+                  </Grid>
+                  <Grid item xs={2} sx={{ mt: 4.1 }}>
+                    <Button
+                      variant="contained"
+                      component="span"
+                      style={{ backgroundColor: "#0E0140", color: "white" }}
+                    >
+                      <VisibilityIcon />
+                      View
+                    </Button>
+                  </Grid>
+                </Grid>
+              );
+            })
+          );
+          setSearchDone(true);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  }, [accessToken]);
+
+  useEffect(() => {
     if (accessToken) {
       axios
         .get(`${BACKEND_URL}/listings/categories/sorted`, {
@@ -75,12 +210,14 @@ function Search() {
           setMappedCategory(
             info.data.map((info, index) => {
               return (
-                <FormControlLabel
-                  key={index}
-                  value={info.id}
-                  control={<Radio size="small" color="secondary" />}
-                  label={info.name}
-                />
+                <Box>
+                  <FormControlLabel
+                    key={index}
+                    value={info.id}
+                    control={<Radio size="small" color="secondary" />}
+                    label={info.name}
+                  />
+                </Box>
               );
             })
           );
@@ -208,9 +345,20 @@ function Search() {
                           {info.title}
                         </Typography>
                       </Box>
-                      <Typography variant="p" sx={{ fontSize: 14 }}>
-                        {info.company_profile_info.companyName}
-                      </Typography>
+                      <Box
+                        sx={{
+                          height: "3vh",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          WebkitLineClamp: "1",
+                          WebkitBoxOrient: "vertical",
+                          display: "-webkit-box",
+                        }}
+                      >
+                        <Typography variant="p" sx={{ fontSize: 14 }}>
+                          {info.company_profile_info.companyName}
+                        </Typography>
+                      </Box>
                     </Stack>
                   </Grid>
                   <Grid item xs={2}>
@@ -271,7 +419,7 @@ function Search() {
           sx={{
             backgroundColor: "#F3F1FF",
             width: "100vw",
-            height: "180vh",
+            height: "93vh",
             flexDirection: "row",
           }}
         >
@@ -332,13 +480,21 @@ function Search() {
                   value={categoryQuery}
                   onChange={(e) => setCategoryQuery(e.target.value)}
                 >
-                  {mappedCategory ? mappedCategory : null}
+                  <Box
+                    sx={{
+                      height: "60vh",
+                      overflow: "auto",
+                      wordWrap: "noWrap",
+                    }}
+                  >
+                    {mappedCategory ? mappedCategory : null}
+                  </Box>
                 </RadioGroup>
               </Collapse>
             </Box>
           </Grid>
           <Grid item xs={8}>
-            <Box>
+            <Box sx={{ ml: "2vw" }}>
               <Grid
                 container
                 justifyContent="center"
@@ -400,7 +556,9 @@ function Search() {
                 </Grid>
               </Grid>
               <Divider sx={{ mt: 3, mb: 3 }} />
-              {jobsDisplay.length !== 0 && searchDone ? jobsDisplay : null}
+              <Box sx={{ height: "70vh", overflow: "auto" }}>
+                {jobsDisplay.length !== 0 && searchDone ? jobsDisplay : null}
+              </Box>
               {jobsDisplay.length === 0 && searchDone ? (
                 <Typography variant="h5" sx={{ ml: "10vw", mt: "20vh" }}>
                   No available listings from search parameters provided!
