@@ -192,31 +192,29 @@ function Search() {
           console.log(error);
         });
     }
-  }, [accessToken]);
+  }, []);
 
   useEffect(() => {
-    if (accessToken) {
-      axios
-        .get(`${BACKEND_URL}/listings/categories/sorted`)
-        .then((info) => {
-          setMappedCategory(
-            info.data.map((info, index) => {
-              return (
-                <Box key={index}>
-                  <FormControlLabel
-                    value={info.id}
-                    control={<Radio size="small" color="secondary" />}
-                    label={info.name}
-                  />
-                </Box>
-              );
-            })
-          );
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    }
+    axios
+      .get(`${BACKEND_URL}/listings/categories/sorted`)
+      .then((info) => {
+        setMappedCategory(
+          info.data.map((info, index) => {
+            return (
+              <Box key={index}>
+                <FormControlLabel
+                  value={info.id}
+                  control={<Radio size="small" color="secondary" />}
+                  label={info.name}
+                />
+              </Box>
+            );
+          })
+        );
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }, []);
 
   const handleExpandClick = (target) => {

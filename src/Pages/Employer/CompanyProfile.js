@@ -150,7 +150,7 @@ function CompanyProfile() {
           console.log(error);
         });
     }
-  }, [accessToken]);
+  }, []);
 
   //for consolelogging only, to remove
   useEffect(() => {
