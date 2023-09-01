@@ -20,6 +20,7 @@ import PDFReadingTest from "./TestPages(TO_BE_DELETED)/PDFReaderTest";
 import GoogleCalendar from "./TestPages(TO_BE_DELETED)/GoogleCalendarPlanner";
 import FirebaseUpload from "./TestPages(TO_BE_DELETED)/FirebaseUpload";
 import ResumeList from "./Pages/User/ResumeList";
+import CompanyProfile from "./Pages/Employer/CompanyProfile";
 import CreateResume from "./Pages/User/CreateResume";
 function App() {
   const { isAuthenticated, isLoading } = useAuth0();
@@ -53,13 +54,23 @@ function App() {
           path="/profile"
           element={<AuthenticationGuard component={Profile} />}
         />
-        <Route path="/search" element={<Search />} />
+        <Route
+          path="/search"
+          element={<AuthenticationGuard component={Search} />}
+        />
         <Route path="/updateprofile" element={<UpdateProfile />} />
         <Route
           path="/jobpost"
           element={<AuthenticationGuard component={JobPost} />}
         />
-        <Route path="userresumelist" element={<ResumeList />} />
+        <Route
+          path="/userresumelist"
+          element={<AuthenticationGuard component={ResumeList} />}
+        />
+        <Route
+          path="/companyprofile/:companyId"
+          element={<AuthenticationGuard component={CompanyProfile} />}
+        />
         <Route path="createresume" element={<CreateResume />} />
         {/* These 4 Pages are Test pages, to be deleted near the end */}
         <Route path="/onemap" element={<OnemapApiTest />} />
