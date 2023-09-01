@@ -41,13 +41,13 @@ function Homepage() {
   const imgWidth = windowWidth >= 980 ? "auto" : "auto";
   const imgHeight = windowHeight >= 900 ? "80%" : "65%";
   const vh = windowHeight >= 950 ? "80vh" : "70vh";
-  const { setCurrUser, currUser } = useUserContext();
+  const { currUser, setCurrUser } = useUserContext();
   const roles = { user: 1, admin: 2, employer: 3 };
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
   useEffect(() => {
     if (isAuthenticated) {
-      const role = JSON.parse(localStorage.getItem("role"));
+      const role = JSON.parse(localStorage.getItem("verveRole"));
       const checkLogin = async () => {
         const accessToken = await getAccessTokenSilently({
           authorizationParams: {
@@ -62,7 +62,7 @@ function Homepage() {
         if (role !== null) {
           if (role === "user") {
             currentUser.role = roles.user;
-            console.log(currentUser);
+            console.log("Role is: ", currentUser);
           } else if (role === "employer") {
             currentUser.role = roles.employer;
             console.log("Role: ", role);
@@ -84,7 +84,6 @@ function Homepage() {
             console.log(userInfo.data.checkedUser);
             if (userInfo != null) {
               setCurrUser(userInfo.data.checkedUser);
-              console.log(currUser);
             }
           } catch (err) {
             console.log(err);
@@ -94,6 +93,26 @@ function Homepage() {
       checkLogin();
     }
   }, [user, isAuthenticated]);
+
+  useEffect(() => {
+    console.log(currUser);
+  }, [currUser]);
+
+  useEffect(() => {
+    if (accessToken !== null) {
+      localStorage.setItem("verveToken", JSON.stringify(accessToken));
+    }
+  }, [accessToken]);
+
+  useEffect(() => {
+    if (currUser !== null || currUser !== "") {
+      localStorage.setItem("verveCurrUser", JSON.stringify(currUser));
+    }
+  }, [currUser]);
+
+  useEffect(() => {
+    console.log(setCurrUser);
+  }, [setCurrUser]);
 
   useEffect(() => {
     const handleWindowResize = () => {
