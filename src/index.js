@@ -15,21 +15,21 @@ const supabase = createClient(
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <Auth0Provider
-    domain={process.env.REACT_APP_DOMAIN}
-    clientId={process.env.REACT_APP_CLIENTID}
-    authorizationParams={{
-      redirect_uri: window.location.origin,
-      audience: process.env.REACT_APP_AUDIENCE,
-      scope: process.env.REACT_APP_SCOPE,
-    }}
-  >
-    <SessionContextProvider supabaseClient={supabase}>
-      <UserProvider>
-        <BrowserRouter>
+  <BrowserRouter>
+    <Auth0Provider
+      domain={process.env.REACT_APP_DOMAIN}
+      clientId={process.env.REACT_APP_CLIENTID}
+      authorizationParams={{
+        redirect_uri: window.location.origin,
+        audience: process.env.REACT_APP_AUDIENCE,
+        scope: process.env.REACT_APP_SCOPE,
+      }}
+    >
+      <SessionContextProvider supabaseClient={supabase}>
+        <UserProvider>
           <App />
-        </BrowserRouter>
-      </UserProvider>
-    </SessionContextProvider>
-  </Auth0Provider>
+        </UserProvider>
+      </SessionContextProvider>
+    </Auth0Provider>
+  </BrowserRouter>
 );
