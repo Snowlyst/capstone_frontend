@@ -30,12 +30,7 @@ function CompanyProfile() {
 
   useEffect(() => {
     console.log(currUser);
-    if (currUser === null) {
-      const localAccess = JSON.parse(localStorage.getItem("verveCurrUser"));
-      console.log(localAccess);
-      setCurrUser(localAccess);
-    }
-  }, [currUser]);
+  }, []);
 
   useEffect(() => {
     if (!accessToken) {
