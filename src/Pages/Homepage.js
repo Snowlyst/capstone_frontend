@@ -159,10 +159,10 @@ function Homepage() {
           height: windowHeight >= 600 ? "90vh" : "88.2vh",
         }}
       >
-        <Grid Container justify="center" spacing={3}>
+        <Grid container justify="center" spacing={3}>
           <Grid item xs={12}>
             <Box
-              className="container"
+              className="container2"
               component="div"
               sx={{
                 minHeight: `${vh}`,
@@ -187,24 +187,29 @@ function Homepage() {
                     sx={{
                       fontFamily: theme.typography.h3Cursive.fontFamily,
                       fontSize:
-                        windowHeight >= 600 && windowWidth >= 980
+                        windowHeight >= 600 && windowWidth >= 920
                           ? "4rem"
                           : "2.5rem",
-                      left: windowWidth >= 1400 ? "56%" : "45%",
+                      left:
+                        windowWidth >= 1000
+                          ? "60%"
+                          : windowWidth >= 930
+                          ? "50%"
+                          : "43%",
                     }}
                   >
                     Where Journeys Thrive
                   </Typography>
                   <Box
                     component="img"
-                    src={people} // Set the path to your overlay image
+                    src={people}
                     alt="People"
                     width={imgWidth}
                     height={imgHeight}
                     style={{
                       position: "absolute",
-                      top: windowHeight >= 600 ? "40%" : "36%", // Adjust vertically
-                      left: windowHeight >= 550 ? "53%" : "50%", // Adjust horizontally
+                      top: windowHeight >= 600 ? "40%" : "36%",
+                      left: windowHeight >= 550 ? "53%" : "50%",
                       transform: "translate(-50%, -50%)",
                       zIndex: 1,
                     }}
@@ -230,8 +235,8 @@ function Homepage() {
                 }}
               >
                 <Stack
-                  spacing={2}
                   direction={windowWidth >= 767 ? "row" : "column"}
+                  spacing={2}
                 >
                   <FormControl variant="standard" sx={{ minWidth: "200px" }}>
                     <InputLabel htmlFor="location-input">
