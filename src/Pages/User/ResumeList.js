@@ -175,8 +175,6 @@ function ResumeList() {
 
   // on launch get user resume details
   useEffect(() => {
-    //temporarily hardcoded user
-
     if (accessToken && currUser) {
       const userId = currUser.id;
       axios

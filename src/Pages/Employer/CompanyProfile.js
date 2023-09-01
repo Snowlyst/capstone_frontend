@@ -45,13 +45,9 @@ function CompanyProfile() {
   }, [accessToken]);
 
   useEffect(() => {
-    if (companyId && accessToken) {
+    if (companyId) {
       axios
-        .get(`${BACKEND_URL}/company/${companyId}`, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        })
+        .get(`${BACKEND_URL}/company/${companyId}`)
         .then((info) => {
           console.log(info);
           setCompanyData(info.data[0]);
@@ -59,11 +55,7 @@ function CompanyProfile() {
         })
         .then((logo) => {
           axios
-            .get(`${BACKEND_URL}/listings/${companyId}`, {
-              headers: {
-                Authorization: `Bearer ${accessToken}`,
-              },
-            })
+            .get(`${BACKEND_URL}/listings/${companyId}`)
             .then((info) => {
               console.log(info);
               setCompanyJobs(
