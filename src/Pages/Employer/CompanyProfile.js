@@ -47,7 +47,7 @@ function CompanyProfile() {
   useEffect(() => {
     if (companyId) {
       axios
-        .get(`${BACKEND_URL}/company/${companyId}`)
+        .get(`${BACKEND_URL}/company/company/${companyId}`)
         .then((info) => {
           console.log(info);
           setCompanyData(info.data[0]);
@@ -55,7 +55,7 @@ function CompanyProfile() {
         })
         .then((logo) => {
           axios
-            .get(`${BACKEND_URL}/listings/${companyId}`)
+            .get(`${BACKEND_URL}/listings/company/${companyId}`)
             .then((info) => {
               console.log(info);
               setCompanyJobs(
