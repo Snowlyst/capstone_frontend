@@ -65,15 +65,22 @@ export const theme = createTheme({
     },
     p: {
       fontFamily: pFont,
-      color: "#868484",
+      color: "#868484", // grey
       fontWeight: 400,
       fontWeightBold: 700,
     },
     darkP: {
       fontFamily: pFont,
-      color: "#0E0140",
+      color: "#0E0140", // blue
       fontWeight: 400,
       fontWeightBold: 700,
+    },
+    error: {
+      fontFamily: pFont,
+      color: "#BA000d", // red
+      fontWeight: 400,
+      fontWeightBold: 700,
+      fontSize: 12,
     },
   },
   customStyles: {
