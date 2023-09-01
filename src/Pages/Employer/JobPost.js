@@ -43,7 +43,7 @@ import { ThemeProvider } from "@emotion/react";
 
 function JobPost() {
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
-  const { currUser, setCurrUser, categories } = useUserContext();
+  const { currUser, setCurrUser, categories, location } = useUserContext();
   const [rawMessage, setRawMessage] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [descriptionError, setDescriptionError] = useState(false);
@@ -428,7 +428,9 @@ function JobPost() {
                         closeMenuOnSelect={false}
                         components={animatedComponents}
                         options={categoryOptions}
-                      />
+                      >
+                        Test
+                      </reactSelect>
                     </Box>
                     <Tooltip title="Please include Responsibilities and Requirements here, where possible.">
                       <div>
