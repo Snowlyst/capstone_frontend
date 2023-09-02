@@ -23,6 +23,7 @@ import ResumeList from "./Pages/User/ResumeList";
 import CompanyProfile from "./Pages/Employer/CompanyProfile";
 import CreateResume from "./Pages/User/CreateResume";
 import JobListingOverall from "./Pages/Employer/JobListingOverall";
+import AdminDashboard from "./Pages/Administrator/AdminDashboard";
 function App() {
   const { isAuthenticated, isLoading } = useAuth0();
   useEffect(() => {
@@ -76,6 +77,10 @@ function App() {
         <Route
           path="/joblisting"
           element={<AuthenticationGuard component={JobListingOverall} />}
+        />
+        <Route
+          path="/admin/dashboard"
+          element={<AuthenticationGuard component={AdminDashboard} />}
         />
         {/* These 4 Pages are Test pages, to be deleted near the end */}
         <Route path="/onemap" element={<OnemapApiTest />} />
