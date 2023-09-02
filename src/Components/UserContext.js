@@ -10,15 +10,6 @@ export function useUserContext() {
 export function UserProvider({ children }) {
   const [currUser, setCurrUser] = useState(null);
   const [categories, setCategories] = useState([]);
-<<<<<<< HEAD
-
-  useEffect(() => {
-    axios
-      .get(`${process.env.REACT_APP_BACKEND_URL}/listings/categories`)
-      .then((response) => {
-        setCategories(response.data);
-        console.log("categories from context: ", categories);
-=======
   const [location, setLocation] = useState([]);
   const [companies, setCompanies] = useState([]);
 
@@ -28,14 +19,10 @@ export function UserProvider({ children }) {
       .get(`${process.env.REACT_APP_BACKEND_URL}/listings/categories/sorted`)
       .then((response) => {
         setCategories(response.data);
->>>>>>> main
       })
       .catch((error) => {
         console.error("Error fetching categories:", error);
       });
-<<<<<<< HEAD
-    // other api calls if needed
-=======
 
     // get location
     axios
@@ -58,18 +45,14 @@ export function UserProvider({ children }) {
       .catch((error) => {
         console.log("Error fetching companies: ", error);
       });
->>>>>>> main
   }, []);
 
   const contextValue = {
     currUser,
     setCurrUser,
     categories,
-<<<<<<< HEAD
-=======
     location,
     companies,
->>>>>>> main
   };
 
   return (

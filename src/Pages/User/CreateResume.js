@@ -18,6 +18,7 @@ import { theme } from "../../Assets/Styles/Theme";
 import Swal from "sweetalert2";
 function CreateResume() {
   // All the states
+  // States for the Experience
   const [selectedContent, setSelectedContent] = useState(null);
   const [selectedOption, setSelectedOption] = useState("");
   const [yearValue, setYearValue] = useState("");
@@ -43,6 +44,24 @@ function CreateResume() {
     monthlySalary: "",
     experienceSummary: "",
   });
+  const [savedFieldValues, setSavedFieldValues] = useState([]);
+  const [editingIndex, setEditingIndex] = useState(null);
+  // States for education
+  const [educationFields, setEducationFields] = useState([]);
+  const [eduFieldValues, setEduFieldValues] = useState({
+    university: "",
+    graduationDate: "",
+    qualification: "",
+    universityLocation: "",
+    fieldOfStudy: "",
+    major: "",
+    grade: "",
+    awards: "",
+  });
+  const [eduFieldErrors, setEduFieldErrors] = useState({});
+  const [eduEditingIndex, setEduEditingIndex] = useState(null);
+  const [eduFieldsVisible, setEduFieldsVisible] = useState(false);
+  // Logic for experience
   const handleContentClick = (content) => {
     setSelectedContent(content);
   };
@@ -76,7 +95,7 @@ function CreateResume() {
     const newYearValue = event.target.value;
     setYearValue(newYearValue);
     console.log(newYearValue);
-    setSelectedOption(`I have been working since ${newYearValue}`);
+    setSelectedOption(selectedOption);
   };
 
   const handleExperienceChange = (fieldName, value) => {
@@ -93,8 +112,7 @@ function CreateResume() {
     }
   };
 
-  const handleSaveExperience = (e) => {
-    //e.preventDefault();
+  const handleSaveExperience = () => {
     const newFieldErrors = {};
     Object.keys(fieldValues).forEach((fieldName) => {
       if (fieldValues[fieldName].trim() === "") {
@@ -105,10 +123,21 @@ function CreateResume() {
     if (Object.keys(newFieldErrors).length > 0) {
       Swal.fire("Ooops!", "You need to fill up the required fields!", "error");
     } else {
-      console.log(fieldValues);
+      // Check if we are editing an existing entry
+      if (editingIndex !== null) {
+        // Update the existing entry at the specified index
+        const updatedSavedFieldValues = [...savedFieldValues];
+        updatedSavedFieldValues[editingIndex] = fieldValues;
+        setSavedFieldValues(updatedSavedFieldValues);
+        setEditingIndex(null); // Exit edit mode
+      } else {
+        // Append the new entry to the array if not editing
+        setSavedFieldValues([...savedFieldValues, fieldValues]);
+      }
+
+      // Reset form fields and show saved values
       setExperienceFormFieldVisible(false);
       setShowSavedValues(true);
-       
     }
   };
   useEffect(() => {
@@ -116,6 +145,112 @@ function CreateResume() {
     console.log(showSavedValues);
   }, [showSavedValues]);
 
+  const resetFormFields = (index) => {
+    const entry = savedFieldValues[index];
+    setFieldValues({
+      positionTitle: entry.positionTitle,
+      companyName: entry.companyName,
+      joinedDate: entry.joinedDate,
+      leftDate: entry.leftDate,
+      specialization: entry.specialization,
+      role: entry.role,
+      country: entry.country,
+      industry: entry.industry,
+      positionLevel: entry.positionLevel,
+      monthlySalary: entry.monthlySalary,
+      experienceSummary: entry.experienceSummary,
+    });
+  };
+  console.log(savedFieldValues);
+  // Logic for education .
+  const handleSaveEducation = () => {
+    const newEduFieldErrors = eduValidateFields(eduFieldValues);
+
+    if (Object.keys(newEduFieldErrors).length > 0) {
+      // Display validation errors
+      setEduFieldErrors(newEduFieldErrors);
+    } else {
+      if (eduEditingIndex !== null) {
+        // Update the existing education entry
+        const updatedEducationFields = [...educationFields];
+        updatedEducationFields[eduEditingIndex] = eduFieldValues;
+        setEducationFields(updatedEducationFields);
+        setEduEditingIndex(null);
+      } else {
+        // Save the new education entry
+        setEducationFields([...educationFields, eduFieldValues]);
+      }
+
+      // Clear the form fields
+      setEduFieldValues({
+        university: "",
+        graduationDate: "",
+        qualification: "",
+        universityLocation: "",
+        fieldOfStudy: "",
+        major: "",
+        grade: "",
+        awards: "",
+      });
+
+      // Clear field errors
+      setEduFieldErrors({});
+      setEduFieldsVisible(false);
+    }
+  };
+  const eduValidateFields = (fields) => {
+    const eduErrors = {};
+
+    // Add validation logic for each field here
+    if (fields.university.trim() === "") {
+      eduErrors.university = "Institute/University is required";
+    }
+    if (fields.graduationDate.trim() === "") {
+      eduErrors.graduationDate = "Graduation Date is required";
+    }
+
+    if (fields.qualification.trim() === "") {
+      eduErrors.qualification = "Qualification is required";
+    }
+
+    if (fields.universityLocation.trim() === "") {
+      eduErrors.universityLocation =
+        "Institute/University Location is required";
+    }
+
+    if (fields.fieldOfStudy.trim() === "") {
+      eduErrors.fieldOfStudy = "Field of Study is required";
+    }
+
+    if (fields.major.trim() === "") {
+      eduErrors.major = "Major is required";
+    }
+
+    if (fields.grade.trim() === "") {
+      eduErrors.grade = "Grade is required";
+    }
+
+    if (fields.awards.trim() === "") {
+      eduErrors.awards = "Awards is required";
+    }
+    // Add similar validations for other fields
+
+    return eduErrors;
+  };
+  const resetEduFormFields = () => {
+    setFieldValues({
+      university: "",
+      graduationDate: "",
+      qualification: "",
+      universityLocation: "",
+      fieldOfStudy: "",
+      major: "",
+      grade: "",
+      awards: "",
+    });
+    setEduFieldErrors({});
+    setEduEditingIndex(null);
+  };
   return (
     <ThemeProvider theme={theme}>
       <Box>
@@ -293,7 +428,7 @@ function CreateResume() {
                     {!radioCollapsed && (
                       <Button
                         variant="contained"
-                        color="primary"
+                        classes={{ root: "orange" }}
                         onClick={handleOptionSaveClick}
                       >
                         Save
@@ -565,10 +700,20 @@ function CreateResume() {
                             />
                             <Button
                               variant="contained"
-                              color="primary"
+                              classes={{ root: "orange" }}
                               onClick={handleSaveExperience}
+                               sx={{ marginRight: '8px' }} 
                             >
                               Save
+                            </Button>
+                            <Button
+                              classes={{ root: "orange" }}
+                              onClick={() => {
+                                
+                                setExperienceFormFieldVisible(false);
+                              }}
+                            >
+                              Cancel
                             </Button>
                           </form>
                         </div>
@@ -577,47 +722,262 @@ function CreateResume() {
                       <div>
                         {/* Your saved values */}
                         <Typography variant="h6">Saved Experience:</Typography>
-                        <Typography variant="p">
-                          Position Title: {fieldValues.positionTitle}
-                          <br />
-                          Company Name: {fieldValues.companyName}
-                          <br />
-                          Joined Date: {fieldValues.joinedDate}
-                          <br />
-                          Left Date: {fieldValues.leftDate}
-                          <br />
-                          Specialization: {fieldValues.specialization}
-                          <br />
-                          Role: {fieldValues.role}
-                          <br />
-                          Country: {fieldValues.country}
-                          <br />
-                          Industry: {fieldValues.industry}
-                          <br />
-                          Position Level: {fieldValues.positonLevel}
-                          <br />
-                          Monthly Salary: {fieldValues.monthlySalary}
-                          <br />
-                          Experience Summary: {fieldValues.experienceSummary}
-                        </Typography>
-                        <br/>
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          onClick={() => {
-                            setExperienceFormFieldVisible(true);
-                            setShowSavedValues(false);
-                            
-                          }}
-                        >
-                          Edit
-                        </Button>
+                        {savedFieldValues.map((savedValues, index) => (
+                          <div key={index}>
+                            <Typography variant="p">
+                              Position Title: {savedValues.positionTitle}
+                              <br />
+                              Company Name: {savedValues.companyName}
+                              <br />
+                              Joined Date: {savedValues.joinedDate}
+                              <br />
+                              Left Date: {savedValues.leftDate}
+                              <br />
+                              Specialization: {savedValues.specialization}
+                              <br />
+                              Role: {savedValues.role}
+                              <br />
+                              Country: {savedValues.country}
+                              <br />
+                              Industry: {savedValues.industry}
+                              <br />
+                              Position Level: {savedValues.positionLevel}
+                              <br />
+                              Monthly Salary: {savedValues.monthlySalary}
+                              <br />
+                              Experience Summary:{" "}
+                              {savedValues.experienceSummary}
+                            </Typography>
+                            <br />
+                            <Button
+                              variant="contained"
+                              classes={{ root: "orange" }}
+                              onClick={() => {
+                                resetFormFields(index);
+                                setEditingIndex(index);
+                                setExperienceFormFieldVisible(true);
+                                setShowSavedValues(false);
+                              }}
+                              style={{ marginRight: "10px" }}
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              variant="contained"
+                              classes={{ root: "orange" }}
+                              onClick={() => {
+                                resetFormFields(index);
+                                setExperienceFormFieldVisible(true);
+                                setShowSavedValues(false);
+                              }}
+                            >
+                              Add Experience
+                            </Button>
+                          </div>
+                        ))}
                       </div>
                     )}
                   </div>
                 </div>
               )}
-              {selectedContent === "Education" && <div>Education Content</div>}
+              {selectedContent === "Education" && (
+                <div>
+                  <Button
+                    variant="contained"
+                    onClick={() => {
+                      // Handle adding new education
+                      setEduFieldsVisible(true);
+                      setEduFieldValues({}); // Clear the fields for a new entry
+                      setEduEditingIndex(null); // Reset the editing index for adding
+                    }}
+                    classes={{ root: "orange" }}
+                  >
+                    Add Education
+                  </Button>
+                  {educationFields.map((education, index) => (
+                    <div key={index}>
+                      <Typography variant="subtitle1">
+                        Institute/University: {education.university}
+                      </Typography>
+                      <Typography variant="subtitle1">
+                        Graduation Date: {education.graduationDate}
+                      </Typography>
+                      <Typography variant="subtitle1">
+                        Qualification: {education.qualification}
+                      </Typography>
+                      <Typography variant="subtitle1">
+                        Institute/University Location:
+                        {education.universityLocation}
+                      </Typography>
+                      <Typography variant="subtitle1">
+                        Field of Study: {education.fieldOfStudy}
+                      </Typography>
+                      <Typography variant="subtitle1">
+                        Major: {education.major}
+                      </Typography>
+                      <Typography variant="subtitle1">
+                        Grade: {education.grade}
+                      </Typography>
+                      <Typography variant="subtitle1">
+                        Awards: {education.awards}
+                      </Typography>
+                      <Button
+                        variant="contained"
+                        classes={{ root: "orange" }}
+                        onClick={() => {
+                          setEduFieldsVisible(true);
+                          setEduFieldValues(education);
+                          setEduEditingIndex(index);
+                        }}
+                      >
+                        Edit
+                      </Button>
+                    </div>
+                  ))}
+                  <Divider sx={{ margin: "20px 0" }} />
+                  {eduFieldsVisible && (
+                    <div>
+                      <TextField
+                        label="Institute/University"
+                        value={eduFieldValues.university}
+                        onChange={(e) =>
+                          setEduFieldValues({
+                            ...eduFieldValues,
+                            university: e.target.value,
+                          })
+                        }
+                        fullWidth
+                        margin="normal"
+                        size="small"
+                        error={!!eduFieldErrors.university}
+                        helperText={eduFieldErrors.university}
+                      />
+                      <TextField
+                        label="Graduation Date"
+                        value={eduFieldValues.graduationDate}
+                        onChange={(e) =>
+                          setEduFieldValues({
+                            ...eduFieldValues,
+                            graduationDate: e.target.value,
+                          })
+                        }
+                        fullWidth
+                        margin="normal"
+                        error={!!eduFieldErrors.graduationDate}
+                        helperText={eduFieldErrors.graduationDate}
+                      />
+                      <TextField
+                        label="Qualification"
+                        value={eduFieldValues.qualification}
+                        onChange={(e) =>
+                          setEduFieldValues({
+                            ...eduFieldValues,
+                            qualification: e.target.value,
+                          })
+                        }
+                        fullWidth
+                        margin="normal"
+                        size="small"
+                        error={!!eduFieldErrors.qualification}
+                        helperText={eduFieldErrors.qualification}
+                      />
+                      <TextField
+                        label="Institute/University Location"
+                        value={eduFieldValues.universityLocation}
+                        onChange={(e) =>
+                          setEduFieldValues({
+                            ...eduFieldValues,
+                            universityLocation: e.target.value,
+                          })
+                        }
+                        fullWidth
+                        margin="normal"
+                        size="small"
+                        error={!!eduFieldErrors.universityLocation}
+                        helperText={eduFieldErrors.universityLocation}
+                      />
+                      <TextField
+                        label="Field of Study"
+                        value={eduFieldValues.fieldOfStudy}
+                        onChange={(e) =>
+                          setEduFieldValues({
+                            ...eduFieldValues,
+                            fieldOfStudy: e.target.value,
+                          })
+                        }
+                        fullWidth
+                        margin="normal"
+                        error={!!eduFieldErrors.fieldOfStudy}
+                        helperText={eduFieldErrors.fieldOfStudy}
+                      />
+                      <TextField
+                        label="Major"
+                        value={eduFieldValues.major}
+                        onChange={(e) =>
+                          setEduFieldValues({
+                            ...eduFieldValues,
+                            major: e.target.value,
+                          })
+                        }
+                        fullWidth
+                        margin="normal"
+                        size="small"
+                        error={!!eduFieldErrors.major}
+                        helperText={eduFieldErrors.major}
+                      />
+                      <TextField
+                        label="Grade"
+                        value={eduFieldValues.grade}
+                        onChange={(e) =>
+                          setEduFieldValues({
+                            ...eduFieldValues,
+                            grade: e.target.value,
+                          })
+                        }
+                        fullWidth
+                        margin="normal"
+                        size="small"
+                        error={!!eduFieldErrors.grade}
+                        helperText={eduFieldErrors.grade}
+                      />
+                      <TextField
+                        label="Awards"
+                        value={eduFieldValues.awards}
+                        onChange={(e) =>
+                          setEduFieldValues({
+                            ...eduFieldValues,
+                            awards: e.target.value,
+                          })
+                        }
+                        fullWidth
+                        margin="normal"
+                        size="small"
+                        error={!!eduFieldErrors.awards}
+                        helperText={eduFieldErrors.awards}
+                      />
+                      <Button
+                        variant="contained"
+                        classes={{ root: "orange" }}
+                        onClick={() => {
+                          handleSaveEducation();
+                          setEduFieldsVisible(false);
+                        }}
+                      >
+                        Save
+                      </Button>
+                      <Button
+                        classes={{ root: "orange" }}
+                        onClick={() => {
+                          resetEduFormFields();
+                          setEduFieldsVisible(false);
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              )}
               {selectedContent === "Skills" && <div>Skills Content</div>}
               {selectedContent === "Languages" && <div>Languages Content</div>}
               {selectedContent === "Additional Info" && (
