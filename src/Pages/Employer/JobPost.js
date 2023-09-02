@@ -4,6 +4,7 @@ import { useUserContext } from "../../Components/UserContext";
 import { theme } from "../../Assets/Styles/Theme";
 import { Editor } from "react-draft-wysiwyg";
 import draftToHtml from "draftjs-to-html";
+
 import {
   EditorState,
   ContentState,
@@ -13,10 +14,12 @@ import {
 import { stateFromHTML } from "draft-js-import-html";
 import "draft-js/dist/Draft.css";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
-import reactSelect from "react-select";
-import makeAnimated from "react-select/animated";
+import AxiosLoader from "../../Components/AxiosLoader";
+// import ReactSelect from "react-select";
+// import makeAnimated from "react-select/animated";
 // import { styled } from "@mui/material/styles";
 import {
+  Autocomplete,
   Box,
   Typography,
   Grid,
@@ -34,32 +37,39 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
-  Stack,
   FormHelperText,
+  InputAdornment,
+  OutlinedInput,
+  breadcrumbsClasses,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import Swal from "sweetalert2";
 import { ThemeProvider } from "@emotion/react";
+import "../../Assets/Styles/Homepage.css";
 
 function JobPost() {
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
-  const { currUser, setCurrUser, categories, location } = useUserContext();
+  const { currUser, setCurrUser, categories, location, companies } =
+    useUserContext();
   const [rawMessage, setRawMessage] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [descriptionError, setDescriptionError] = useState(false);
   const [jobInfo, setJobInfo] = useState("");
-  const [url, setUrl] = useState({});
+  const [maxSalary, setMaxSalary] = useState("");
+  const [url, setUrl] = useState("");
   const [fieldErrors, setFieldErrors] = useState({});
+  // const [submitted, setSubmitted] = useState(false);
+  const [axiosLoading, setAxiosLoading] = useState(false);
   const [fieldValues, setFieldValues] = useState({
     jobTitle: "",
     employmentType: "",
     jobCategory: "",
-    companyId: "",
-    locationId: "",
+    location: "",
     jobDescription: "",
+    minSalary: "",
   });
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-  const animatedComponents = makeAnimated();
+  // const animatedComponents = makeAnimated();
   const toolbarOptions = {
     options: [
       "inline",
@@ -68,6 +78,7 @@ function JobPost() {
       "fontFamily",
       "textAlign",
       "list",
+      "colorPicker",
       "history",
     ],
     inline: {
@@ -103,22 +114,27 @@ function JobPost() {
     : { border: "1px solid #969696" };
 
   const editorStyle = descriptionError
-    ? { border: "1px solid #FF5733 ", height: "10rem", padding: "1rem" }
-    : { border: "1px solid #969696", height: "10rem", padding: "1rem" };
+    ? { border: "1px solid #FF5733 ", height: "20rem", padding: "1rem" }
+    : { border: "1px solid #969696", height: "20rem", padding: "1rem" };
 
   const categoryOptions = categories.map((category) => ({
-    value: category.id,
+    id: category.id,
     label: category.name,
   }));
 
-  // const locationOptions = [{                            value="Any", label>
-  //                             <em>Any</em>
-  //                           </MenuItem>
-  //                           <MenuItem value="Central">Central</MenuItem>
-  //                           <MenuItem value="East">East</MenuItem>
-  //                           <MenuItem value="North">North</MenuItem>
-  //                           <MenuItem value="North-East">North-East</MenuItem>
-  //                           <MenuItem value="West">West</MenuItem>}]
+  const locationOptions = location.map((area) => ({
+    id: area.id,
+    label: area.name,
+  }));
+
+  const fieldInitialState = {
+    jobTitle: "",
+    employmentType: "",
+    jobCategory: "",
+    location: "",
+    jobDescription: "",
+    minSalary: "",
+  };
 
   useEffect(() => {
     console.log("Categories: ", categories);
@@ -131,40 +147,107 @@ function JobPost() {
   useEffect(() => {
     if (jobInfo !== "") {
       handleChange("jobTitle", jobInfo[0].mainTitle);
-      console.log("Description is: ", jobInfo[1].description);
-      const convertedDescription = stateFromHTML(jobInfo[1].description);
+      handleChange("jobDescription", jobInfo[0].description);
+      const convertedDescription = stateFromHTML(jobInfo[0].description);
       onEditorStateChange(EditorState.createWithContent(convertedDescription));
+      setDescriptionError(false);
     }
   }, [jobInfo]);
 
   const onEditorStateChange = (newEditorState) => {
+    const editorHasText = editorState.getCurrentContent().hasText();
+    if (!editorHasText) {
+      setDescriptionError(true);
+    } else {
+      setDescriptionError(false);
+    }
     setEditorState(newEditorState);
-    console.log("This is editor state line 124: ", newEditorState);
     setRawMessage(
       draftToHtml(convertToRaw(newEditorState.getCurrentContent()))
     );
   };
 
-  const handleEditorStateToMessage = () => {
-    handleChange("jobDescription", rawMessage);
-    setModalOpen(true);
+  const checkInputsError = () => {
+    const editorHasText = editorState.getCurrentContent().hasText();
+    let error = false;
+    console.log("Field Values: ", fieldValues);
+    if (!editorHasText) {
+      setDescriptionError(true);
+      error = true;
+    } else {
+      setDescriptionError(false);
+    }
+    const newFieldErrors = {};
+    Object.keys(fieldValues).forEach((fieldName) => {
+      if (
+        typeof fieldValues[fieldName] === "string" &&
+        fieldValues[fieldName].trim() === ""
+      ) {
+        newFieldErrors[fieldName] = true;
+        error = true;
+      } else if (
+        typeof fieldValues[fieldName] === "object" &&
+        fieldValues[fieldName].hasOwnProperty("name")
+      ) {
+        if (fieldValues[fieldName].name.trim() === "") {
+          newFieldErrors[fieldName] = true;
+          error = true;
+        }
+      }
+    });
+    setFieldErrors(newFieldErrors);
+    return error;
   };
 
-  const getData = async (e) => {
-    e.preventDefault();
+  const handleEditorStateToMessage = () => {
+    handleChange("jobDescription", rawMessage);
+    const error = checkInputsError();
+    console.log(
+      "fielderrors :",
+      fieldErrors,
+      "descrip error: ",
+      descriptionError
+    );
+    if (
+      !error &&
+      Object.values(fieldErrors).every((error) => !error) &&
+      !descriptionError
+    ) {
+      setModalOpen(true);
+    } else {
+      Swal.fire("Ooops!", "You need to fill up the required fields!", "error");
+    }
+  };
+
+  const hasChanges = () => {
+    for (const key in fieldValues) {
+      if (fieldValues[key] !== fieldInitialState[key]) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const resetFields = () => {
+    setFieldValues(fieldInitialState);
+    setMaxSalary("");
+  };
+
+  const importLinkedIn = async () => {
+    setAxiosLoading(true);
     try {
       const response = await axios.post(
         `${BACKEND_URL}/listings/linkedin`,
         url
       );
       const info = response.data;
-      console.log(info);
       if (info !== null) {
         setJobInfo(info);
         setUrl("");
+
         Swal.fire(
           "Imported!",
-          "The job information was successfully imported. Feel free to make some changes before you submit it for approval.",
+          "The job information was successfully imported. Please add in the missing information before you submit it for approval.",
           "success"
         );
       }
@@ -175,33 +258,112 @@ function JobPost() {
         "The job information could not be imported. Please check the url is in the correct format. Otherwise, you can also key in the information. ",
         "error"
       );
+    } finally {
+      setAxiosLoading(false);
+    }
+  };
+
+  const getData = (e) => {
+    e.preventDefault();
+    if (hasChanges()) {
+      Swal.fire({
+        title: "Hold On!",
+        text: "There is already information in the form. Are you sure you wish to overwrite them? The information will be erased if you proceed.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "LightSeaGreen",
+        cancelButtonColor: "Crimson",
+        confirmButtonText: "Yes, delete it!",
+      }).then((result) => {
+        if (result.value) {
+          resetFields();
+          importLinkedIn();
+        }
+      });
+    } else {
+      importLinkedIn();
+    }
+  };
+
+  const checkSalary = (value) => {
+    const intValue = parseInt(value, 10);
+    if (!isNaN(intValue) && Number.isInteger(intValue)) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  const handleMaxSalaryChange = (value) => {
+    const maxSalaryIsNumber = checkSalary(value);
+    if (maxSalaryIsNumber) {
+      const maxSalary = Number(value);
+      setMaxSalary(maxSalary);
+    } else {
+      Swal.fire(
+        "Error!",
+        "Maximum salary must be a whole number. This is an optional field.",
+        "error"
+      );
     }
   };
 
   const handleChange = (fieldName, value) => {
-    setFieldValues((prevValues) => ({
-      ...prevValues,
-      [fieldName]: value,
+    console.log(" value: ", value);
+
+    if (fieldName === "minSalary") {
+      const minSalaryIsNumber = checkSalary(value);
+      if (minSalaryIsNumber) {
+        setFieldValues((prevValues) => ({
+          ...prevValues,
+          [fieldName]: Number(value),
+        }));
+        setFieldErrors((prevErrors) => ({
+          ...prevErrors,
+          minSalary: false,
+        }));
+      } else {
+        Swal.fire("Error!", "Minimum salary must be a whole number.", "error");
+        setFieldErrors((prevErrors) => ({
+          ...prevErrors,
+          minSalary: true,
+        }));
+      }
+      return;
+    }
+
+    if (fieldName === "jobCategory" || fieldName === "location") {
+      const selectedOption = { id: value.id, name: value.label };
+      console.log(fieldName, selectedOption);
+      setFieldValues((prevValues) => ({
+        ...prevValues,
+        [fieldName]: selectedOption,
+      }));
+    } else {
+      setFieldValues((prevValues) => ({
+        ...prevValues,
+        [fieldName]: value,
+      }));
+    }
+
+    setFieldErrors((prevErrors) => ({
+      ...prevErrors,
+      [fieldName]: false,
     }));
+
+    console.log(fieldValues);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setModalOpen(false);
-    const editorHasText = editorState.getCurrentContent().hasText();
-    const newFieldErrors = {};
-    Object.keys(fieldValues).forEach((fieldName) => {
-      if (fieldValues[fieldName].trim() === "") {
-        newFieldErrors[fieldName] = true;
-      }
-    });
-    if (!editorHasText) {
-      setDescriptionError(true);
+    const error = checkInputsError();
+    if (
+      !error &&
+      Object.values(fieldErrors).every((error) => !error) &&
+      !descriptionError
+    ) {
+      setModalOpen(true);
     } else {
-      setDescriptionError(false);
-    }
-    setFieldErrors(newFieldErrors);
-    if (newFieldErrors.length > 0) {
       Swal.fire("Ooops!", "You need to fill up the required fields!", "error");
     }
   };
@@ -210,54 +372,55 @@ function JobPost() {
     <Grid
       container
       direction="column"
-      spacing={2}
       sx={theme.customStyles.centered.container}
-      pt="15px"
     >
+      {axiosLoading && <AxiosLoader />}
       <ThemeProvider theme={theme}>
-        <Box p={5} sx={theme.customStyles.centered.container} padding={4}>
-          <Paper elevation={2}>
-            <Grid item container xs={12} m={3} justifyContent="center">
-              <Box maxWidth="80%">
-                <Typography
-                  variant="h4"
-                  sx={{
-                    fontWeight: theme.typography.h4.fontWeightBold,
-                    textAlign: "center",
-                  }}
-                >
-                  List a New Job
-                </Typography>
-              </Box>
-            </Grid>
-            <Grid item xs={12}>
-              <Box mt={2} ml={2} mr={2} display="flex" justifyContent="center">
-                <Typography
-                  variant="p"
-                  sx={{
-                    fontWeight: theme.typography.p.fontWeightBold,
-                    color: theme.typography.p.color,
-                  }}
-                >
-                  Please fill in all particulars to list a job. Do note that
-                  jobs have to be approved before they can be listed.
-                </Typography>
-              </Box>
-            </Grid>
-
-            <Box ml={2} mr={2} mt={3}>
-              <Grid item xs={12} mb={1}>
-                <Typography
-                  variant="h6"
-                  sx={{
-                    fontWeight: theme.typography.h6.fontWeightBold,
-                  }}
-                >
-                  Job Details Import
-                </Typography>
+        <Grid container direction="row" justifyContent="center">
+          <Box mb={4} p={4} width="80%">
+            <Paper elevation={2} color="FFF">
+              <Grid item xs={12}>
+                <Box pt={3}>
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      fontWeight: theme.typography.h4.fontWeightBold,
+                      textAlign: "center",
+                    }}
+                  >
+                    List a New Job
+                  </Typography>
+                </Box>
               </Grid>
-              <Grid item xs={12} mb={1}>
-                <div>
+
+              <Grid item xs={12}>
+                <Box m={2} pt={2} display="flex" justifyContent="center">
+                  <Typography
+                    variant="p"
+                    sx={{
+                      fontWeight: theme.typography.p.fontWeightBold,
+                      color: theme.typography.p.color,
+                    }}
+                  >
+                    Please fill in all particulars to list a job. Do note that
+                    jobs have to be approved before they can be listed.
+                  </Typography>
+                </Box>
+              </Grid>
+              <Grid item>
+                <Box m={4}>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      fontWeight: theme.typography.h6.fontWeightBold,
+                    }}
+                  >
+                    Job Details Import
+                  </Typography>
+                </Box>
+              </Grid>
+              <Grid item xs={12}>
+                <Box ml={4} mt={2} mr={3}>
                   <Typography
                     variant="p"
                     sx={{
@@ -277,50 +440,58 @@ function JobPost() {
                     </Typography>{" "}
                     and click search.
                   </Typography>
-                </div>
+                </Box>
               </Grid>
-            </Box>
-
-            <Box
-              ml={1}
-              mb={3}
-              // component="form"
-              sx={{
-                "& .MuiTextField-root": { m: 1, width: "50ch" },
-              }}
-            >
-              <Grid container>
-                <Grid item>
-                  <TextField
-                    id="search"
-                    type="search"
-                    label="Linkedin URL"
-                    placeholder="Job Post URL"
-                    helperText="Optional"
-                    value={url.url}
-                    size="small"
-                    onChange={(e) => setUrl({ url: e.target.value })}
-                    onBlur={(e) => setUrl({ url: e.target.value })}
-                  />
-                </Grid>
-                <Grid item alignItems="center" style={{ display: "flex" }}>
-                  <div>
-                    <Tooltip title="Import via Linkedin Job Post">
-                      <IconButton sx={{ p: 0 }} onClick={(e) => getData(e)}>
-                        <SearchIcon
-                          fontSize="large"
-                          sx={{ color: "#FF6B2C" }}
-                          alt="Search"
+              <Grid item>
+                <Box ml={3} mb={3} mt={3}>
+                  <Grid
+                    container
+                    alignItems="top"
+                    direction="row"
+                    justifyContent="center"
+                  >
+                    {" "}
+                    <Box display="flex" justifyContent="center">
+                      <Grid item xs={12}>
+                        <TextField
+                          id="search"
+                          type="search"
+                          label="Linkedin URL"
+                          placeholder="Job Post URL"
+                          helperText="Optional"
+                          value={url.url || ""}
+                          size="small"
+                          sx={{
+                            width: "50ch",
+                            m: 1,
+                          }}
+                          onChange={(e) => setUrl({ url: e.target.value })}
+                          onBlur={(e) => setUrl({ url: e.target.value })}
                         />
-                      </IconButton>
-                    </Tooltip>
-                  </div>
-                </Grid>
+                      </Grid>
+                      <Grid item>
+                        <Box mt={2}>
+                          <Tooltip title="Import via Linkedin Job Post">
+                            <IconButton
+                              sx={{ p: 0 }}
+                              onClick={(e) => getData(e)}
+                            >
+                              <SearchIcon
+                                fontSize="large"
+                                sx={{ color: "#FF6B2C" }}
+                                alt="Search"
+                              />
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
+                      </Grid>
+                    </Box>
+                  </Grid>
+                </Box>
               </Grid>
-            </Box>
-            <Box ml={1} mr={2} mb={3}>
-              <Grid container>
-                <Grid item xs={12} mb={2} ml={1}>
+
+              <Grid item>
+                <Box ml={4} mt={2}>
                   <Typography
                     variant="h6"
                     sx={{
@@ -329,119 +500,233 @@ function JobPost() {
                   >
                     Job Information
                   </Typography>
-                </Grid>
+                </Box>
+              </Grid>
 
-                <Grid item>
-                  <Box>
-                    <Grid container>
-                      <FormControl>
-                        <Typography
-                          variant="p"
-                          sx={{
-                            color: theme.typography.p.color,
-                          }}
+              <Grid item>
+                <Box ml={3} mt={2} width="80%">
+                  <FormControl>
+                    <Typography
+                      variant="p"
+                      sx={{
+                        color: theme.typography.p.color,
+                      }}
+                    >
+                      <TextField
+                        sx={{ width: "60ch", m: 1 }}
+                        required
+                        id="jobTitle"
+                        type="search"
+                        label="Job Title"
+                        size="small"
+                        value={fieldValues.jobTitle}
+                        placeholder="Job title of the position"
+                        onChange={(e) =>
+                          handleChange("jobTitle", e.target.value)
+                        }
+                        error={fieldErrors.jobTitle || false}
+                        helperText={
+                          fieldErrors.jobTitle && "Job Title is required!"
+                        }
+                      />
+                    </Typography>
+                  </FormControl>
+                </Box>
+              </Grid>
+
+              <Grid item>
+                <Box ml={3} mt={2}>
+                  <Grid
+                    container
+                    direction="row"
+                    alignItems="flex-end"
+                    spacing={2}
+                  >
+                    <Grid item xs={12} sm={4} md={3}>
+                      <FormControl
+                        variant="standard"
+                        sx={{ ml: 2, minWidth: 200 }}
+                        error={fieldErrors.employmentType || false}
+                      >
+                        <InputLabel id="employmentTypeLabel">
+                          Employment Type
+                        </InputLabel>
+                        <Select
+                          labelId="employmentTypeLabel"
+                          label="Employment Type"
+                          id="employmentType"
+                          value={fieldValues.employmentType}
+                          onChange={(e) =>
+                            handleChange(`employmentType`, e.target.value)
+                          }
                         >
-                          <TextField
-                            sx={{ width: "80ch", m: 1 }}
-                            required
-                            id="jobTitle"
-                            type="search"
-                            label="Job Title"
-                            size="small"
-                            value={fieldValues.jobTitle}
-                            placeholder="Job title of the position"
-                            onChange={(e) =>
-                              handleChange("jobTitle", e.target.value)
-                            }
-                            error={fieldErrors.jobTitle || false}
-                            helperText={
-                              fieldErrors.jobTitle && "Job Title is required!"
-                            }
-                          />
-                        </Typography>
+                          <MenuItem value="any">
+                            <em>Any</em>
+                          </MenuItem>
+                          <MenuItem value="Full-Time">Full-Time</MenuItem>
+                          <MenuItem value="Part-Time">Part-Time</MenuItem>
+                          <MenuItem value="Contract">Contract</MenuItem>
+                          <MenuItem value="Remote">Remote</MenuItem>
+                        </Select>
+                        <FormHelperText>
+                          {fieldErrors.employmentType &&
+                            "Employment Type is required!"}
+                        </FormHelperText>
                       </FormControl>
                     </Grid>
-                    <Box>
-                      <Grid container mt={4}>
-                        <FormControl
-                          variant="standard"
-                          sx={{ ml: 2, minWidth: 200 }}
-                          error={fieldErrors.employmentType || false}
-                        >
-                          <InputLabel id="employmentTypeLabel">
-                            Employment Type
-                          </InputLabel>
-                          <Select
-                            labelId="employmentTypeLabel"
-                            label="Employment Type"
-                            id="employmentType"
-                            value={fieldValues.employmentType}
-                            onChange={(e) =>
-                              handleChange(`employmentType`, e.target.value)
-                            }
-                          >
-                            <MenuItem value="any">
-                              <em>Any</em>
-                            </MenuItem>
-                            <MenuItem value="Full-Time">Full-Time</MenuItem>
-                            <MenuItem value="Part-Time">Part-Time</MenuItem>
-                            <MenuItem value="Contract">Contract</MenuItem>
-                            <MenuItem value="Remote">Remote</MenuItem>
-                          </Select>
-                          <FormHelperText>
-                            {fieldErrors.employmentType &&
-                              "Employment Type is required!"}
-                          </FormHelperText>
-                        </FormControl>
-                        <FormControl
-                          variant="standard"
-                          sx={{ ml: 4, minWidth: 200 }}
-                          error={fieldErrors.locationId || false}
-                        >
-                          <InputLabel id="employmentTypeLabel">
-                            Location
-                          </InputLabel>
-                          <Select
-                            labelId="locationIdLabel"
-                            label="Location"
-                            id="locationId"
-                            value={fieldValues.locationId}
-                            onChange={(e) =>
-                              handleChange(`locationId`, e.target.value)
-                            }
-                          >
-                            <MenuItem value="Any">
-                              <em>Any</em>
-                            </MenuItem>
-                            <MenuItem value="Central">Central</MenuItem>
-                            <MenuItem value="East">East</MenuItem>
-                            <MenuItem value="North">North</MenuItem>
-                            <MenuItem value="North-East">North-East</MenuItem>
-                            <MenuItem value="West">West</MenuItem>
-                          </Select>
-                          <FormHelperText>
-                            {fieldErrors.locationId && "Location is required!"}
-                          </FormHelperText>
-                        </FormControl>
-                      </Grid>
-                      <reactSelect
-                        closeMenuOnSelect={false}
-                        components={animatedComponents}
-                        options={categoryOptions}
+                    <Grid item xs={12} sm={4} md={3}>
+                      <FormControl
+                        variant="standard"
+                        sx={{ ml: 4, minWidth: 200 }}
+                        error={fieldErrors.location || false}
                       >
-                        Test
-                      </reactSelect>
-                    </Box>
-                    <Tooltip title="Please include Responsibilities and Requirements here, where possible.">
-                      <div>
-                        <Grid container>
-                          <Grid item xs={3}></Grid>
-                        </Grid>
-                        <div style={{ marginTop: "5%", marginLeft: "2%" }}>
+                        <Autocomplete
+                          disablePortal
+                          id="location"
+                          value={fieldValues.location.name || ""}
+                          options={locationOptions}
+                          isOptionEqualToValue={(option, value) =>
+                            option.id === Number(value.id)
+                          }
+                          sx={{ width: 200 }}
+                          onChange={(e, selectedOption) => {
+                            console.log(selectedOption);
+                            if (selectedOption) {
+                              handleChange(`location`, selectedOption);
+                            }
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              required
+                              label="Location"
+                              variant="standard"
+                            />
+                          )}
+                        />
+                        <FormHelperText>
+                          {fieldErrors.location && "Location is required!"}
+                        </FormHelperText>
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={4} md={3}>
+                      <FormControl
+                        variant="standard"
+                        sx={{ ml: 4, minWidth: 200 }}
+                        error={fieldErrors.jobCategory || false}
+                      >
+                        <Autocomplete
+                          disablePortal
+                          id="jobCategory"
+                          options={categoryOptions}
+                          value={fieldValues.jobCategory.name || ""}
+                          sx={{ width: 200 }}
+                          isOptionEqualToValue={(option, value) =>
+                            option.id === Number(value.id)
+                          }
+                          onChange={(e, selectedOption) => {
+                            console.log(selectedOption);
+                            if (selectedOption) {
+                              handleChange(`jobCategory`, selectedOption);
+                            }
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              required
+                              label="Job Category"
+                              variant="standard"
+                            />
+                          )}
+                        />
+                        <FormHelperText>
+                          {fieldErrors.jobCategory &&
+                            "Job category is required!"}
+                        </FormHelperText>
+                      </FormControl>
+                    </Grid>
+                  </Grid>
+                </Box>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Box ml={3} mt={5}>
+                  <Grid container direction="row" alignItems="top" spacing={5}>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl
+                        sx={{ m: 1, width: "25ch" }}
+                        variant="outlined"
+                      >
+                        <TextField
+                          required
+                          id="minSalary"
+                          InputProps={{
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                $
+                              </InputAdornment>
+                            ),
+                            endAdornment: (
+                              <InputAdornment position="end">
+                                /mth
+                              </InputAdornment>
+                            ),
+                          }}
+                          label="Minimum Salary / mth"
+                          value={fieldValues.minSalary}
+                          onChange={(e) =>
+                            handleChange(`minSalary`, e.target.value)
+                          }
+                          error={fieldErrors.minSalary || false}
+                          helperText={
+                            fieldErrors.minSalary &&
+                            "Minimum Salary is required for Approval!"
+                          }
+                        ></TextField>
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl
+                        sx={{ m: 1, width: "25ch" }}
+                        variant="outlined"
+                      >
+                        <TextField
+                          id="maxSalary"
+                          InputProps={{
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                $
+                              </InputAdornment>
+                            ),
+                            endAdornment: (
+                              <InputAdornment position="end">
+                                /mth
+                              </InputAdornment>
+                            ),
+                          }}
+                          label="Maximum Salary / mth"
+                          helperText={"Optional"}
+                          value={maxSalary}
+                          onChange={(e) =>
+                            handleMaxSalaryChange(e.target.value)
+                          }
+                        />
+                      </FormControl>
+                    </Grid>
+                  </Grid>
+                </Box>
+              </Grid>
+              <Grid item>
+                <Box ml={3} mt={2} mr={5}>
+                  <Tooltip title="Please include Responsibilities and Requirements here, where possible.">
+                    <Grid container direction="column">
+                      <Grid item>
+                        <Box mt={3} ml={1}>
                           <Typography
                             variant="p"
                             sx={{
-                              color: theme.typography.p.color,
+                              color: descriptionError
+                                ? theme.typography.error.color
+                                : theme.typography.p.color,
                             }}
                           >
                             Job Description
@@ -455,9 +740,8 @@ function JobPost() {
                             onEditorStateChange={onEditorStateChange}
                             toolbar={toolbarOptions}
                           />
-                        </div>
-                        {descriptionError && (
-                          <div>
+
+                          {descriptionError && (
                             <Typography
                               variant="p"
                               sx={{
@@ -467,92 +751,146 @@ function JobPost() {
                             >
                               Job Description is required!
                             </Typography>
-                          </div>
-                        )}
-                        <div style={{ marginTop: "2%" }}>
-                          <Stack justifyContent="right" direction="row">
+                          )}
+                        </Box>
+                      </Grid>
+                      <Grid item>
+                        <Box mb={3} mt={2}>
+                          <Grid
+                            container
+                            justifyContent="flex-end"
+                            direction="row"
+                          >
                             <Button
                               classes={{ root: "orange" }}
                               variant="contained"
                               onClick={handleEditorStateToMessage}
                             >
-                              submit
+                              preview
                             </Button>
-                          </Stack>
-                        </div>
-                        <Dialog
-                          open={modalOpen}
-                          onClose={() => setModalOpen(false)}
-                        >
-                          <DialogTitle>
-                            <Typography
-                              variant="h4"
-                              sx={{
-                                fontWeight: theme.typography.h4.fontWeightBold,
-                              }}
-                            >
-                              New Job Post
-                            </Typography>
-                          </DialogTitle>
-                          <DialogContent>
-                            <DialogContentText>
-                              <div>
-                                <Typography
-                                  variant="p"
-                                  sx={{
-                                    fontWeight:
-                                      theme.typography.p.fontWeightBold,
-                                  }}
-                                >
-                                  Job Title:
-                                </Typography>{" "}
-                                {fieldValues.jobTitle}
-                              </div>
-                              <div>
-                                <Typography
-                                  variant="p"
-                                  sx={{
-                                    fontWeight:
-                                      theme.typography.p.fontWeightBold,
-                                  }}
-                                >
-                                  Employment Type:{" "}
-                                </Typography>
-                                {fieldValues.employmentType}
-                              </div>
-                              <div
-                                dangerouslySetInnerHTML={{
-                                  __html: fieldValues.jobDescription,
-                                }}
-                              />
-                            </DialogContentText>
-                          </DialogContent>
-                          <DialogActions>
-                            <Button
-                              onClick={() => setModalOpen(false)}
-                              classes={{ root: "blue" }}
-                              variant="contained"
-                            >
-                              edit
-                            </Button>
-                            <Button
-                              onClick={handleSubmit}
-                              classes={{ root: "orange" }}
-                              variant="contained"
-                            >
-                              submit
-                            </Button>
-                          </DialogActions>
-                        </Dialog>
-                      </div>
-                    </Tooltip>
-                  </Box>
-                </Grid>
+                          </Grid>
+                        </Box>
+                      </Grid>
+                    </Grid>
+                  </Tooltip>
+                </Box>
               </Grid>
-            </Box>
-            {console.log(jobInfo)}
-          </Paper>
-        </Box>
+            </Paper>
+          </Box>
+        </Grid>
+
+        <Dialog open={modalOpen} onClose={() => setModalOpen(false)}>
+          <Grid container direction="column">
+            <Grid item>
+              <Box mt={2} justifyContent="center" display="flex">
+                <DialogTitle>
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      fontWeight: theme.typography.h4.fontWeightBold,
+                    }}
+                  >
+                    New Job Post
+                  </Typography>
+                </DialogTitle>
+              </Box>
+            </Grid>
+
+            <Grid item xs={12}>
+              <DialogContent>
+                <DialogContentText
+                  style={{ marginBottom: "16px", textAlign: "center" }}
+                >
+                  <Typography
+                    variant="h5"
+                    sx={{
+                      fontWeight: theme.typography.h5.fontWeightBold,
+                    }}
+                  >
+                    {fieldValues.jobTitle
+                      ? fieldValues.jobTitle
+                      : "Please key in Job Title!"}
+                  </Typography>{" "}
+                </DialogContentText>
+
+                <DialogContentText>
+                  <Typography
+                    variant="p"
+                    sx={{
+                      fontWeight: theme.typography.p.fontWeightBold,
+                    }}
+                  >
+                    {fieldValues.employmentType
+                      ? fieldValues.employmentType
+                      : ""}
+                  </Typography>
+                </DialogContentText>
+
+                <DialogContentText>
+                  <Typography
+                    variant="p"
+                    sx={{
+                      fontWeight: theme.typography.p.fontWeightBold,
+                    }}
+                  >
+                    Location:{" "}
+                  </Typography>
+                  {fieldValues.location && fieldValues.location.name
+                    ? fieldValues.location.name
+                    : "Please select a location."}
+                </DialogContentText>
+
+                <DialogContentText style={{ marginBottom: "16px" }}>
+                  <Typography
+                    variant="p"
+                    sx={{
+                      fontWeight: theme.typography.p.fontWeightBold,
+                    }}
+                  >
+                    Category:{" "}
+                  </Typography>
+                  {fieldValues.categories && fieldValues.categories.name
+                    ? fieldValues.categories.name
+                    : "Please select a category."}
+                </DialogContentText>
+                <DialogContentText>
+                  <Box>
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        fontWeight: theme.typography.h6.fontWeightBold,
+                      }}
+                    >
+                      Job Details{" "}
+                    </Typography>
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: fieldValues.jobDescription,
+                      }}
+                    />
+                  </Box>
+                </DialogContentText>
+              </DialogContent>
+            </Grid>
+
+            <DialogActions>
+              <Button
+                onClick={() => setModalOpen(false)}
+                classes={{ root: "blue" }}
+                variant="contained"
+              >
+                edit
+              </Button>
+              <Button
+                onClick={handleSubmit}
+                classes={{ root: "orange" }}
+                variant="contained"
+              >
+                submit
+              </Button>
+            </DialogActions>
+          </Grid>
+        </Dialog>
       </ThemeProvider>
     </Grid>
   );
