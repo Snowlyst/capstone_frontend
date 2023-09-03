@@ -84,6 +84,21 @@ export const theme = createTheme({
     },
   },
   customStyles: {
+    displayFlexRowCenter: {
+      display: "flex",
+      flexDirection: "row",
+      justifyContent: "center",
+    },
+    displayFlexRowLeft: {
+      display: "flex",
+      flexDirection: "row",
+      justifyContent: "left",
+    },
+    displayFlexColumnCenter: {
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+    },
     centered: {
       container: {
         backgroundColor: "#F3F1FF",
@@ -116,6 +131,13 @@ export const theme = createTheme({
             color: "#ffffff",
             "&:hover": {
               backgroundColor: "#f79568",
+            },
+          },
+          "&.red": {
+            backgroundColor: "#D73030",
+            color: "#ffffff",
+            "&:hover": {
+              backgroundColor: "#EC6767",
             },
           },
         },

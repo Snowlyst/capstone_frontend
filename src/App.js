@@ -23,6 +23,7 @@ import ResumeList from "./Pages/User/ResumeList";
 import CompanyProfile from "./Pages/Employer/CompanyProfile";
 import CreateResume from "./Pages/User/CreateResume";
 import JobListingOverall from "./Pages/Employer/JobListingOverall";
+import IndividualJobPage from "./Pages/Employer/IndividualJobPage";
 function App() {
   const { isAuthenticated, isLoading } = useAuth0();
   useEffect(() => {
@@ -60,6 +61,7 @@ function App() {
           element={<AuthenticationGuard component={Search} />}
         />
         <Route path="/updateprofile" element={<UpdateProfile />} />
+        <Route path="/company/jobs/:jobId" element={<IndividualJobPage />} />
         <Route
           path="/jobpost"
           element={<AuthenticationGuard component={JobPost} />}
