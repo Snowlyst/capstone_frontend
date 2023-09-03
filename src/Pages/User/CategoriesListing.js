@@ -11,7 +11,6 @@ function CategoriesListing() {
   const [listings, setListings] = useState([]);
   const { categoryId } = useParams();
 
-
   useEffect(() => {
     axios
       .get(`http://localhost:8080/listings/categories/${categoryId}`)
@@ -28,9 +27,9 @@ function CategoriesListing() {
     setSelectedListing(listing);
   };
 
-  const handleBackClick=() =>{
-    navigate("/categories")
-  }
+  const handleBackClick = () => {
+    navigate("/categories");
+  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -144,7 +143,7 @@ function CategoriesListing() {
                 <Button
                   className="orange"
                   variant="contained"
-                  onClick={()=>{
+                  onClick={() => {
                     Swal.fire({
                       icon: "success",
                       title: "Resume Sent",

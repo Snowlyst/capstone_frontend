@@ -30,12 +30,7 @@ function CompanyProfile() {
 
   useEffect(() => {
     console.log(currUser);
-    if (currUser === null) {
-      const localAccess = JSON.parse(localStorage.getItem("verveCurrUser"));
-      console.log(localAccess);
-      setCurrUser(localAccess);
-    }
-  }, [currUser]);
+  }, []);
 
   useEffect(() => {
     if (!accessToken) {
@@ -47,7 +42,7 @@ function CompanyProfile() {
   useEffect(() => {
     if (companyId) {
       axios
-        .get(`${BACKEND_URL}/company/${companyId}`)
+        .get(`${BACKEND_URL}/company/company/${companyId}`)
         .then((info) => {
           console.log(info);
           setCompanyData(info.data[0]);
@@ -55,7 +50,7 @@ function CompanyProfile() {
         })
         .then((logo) => {
           axios
-            .get(`${BACKEND_URL}/listings/${companyId}`)
+            .get(`${BACKEND_URL}/listings/company/${companyId}`)
             .then((info) => {
               console.log(info);
               setCompanyJobs(
@@ -150,7 +145,7 @@ function CompanyProfile() {
           console.log(error);
         });
     }
-  }, [accessToken]);
+  }, []);
 
   //for consolelogging only, to remove
   useEffect(() => {
