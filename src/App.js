@@ -22,6 +22,7 @@ import FirebaseUpload from "./TestPages(TO_BE_DELETED)/FirebaseUpload";
 import ResumeList from "./Pages/User/ResumeList";
 import CompanyProfile from "./Pages/Employer/CompanyProfile";
 import CreateResume from "./Pages/User/CreateResume";
+import JobListingOverall from "./Pages/Employer/JobListingOverall";
 function App() {
   const { isAuthenticated, isLoading } = useAuth0();
   useEffect(() => {
@@ -72,6 +73,10 @@ function App() {
           element={<AuthenticationGuard component={CompanyProfile} />}
         />
         <Route path="createresume" element={<CreateResume />} />
+        <Route
+          path="/joblisting"
+          element={<AuthenticationGuard component={JobListingOverall} />}
+        />
         {/* These 4 Pages are Test pages, to be deleted near the end */}
         <Route path="/onemap" element={<OnemapApiTest />} />
         <Route path="/pdf" element={<PDFReadingTest />} />
