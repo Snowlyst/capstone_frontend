@@ -86,8 +86,10 @@ function Homepage() {
               }
             );
             console.log(userInfo.data.checkedUser);
+            const userObject = userInfo.data.checkedUser;
+            userObject.accessToken = accessToken;
             if (userInfo != null) {
-              setCurrUser(userInfo.data.checkedUser);
+              setCurrUser(userObject);
             }
           } catch (error) {
             console.log(error);
