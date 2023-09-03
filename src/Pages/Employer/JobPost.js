@@ -1,23 +1,20 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../../Components/UserContext";
 import { theme } from "../../Assets/Styles/Theme";
 import { Editor } from "react-draft-wysiwyg";
 import draftToHtml from "draftjs-to-html";
-
-import {
-  EditorState,
-  ContentState,
-  convertFromHTML,
-  convertToRaw,
-} from "draft-js";
+import { EditorState, convertToRaw } from "draft-js";
 import { stateFromHTML } from "draft-js-import-html";
 import "draft-js/dist/Draft.css";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import AxiosLoader from "../../Components/AxiosLoader";
-// import ReactSelect from "react-select";
-// import makeAnimated from "react-select/animated";
-// import { styled } from "@mui/material/styles";
+import SearchIcon from "@mui/icons-material/Search";
+import Swal from "sweetalert2";
+import { ThemeProvider } from "@emotion/react";
+import "../../Assets/Styles/Homepage.css";
+import * as SwalMsgs from "../../Utils/SwalMsgs";
 import {
   Autocomplete,
   Box,
@@ -39,26 +36,20 @@ import {
   DialogActions,
   FormHelperText,
   InputAdornment,
-  OutlinedInput,
-  breadcrumbsClasses,
 } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
-import Swal from "sweetalert2";
-import { ThemeProvider } from "@emotion/react";
-import "../../Assets/Styles/Homepage.css";
 
 function JobPost() {
+  let navigate = useNavigate();
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
-  const { currUser, setCurrUser, categories, location, companies } =
-    useUserContext();
+  const { currUser, categories, location } = useUserContext();
   const [rawMessage, setRawMessage] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [descriptionError, setDescriptionError] = useState(false);
   const [jobInfo, setJobInfo] = useState("");
   const [maxSalary, setMaxSalary] = useState("");
+  const [disableSubmit, setDisableSubmit] = useState(false);
   const [url, setUrl] = useState("");
   const [fieldErrors, setFieldErrors] = useState({});
-  // const [submitted, setSubmitted] = useState(false);
   const [axiosLoading, setAxiosLoading] = useState(false);
   const [fieldValues, setFieldValues] = useState({
     jobTitle: "",
@@ -69,7 +60,6 @@ function JobPost() {
     minSalary: "",
   });
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-  // const animatedComponents = makeAnimated();
   const toolbarOptions = {
     options: [
       "inline",
@@ -141,8 +131,19 @@ function JobPost() {
   }, [categories]);
 
   useEffect(() => {
-    console.log("url: ", url);
-  }, [url]);
+    console.log("currUser: ", currUser);
+
+    if (currUser && currUser.id !== null && !currUser.approvedByAdmin) {
+      Swal.fire(SwalMsgs.awaitingAccountApproval("Home")).then((result) => {
+        if (result.isConfirmed) {
+          setDisableSubmit(true);
+          navigate("/");
+        } else {
+          setDisableSubmit(false);
+        }
+      });
+    }
+  }, [currUser]);
 
   useEffect(() => {
     if (jobInfo !== "") {
@@ -162,9 +163,11 @@ function JobPost() {
       setDescriptionError(false);
     }
     setEditorState(newEditorState);
-    setRawMessage(
-      draftToHtml(convertToRaw(newEditorState.getCurrentContent()))
+    const htmlMessage = draftToHtml(
+      convertToRaw(newEditorState.getCurrentContent())
     );
+    setRawMessage(htmlMessage);
+    handleChange("jobDescription", htmlMessage);
   };
 
   const checkInputsError = () => {
@@ -215,7 +218,7 @@ function JobPost() {
     ) {
       setModalOpen(true);
     } else {
-      Swal.fire("Ooops!", "You need to fill up the required fields!", "error");
+      Swal.fire(SwalMsgs.missingFormInfoGentle);
     }
   };
 
@@ -245,19 +248,11 @@ function JobPost() {
         setJobInfo(info);
         setUrl("");
 
-        Swal.fire(
-          "Imported!",
-          "The job information was successfully imported. Please add in the missing information before you submit it for approval.",
-          "success"
-        );
+        Swal.fire(SwalMsgs.importInfoSuccessful("job information"));
       }
     } catch (error) {
       console.error("Error fetching HTML: ", error);
-      Swal.fire(
-        "Sorry!",
-        "The job information could not be imported. Please check the url is in the correct format. Otherwise, you can also key in the information. ",
-        "error"
-      );
+      Swal.fire(SwalMsgs.importInfoFailed("job information", "url"));
     } finally {
       setAxiosLoading(false);
     }
@@ -265,16 +260,10 @@ function JobPost() {
 
   const getData = (e) => {
     e.preventDefault();
-    if (hasChanges()) {
-      Swal.fire({
-        title: "Hold On!",
-        text: "There is already information in the form. Are you sure you wish to overwrite them? The information will be erased if you proceed.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "LightSeaGreen",
-        cancelButtonColor: "Crimson",
-        confirmButtonText: "Yes, delete it!",
-      }).then((result) => {
+    if (url === "") {
+      Swal.fire(SwalMsgs.missingFormInfoGentle);
+    } else if (hasChanges()) {
+      Swal.fire(SwalMsgs.overwriteCurrentInfo).then((result) => {
         if (result.value) {
           resetFields();
           importLinkedIn();
@@ -300,11 +289,7 @@ function JobPost() {
       const maxSalary = Number(value);
       setMaxSalary(maxSalary);
     } else {
-      Swal.fire(
-        "Error!",
-        "Maximum salary must be a whole number. This is an optional field.",
-        "error"
-      );
+      Swal.fire(SwalMsgs.numberRequiredOptionalField("Maximum Salary"));
     }
   };
 
@@ -323,7 +308,7 @@ function JobPost() {
           minSalary: false,
         }));
       } else {
-        Swal.fire("Error!", "Minimum salary must be a whole number.", "error");
+        Swal.fire(SwalMsgs.numberRequired("Minimum Salary"));
         setFieldErrors((prevErrors) => ({
           ...prevErrors,
           minSalary: true,
@@ -354,17 +339,70 @@ function JobPost() {
     console.log(fieldValues);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const error = checkInputsError();
-    if (
-      !error &&
-      Object.values(fieldErrors).every((error) => !error) &&
-      !descriptionError
-    ) {
-      setModalOpen(true);
-    } else {
-      Swal.fire("Ooops!", "You need to fill up the required fields!", "error");
+    const jobPost =
+      maxSalary !== null
+        ? {
+            companyId: currUser.companyInfo.id,
+            title: fieldValues.jobTitle,
+            employmentType: fieldValues.employmentType,
+            jobCategoryId: fieldValues.jobCategory.id,
+            locationId: fieldValues.location.id,
+            description: fieldValues.jobDescription,
+            minSalary: fieldValues.minSalary,
+            maxSalary: maxSalary,
+          }
+        : {
+            companyId: currUser.companyInfo.id,
+            title: fieldValues.jobTitle,
+            employmentType: fieldValues.employmentType,
+            jobCategoryId: fieldValues.jobCategory.id,
+            locationId: fieldValues.location.id,
+            description: fieldValues.jobDescription,
+            minSalary: fieldValues.minSalary,
+          };
+    if (!error && currUser.approvedByAdmin) {
+      console.log(jobPost);
+      setAxiosLoading(true);
+      try {
+        const newJobInfo = await axios.post(
+          `${BACKEND_URL}/company/newjobpost`,
+          jobPost,
+          {
+            headers: {
+              Authorization: `Bearer ${currUser.accessToken}`,
+            },
+          }
+        );
+        console.log(newJobInfo.data.postedJobInfo);
+        if (newJobInfo != null) {
+          setAxiosLoading(false);
+          Swal.fire(SwalMsgs.successPostingAwaitApprovalWButtons).then(
+            (result) => {
+              if (result.isConfirmed) {
+                navigate("/");
+              } else if (result.isDenied) {
+                navigate("/");
+              }
+            }
+          );
+        }
+      } catch (error) {
+        console.log(error);
+        Swal.fire(SwalMsgs.errorPosting);
+      } finally {
+        setAxiosLoading(false);
+        setModalOpen(false);
+      }
+    } else if (!error) {
+      setAxiosLoading(false);
+      Swal.fire(SwalMsgs.missingFormInfo);
+    } else if (!currUser.approvedByAdmin) {
+      setAxiosLoading(false);
+      setDisableSubmit(true);
+      Swal.fire(SwalMsgs.awaitingAccountApproval);
     }
   };
 
@@ -762,6 +800,7 @@ function JobPost() {
                             direction="row"
                           >
                             <Button
+                              disabled={disableSubmit}
                               classes={{ root: "orange" }}
                               variant="contained"
                               onClick={handleEditorStateToMessage}
@@ -849,8 +888,8 @@ function JobPost() {
                   >
                     Category:{" "}
                   </Typography>
-                  {fieldValues.categories && fieldValues.categories.name
-                    ? fieldValues.categories.name
+                  {fieldValues.jobCategory && fieldValues.jobCategory.name
+                    ? fieldValues.jobCategory.name
                     : "Please select a category."}
                 </DialogContentText>
                 <DialogContentText>
@@ -875,6 +914,7 @@ function JobPost() {
 
             <DialogActions>
               <Button
+                disabled={disableSubmit}
                 onClick={() => setModalOpen(false)}
                 classes={{ root: "blue" }}
                 variant="contained"
@@ -882,6 +922,7 @@ function JobPost() {
                 edit
               </Button>
               <Button
+                disabled={disableSubmit}
                 onClick={handleSubmit}
                 classes={{ root: "orange" }}
                 variant="contained"

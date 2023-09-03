@@ -55,7 +55,7 @@ function Navbar() {
   const handleUserMenu = async (page) => {
     let user = {};
     if (page === "Logout") {
-      logout({
+      await logout({
         logoutParams: {
           returnTo: window.location.origin,
         },
@@ -72,7 +72,7 @@ function Navbar() {
       localStorage.setItem("verveRole", JSON.stringify(user.role));
       await loginWithRedirect({
         appState: {
-          returnTo: "/profile",
+          returnTo: "/",
         },
         authorizationParams: {
           screen_hint: "Login/Register",
@@ -84,7 +84,7 @@ function Navbar() {
       localStorage.setItem("verveRole", JSON.stringify(user.role));
       await loginWithRedirect({
         appState: {
-          returnTo: "/dashboard",
+          returnTo: "/",
         },
         authorizationParams: {
           screen_hint: "Login/Register",
