@@ -139,7 +139,7 @@ function AdminDashboard() {
                 </Grid>
                 <Grid item sx={{ mt: 3, mb: 7 }}>
                   <Stack direction={"row"}>
-                    <Link href="#">
+                    <Link href="/joblisting">
                       <Button
                         variant="contained"
                         component="span"
@@ -156,7 +156,7 @@ function AdminDashboard() {
                       </Button>
                     </Link>
                     <Divider sx={{ ml: "5vw", mr: "5vw" }} />
-                    <Link href="#">
+                    <Link href="/admin/checkjobs">
                       <Button
                         variant="contained"
                         component="span"
@@ -201,7 +201,7 @@ function AdminDashboard() {
                       </Button>
                     </Link>
                     <Divider sx={{ ml: "5vw", mr: "5vw" }} />
-                    <Link href="#">
+                    <Link href="/admin/checkusercompanies">
                       <Button
                         variant="contained"
                         component="span"
@@ -212,8 +212,8 @@ function AdminDashboard() {
                           borderRadius: "7px",
                         }}
                       >
-                        <Typography sx={{ fontSize: 14 }}>
-                          Manage Companies
+                        <Typography sx={{ fontSize: "1.25vh" }}>
+                          Approve/Reject Unapproved Users/Companies
                         </Typography>
                       </Button>
                     </Link>
