@@ -85,9 +85,8 @@ function CompanyProfile() {
                         </Grid>
                         <Grid item xs={8}>
                           <Box>
-                            {/* Link to be Updated with the Job Page Later */}
                             <Link
-                              href={"#"}
+                              href={`/company/jobs/${info.id}`}
                               underline="none"
                               sx={{ color: theme.typography.darkP.color }}
                               target="_blank"

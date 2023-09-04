@@ -17,16 +17,20 @@ import { theme } from "../../Assets/Styles/Theme";
 import { useNavigate } from "react-router-dom";
 //for auth
 import { useUserContext } from "../../Components/UserContext";
+import AxiosLoader from "../../Components/AxiosLoader";
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
-function AdminApproveDenyJob() {
+function AdminApproveDenyUserCompanies() {
   const [isLoaded, setIsLoaded] = useState(false);
-  const [jobsData, setJobsData] = useState("");
+  const [usersData, setUsersData] = useState("");
   const { currUser } = useUserContext();
   const [accessToken, setAccessToken] = useState("");
-  const [currentJobSelection, setCurrentJobSelection] = useState(0);
+  const [currentEntitySelection, setCurrentEntitySelection] = useState(0);
   const [openModal, setOpenModal] = useState(false);
-  const [rejectReason, setRejectReason] = useState("");
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  const [userMode, setUserMode] = useState(true);
+  const [axiosLoading, setAxiosLoading] = useState(false);
+
   const navigate = useNavigate();
 
   //for modal
@@ -72,16 +76,18 @@ function AdminApproveDenyJob() {
   useEffect(() => {
     if (isLoaded) {
       if (currUser.userRoleId === 1) {
+        setAxiosLoading(true);
         axios
-          .get(`${BACKEND_URL}/listings/admin/checkunverifiedjob`, {
+          .get(`${BACKEND_URL}/users/admin/checkunverifieduserandcompany`, {
             headers: {
               Authorization: `Bearer ${accessToken}`,
             },
           })
           .then((info) => {
             console.log(info);
-            setJobsData(
-              info.data.map((info, index) => {
+            setUsersData(
+              info.data[0].map((info, index) => {
+                console.log(info);
                 return (
                   <Box key={index}>
                     <Grid
@@ -98,7 +104,7 @@ function AdminApproveDenyJob() {
                         <img
                           alt="Logo"
                           src={
-                            info.company_profile_info.companyLogo ||
+                            null ||
                             "https://firebasestorage.googleapis.com/v0/b/verve-55239.appspot.com/o/images%2FImage_not_available.png?alt=media&token=0a5a0495-5de3-4fea-93a2-3b4b95b22f64"
                           }
                           style={{
@@ -112,14 +118,10 @@ function AdminApproveDenyJob() {
                       </Grid>
                       <Grid item xs={8}>
                         <Box>
-                          <Link
-                            href={"#"}
-                            underline="none"
-                            sx={{ color: theme.typography.darkP.color }}
-                          >
+                          <Link href="#" underline="hover">
                             <Box
                               component="div"
-                              onClick={() => setCurrentJobSelection(info.id)}
+                              onClick={() => setCurrentEntitySelection(info.id)}
                               sx={{
                                 width: "14vw",
                                 height: "5vh",
@@ -135,10 +137,11 @@ function AdminApproveDenyJob() {
                                 variant="darkP"
                                 sx={{ fontSize: "1.7vh" }}
                               >
-                                {info.title}
+                                {info.firstName} {info.lastName}
                               </Typography>
                             </Box>
                           </Link>
+
                           <Box
                             component="div"
                             sx={{
@@ -152,7 +155,7 @@ function AdminApproveDenyJob() {
                             }}
                           >
                             <Typography variant="p" sx={{ fontSize: "1.4vh" }}>
-                              {info.company_profile_info.companyName}
+                              {info.user_personal_detail.identificationNumber}
                             </Typography>
                           </Box>
                           <Box>
@@ -170,7 +173,7 @@ function AdminApproveDenyJob() {
                                 display: "-webkit-box",
                               }}
                             >
-                              {info.location.name}
+                              {info.email}
                             </Typography>
                           </Box>
                         </Box>
@@ -184,6 +187,9 @@ function AdminApproveDenyJob() {
           })
           .catch((error) => {
             console.log(error);
+          })
+          .finally(() => {
+            setAxiosLoading(false);
           });
       }
     }
@@ -191,38 +197,53 @@ function AdminApproveDenyJob() {
 
   const onAccept = (e) => {
     e.preventDefault();
-    console.log(currentJobSelection);
-    if (currentJobSelection === 0) {
-      Swal.fire("Error", "You have not selected Any Job to Accept!", "error");
+    console.log(currentEntitySelection);
+    if (currentEntitySelection === 0) {
+      Swal.fire("Error", "You have not selected Any User to Accept!", "error");
       return;
     }
     const dataToSend = {
-      jobId: currentJobSelection,
+      entityId: currentEntitySelection,
     };
-    axios
-      .put(`${BACKEND_URL}/listings/admin/acceptunverifiedjob/`, dataToSend, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      })
-      .then(() => {
-        return Swal.fire("Success", "Job has been approved", "success");
-      })
-      .then(() => {
-        window.location.reload();
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    if (userMode) {
+      setAxiosLoading(true);
+      axios
+        .put(`${BACKEND_URL}/users/admin/approveunverifieduser/`, dataToSend, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        })
+        .then(() => {
+          return Swal.fire("Success", "User has been approved", "success");
+        })
+        .then(() => {
+          window.location.reload();
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+        .finally(() => {
+          setAxiosLoading(false);
+        });
+    }
   };
 
   const onRequestChange = (e) => {
     e.preventDefault();
-    console.log(currentJobSelection);
-    if (currentJobSelection === 0) {
-      Swal.fire("Error", "You have not selected Any Job to Accept!", "error");
+    console.log(currentEntitySelection);
+    if (currentEntitySelection === 0) {
+      Swal.fire(
+        "Error",
+        "You have not selected Any Entity to Reject!",
+        "error"
+      );
       return;
     }
+    setIsButtonDisabled(true);
+
+    setTimeout(() => {
+      setIsButtonDisabled(false);
+    }, 5000);
     handleOpen();
   };
 
@@ -234,33 +255,19 @@ function AdminApproveDenyJob() {
 
   const handleClose = () => {
     setOpenModal(false);
-    setRejectReason("");
   };
 
   const handleReject = () => {
-    const dataToSend = {
-      jobId: currentJobSelection,
-      rejectReason: rejectReason,
-    };
-    console.log(dataToSend);
-    axios
-      .put(`${BACKEND_URL}/listings/admin/requestchangetojob`, dataToSend, {
+    setAxiosLoading(true);
+    const entityId = currentEntitySelection;
+    axios.delete(
+      `${BACKEND_URL}/users/admin/deleteunverifieduser/${entityId}`,
+      {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
-      })
-      .then((info) => {
-        console.log(info);
-        handleClose();
-        return Swal.fire(
-          "Success",
-          "Changes/Requests have been requested",
-          "success"
-        );
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+      }
+    );
   };
 
   return (
@@ -297,7 +304,7 @@ function AdminApproveDenyJob() {
                     fontSize: "1.5vw",
                   }}
                 >
-                  Jobs pending Approval
+                  Users pending Approval
                 </Typography>
                 <Stack direction="column" sx={{ pl: 1.5 }}>
                   <Box
@@ -311,15 +318,14 @@ function AdminApproveDenyJob() {
                       display: "-webkit-box",
                     }}
                   >
-                    {jobsData.length !== 0 ? (
-                      jobsData
+                    {usersData.length !== 0 ? (
+                      usersData
                     ) : (
-                      <Typography
-                        variant="darkP"
-                        sx={{ mt: "5vh", width: "10vw", ml: "4vw" }}
-                      >
-                        No Jobs require Approval as of now!
-                      </Typography>
+                      <Box sx={{ mt: "5vh", width: "10vw", ml: "5vw" }}>
+                        <Typography variant="darkP">
+                          No Users require Approval as of now!
+                        </Typography>
+                      </Box>
                     )}
                   </Box>
                 </Stack>
@@ -339,12 +345,12 @@ function AdminApproveDenyJob() {
                   display: "flex",
                   backgroundColor: "white",
                   width: "45vw",
-                  height: "74vh",
+                  height: "78vh",
                   borderRadius: "40px",
                   flexDirection: "column",
                 }}
               ></Grid>
-              <Box sx={{ mt: "7vh" }}>
+              <Box sx={{ mt: "3vh" }}>
                 <Stack direction="row" spacing={7}>
                   <Button
                     classes={{ root: "orange" }}
@@ -359,7 +365,7 @@ function AdminApproveDenyJob() {
                   </Button>
 
                   <Button
-                    classes={{ root: "orange" }}
+                    classes={{ root: "red" }}
                     variant="contained"
                     onClick={onRequestChange}
                     style={{
@@ -367,39 +373,48 @@ function AdminApproveDenyJob() {
                       width: "20vw",
                     }}
                   >
-                    Request Changes
+                    Reject(Delete) User
                   </Button>
                 </Stack>
 
                 <Modal open={openModal} onClose={() => handleClose()}>
                   <Box sx={style}>
                     <Typography
-                      variant="h6"
-                      sx={{ fontWeight: theme.typography.h6.fontWeightBold }}
+                      variant="h5"
+                      sx={{ fontWeight: theme.typography.h5.fontWeightBold }}
                     >
-                      Request Change Details
+                      Are you SURE? This process is irreversible.
                     </Typography>
-                    <TextField
-                      label="Reason/Changes"
-                      value={rejectReason}
-                      onChange={(e) => setRejectReason(e.target.value)}
-                      fullWidth
-                      margin="normal"
-                      multiline
-                      rows={5}
-                    />
-                    <Stack direction="row">
+                    <Typography
+                      variant="darkP"
+                      sx={{ fontWeight: theme.typography.darkP.fontWeightBold }}
+                    >
+                      Delete button is disabled for 5 seconds to prevent
+                      accidents.
+                    </Typography>
+                    <Stack direction="row" spacing={15}>
                       <Button
+                        classes={{ root: "orange" }}
+                        variant="contained"
+                        component="span"
+                        onClick={handleClose}
+                        style={{
+                          marginTop: "1vh",
+                        }}
+                      >
+                        Do Not Delete
+                      </Button>
+                      <Button
+                        classes={{ root: "red" }}
                         variant="contained"
                         component="span"
                         onClick={handleReject}
                         style={{
-                          backgroundColor: "#0E0140",
-                          color: "white",
                           marginTop: "1vh",
                         }}
+                        disabled={isButtonDisabled}
                       >
-                        Reject
+                        Delete
                       </Button>
                     </Stack>
                   </Box>
@@ -413,4 +428,4 @@ function AdminApproveDenyJob() {
   );
 }
 
-export default AdminApproveDenyJob;
+export default AdminApproveDenyUserCompanies;
