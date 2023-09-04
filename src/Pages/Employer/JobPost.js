@@ -393,9 +393,13 @@ function JobPost() {
           Swal.fire(SwalMsgs.successPostingAwaitApprovalWButtons).then(
             (result) => {
               if (result.isConfirmed) {
-                navigate("/");
+                setModalOpen(false);
+                resetFields();
+                fieldValues.jobTitle = "";
+                fieldValues.description = "";
+                setEditorState(EditorState.createEmpty());
               } else if (result.isDenied) {
-                navigate("/");
+                navigate(`/`);
               }
             }
           );
@@ -433,7 +437,7 @@ function JobPost() {
           >
             <Grid item>
               {/* row 1 - banner */}
-
+              {axiosLoading && <AxiosLoader />}
               <Box sx={{ maxWidth: "838px", flexWrap: "wrap" }} p={1} mb={3}>
                 <Paper elevation={2} color="FFF" className="boxpaper">
                   {displayBanner ? (
@@ -820,8 +824,155 @@ function JobPost() {
                       </Stack>
                     </Stack>
                   </Box>
+                  <Dialog open={modalOpen} onClose={() => setModalOpen(false)}>
+                    <Grid container direction="column">
+                      <Grid item>
+                        <Box mt={2} justifyContent="center" display="flex">
+                          <DialogTitle>
+                            <Typography
+                              variant="h4"
+                              sx={{
+                                fontWeight: theme.typography.h4.fontWeightBold,
+                              }}
+                            >
+                              New Job Post
+                            </Typography>
+                          </DialogTitle>
+                        </Box>
+                      </Grid>
 
-                  {/* row 3 - 2 buttons edit listing and delete listing
+                      <Dialog
+                        open={modalOpen}
+                        onClose={() => setModalOpen(false)}
+                      >
+                        <Grid container direction="column">
+                          <Grid item>
+                            <Box mt={2} justifyContent="center" display="flex">
+                              <DialogTitle>
+                                <Typography
+                                  variant="h4"
+                                  sx={{
+                                    fontWeight:
+                                      theme.typography.h4.fontWeightBold,
+                                  }}
+                                >
+                                  New Job Post
+                                </Typography>
+                              </DialogTitle>
+                            </Box>
+                          </Grid>
+
+                          <Grid item xs={12}>
+                            <DialogContent>
+                              <DialogContentText
+                                style={{
+                                  marginBottom: "16px",
+                                  textAlign: "center",
+                                }}
+                              >
+                                <Typography
+                                  variant="h5"
+                                  sx={{
+                                    fontWeight:
+                                      theme.typography.h5.fontWeightBold,
+                                  }}
+                                >
+                                  {fieldValues.jobTitle
+                                    ? fieldValues.jobTitle
+                                    : "Please key in Job Title!"}
+                                </Typography>{" "}
+                              </DialogContentText>
+
+                              <DialogContentText>
+                                <Typography
+                                  variant="p"
+                                  sx={{
+                                    fontWeight:
+                                      theme.typography.p.fontWeightBold,
+                                  }}
+                                >
+                                  {fieldValues.employmentType
+                                    ? fieldValues.employmentType
+                                    : ""}
+                                </Typography>
+                              </DialogContentText>
+
+                              <DialogContentText>
+                                <Typography
+                                  variant="p"
+                                  sx={{
+                                    fontWeight:
+                                      theme.typography.p.fontWeightBold,
+                                  }}
+                                >
+                                  Location:{" "}
+                                </Typography>
+                                {fieldValues.location &&
+                                fieldValues.location.name
+                                  ? fieldValues.location.name
+                                  : "Please select a location."}
+                              </DialogContentText>
+
+                              <DialogContentText
+                                style={{ marginBottom: "16px" }}
+                              >
+                                <Typography
+                                  variant="p"
+                                  sx={{
+                                    fontWeight:
+                                      theme.typography.p.fontWeightBold,
+                                  }}
+                                >
+                                  Category:{" "}
+                                </Typography>
+                                {fieldValues.jobCategory &&
+                                fieldValues.jobCategory.name
+                                  ? fieldValues.jobCategory.name
+                                  : "Please select a category."}
+                              </DialogContentText>
+                              <DialogContentText>
+                                <Box>
+                                  <Typography
+                                    variant="h6"
+                                    sx={{
+                                      fontWeight:
+                                        theme.typography.h6.fontWeightBold,
+                                    }}
+                                  >
+                                    Job Details{" "}
+                                  </Typography>
+                                  <div
+                                    dangerouslySetInnerHTML={{
+                                      __html: fieldValues.jobDescription,
+                                    }}
+                                  />
+                                </Box>
+                              </DialogContentText>
+                            </DialogContent>
+                          </Grid>
+
+                          <DialogActions>
+                            <Button
+                              disabled={disableSubmit}
+                              onClick={() => setModalOpen(false)}
+                              classes={{ root: "blue" }}
+                              variant="contained"
+                            >
+                              edit
+                            </Button>
+                            <Button
+                              disabled={disableSubmit}
+                              onClick={handleSubmit}
+                              classes={{ root: "orange" }}
+                              variant="contained"
+                            >
+                              submit
+                            </Button>
+                          </DialogActions>
+                        </Grid>
+                      </Dialog>
+
+                      {/* row 3 - 2 buttons edit listing and delete listing
                   {displayAdminButtons ? (
                     <Box
                       mt={4}
@@ -862,7 +1013,7 @@ function JobPost() {
                     />
                   </div>
                   {/* row 4 - job details */}
-                  {/* <Box m={4} sx={theme.customStyles.displayFlexRowLeft}>
+                      {/* <Box m={4} sx={theme.customStyles.displayFlexRowLeft}>
                     <Stack direction="column" spacing={2}>
                       <Typography
                         textAlign="left"
@@ -882,7 +1033,7 @@ function JobPost() {
                   </Box>
 
                   {/* row 5 - 1 button to check current applicants */}
-                  {/* <Box
+                      {/* <Box
                     m={4}
                     pb={5}
                     sx={theme.customStyles.displayFlexRowCenter}
@@ -894,6 +1045,8 @@ function JobPost() {
         </div>
       </Grid>
     </ThemeProvider>  */}
+                    </Grid>{" "}
+                  </Dialog>
                 </Paper>
               </Box>
             </Grid>
