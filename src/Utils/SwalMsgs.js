@@ -60,16 +60,14 @@ export const numberRequired = (fieldName) => {
 
 // form related misc
 
-export const overwriteCurrentInfo = () => {
-  return {
-    title: "Hold On!",
-    text: "There is already information in the form. Are you sure you wish to overwrite them? The information will be erased if you proceed.",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "LightSeaGreen",
-    cancelButtonColor: "Crimson",
-    confirmButtonText: "Yes, delete it!",
-  };
+export const overwriteCurrentInfo = {
+  title: "Hold On!",
+  text: "There is already information in the form. Are you sure you wish to overwrite them? The information will be erased if you proceed.",
+  icon: "warning",
+  showCancelButton: true,
+  confirmButtonColor: "LightSeaGreen",
+  cancelButtonColor: "Crimson",
+  confirmButtonText: "Yes, delete it!",
 };
 
 export const deleteCurrentInfo = {
