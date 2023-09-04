@@ -62,3 +62,7 @@ html {
   width: 100px; /* Adjust the size of your loading GIF */
   height: 100px;
 }
+
+.boxpaper.MuiPaper-root {
+  border-radius: 20px !important ;
+}
