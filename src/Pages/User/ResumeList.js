@@ -44,16 +44,12 @@ function ResumeList() {
 
   useEffect(() => {
     console.log(currUser);
-    if (currUser === null) {
-      const localAccess = JSON.parse(localStorage.getItem("verveCurrUser"));
-      console.log(localAccess);
-      setCurrUser(localAccess);
-    }
-  }, [currUser]);
+  }, []);
 
   useEffect(() => {
     if (!accessToken) {
       const localAccess = JSON.parse(localStorage.getItem("verveToken"));
+      console.log("accesstoken exists");
       setAccessToken(localAccess);
     }
   }, [accessToken]);
@@ -107,7 +103,7 @@ function ResumeList() {
           resumeUrl: url,
         };
         axios
-          .post(`${BACKEND_URL}/resumes/${userId}`, dataToSend, {
+          .post(`${BACKEND_URL}/resumes/resume/${userId}`, dataToSend, {
             headers: {
               Authorization: `Bearer ${accessToken}`,
             },
@@ -133,7 +129,7 @@ function ResumeList() {
     if (accessToken) {
       axios
         .put(
-          `${BACKEND_URL}/resumes/${resumeId}`,
+          `${BACKEND_URL}/resumes/resume/${resumeId}`,
           {
             resumeName: resumeName,
             resumeDescription: resumeDescription,
@@ -159,7 +155,7 @@ function ResumeList() {
   const handleDelete = () => {
     console.log(resumeId);
     axios
-      .delete(`${BACKEND_URL}/resumes/${resumeId}`, {
+      .delete(`${BACKEND_URL}/resumes/resume/${resumeId}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -178,7 +174,7 @@ function ResumeList() {
     if (accessToken && currUser) {
       const userId = currUser.id;
       axios
-        .get(`${BACKEND_URL}/resumes/${userId}`, {
+        .get(`${BACKEND_URL}/resumes/resume/${userId}`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
