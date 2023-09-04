@@ -13,9 +13,13 @@ import {
   Input,
   TextField,
   Checkbox,
+  IconButton,
+  FormControl,
 } from "@mui/material";
 import { theme } from "../../Assets/Styles/Theme";
 import Swal from "sweetalert2";
+import axios from "axios";
+import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 function CreateResume() {
   // All the states
   // States for the Experience
@@ -61,6 +65,55 @@ function CreateResume() {
   const [eduFieldErrors, setEduFieldErrors] = useState({});
   const [eduEditingIndex, setEduEditingIndex] = useState(null);
   const [eduFieldsVisible, setEduFieldsVisible] = useState(false);
+  // State for Skills
+  const [skillFields, setSkillFields] = useState([]);
+  const [skillFieldValues, setSkillFieldValues] = useState({
+    skillName: "",
+    proficiencyLevel: "",
+  });
+  const [skillFieldErrors, setSkillFieldErrors] = useState({});
+  const [skillEditingIndex, setSkillEditingIndex] = useState(null);
+  const [skillFormVisible, setSkillFormVisible] = useState(false);
+  // State for language
+
+  const [languageFields, setLanguageFields] = useState([]);
+  const [languageFormVisible, setLanguageFormVisible] = useState(false);
+  const [languageFieldValues, setLanguageFieldValues] = useState({
+    languageName: "",
+    proficiencySpoken: "",
+    proficiencyWritten: "",
+    isPrimary: false,
+  });
+  const [languageFieldErrors, setLanguageFieldErrors] = useState({});
+  const [languageEditingIndex, setLanguageEditingIndex] = useState(null);
+  // State for Additional Information
+  const [additionalInfo, setAdditionalInfo] = useState({
+    expectedSalary: "",
+    preferredLocation: "",
+  });
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [isAdditionalInfoVisible, setIsAdditionalInfoVisible] = useState(true);
+  const [additionalInfoErrors, setAdditionalInfoErrors] = useState({});
+  // State for about me.
+  const [aboutMe, setAboutMe] = useState({
+    name: "",
+    contactNumber: "",
+    email: "",
+    address: "",
+    postalCode: "",
+    dateOfBirth: "",
+    nationality: "",
+  });
+
+  const [isEditingAboutMe, setIsEditingAboutMe] = useState(false);
+  const [aboutMeErrors, setAboutMeErrors] = useState({});
+  const [postalCode, setPostalCode] = useState("");
+  const [address, setAddress] = useState("");
+  const [displayedAddress, setDisplayedAddress] = useState([]);
+  // State for privacy setting
+  const [privacySetting, setPrivacySetting] = useState("searchable");
+  const [isEditingPrivacy, setIsEditingPrivacy] = useState(false);
   // Logic for experience
   const handleContentClick = (content) => {
     setSelectedContent(content);
@@ -96,6 +149,10 @@ function CreateResume() {
     setYearValue(newYearValue);
     console.log(newYearValue);
     setSelectedOption(selectedOption);
+  };
+  const handleEditOptionClick = () => {
+    setRadioCollapsed(false);
+    setExperienceStatement(false);
   };
 
   const handleExperienceChange = (fieldName, value) => {
@@ -140,28 +197,56 @@ function CreateResume() {
       setShowSavedValues(true);
     }
   };
+  const handleCancelExperience = () => {
+    setExperienceFormFieldVisible(false); // Hide the editing fields
+    setShowSavedValues(true); // Show the saved values
+  };
   useEffect(() => {
     console.log("Save button clicked");
     console.log(showSavedValues);
   }, [showSavedValues]);
 
-  const resetFormFields = (index) => {
-    const entry = savedFieldValues[index];
-    setFieldValues({
-      positionTitle: entry.positionTitle,
-      companyName: entry.companyName,
-      joinedDate: entry.joinedDate,
-      leftDate: entry.leftDate,
-      specialization: entry.specialization,
-      role: entry.role,
-      country: entry.country,
-      industry: entry.industry,
-      positionLevel: entry.positionLevel,
-      monthlySalary: entry.monthlySalary,
-      experienceSummary: entry.experienceSummary,
-    });
+  const resetFormFields = (entry) => {
+    if (entry) {
+      setFieldValues({
+        positionTitle: entry.positionTitle,
+        companyName: entry.companyName,
+        joinedDate: entry.joinedDate,
+        leftDate: entry.leftDate,
+        specialization: entry.specialization,
+        role: entry.role,
+        country: entry.country,
+        industry: entry.industry,
+        positionLevel: entry.positionLevel,
+        monthlySalary: entry.monthlySalary,
+        experienceSummary: entry.experienceSummary,
+      });
+    } else {
+      setFieldValues({
+        positionTitle: "",
+        companyName: "",
+        joinedDate: "",
+        leftDate: "",
+        specialization: "",
+        role: "",
+        country: "",
+        industry: "",
+        positionLevel: "",
+        monthlySalary: "",
+        experienceSummary: "",
+      });
+    }
   };
+
   console.log(savedFieldValues);
+  const handleDeleteExperience = (index) => {
+    const updatedSavedFieldValues = [...savedFieldValues];
+
+    updatedSavedFieldValues.splice(index, 1);
+
+    setSavedFieldValues(updatedSavedFieldValues);
+  };
+
   // Logic for education .
   const handleSaveEducation = () => {
     const newEduFieldErrors = eduValidateFields(eduFieldValues);
@@ -233,8 +318,6 @@ function CreateResume() {
     if (fields.awards.trim() === "") {
       eduErrors.awards = "Awards is required";
     }
-    // Add similar validations for other fields
-
     return eduErrors;
   };
   const resetEduFormFields = () => {
@@ -251,6 +334,282 @@ function CreateResume() {
     setEduFieldErrors({});
     setEduEditingIndex(null);
   };
+  console.log("Education info Array", educationFields);
+  const handleDeleteEducation = (indexToDelete) => {
+    const updatedEducationFields = [...educationFields];
+
+    updatedEducationFields.splice(indexToDelete, 1);
+
+    setEducationFields(updatedEducationFields);
+  };
+
+  //Logic for Skills
+  const handleSaveSkill = () => {
+    const newSkillFieldErrors = validateSkillFields(skillFieldValues);
+
+    if (Object.keys(newSkillFieldErrors).length > 0) {
+      setSkillFieldErrors(newSkillFieldErrors);
+    } else {
+      if (skillEditingIndex !== null) {
+        // Update existing skill entry
+        const updatedSkills = [...skillFields];
+        updatedSkills[skillEditingIndex] = skillFieldValues;
+        setSkillFields(updatedSkills);
+        setSkillEditingIndex(null);
+      } else {
+        // Save new skill entry
+        setSkillFields([...skillFields, skillFieldValues]);
+      }
+
+      // Clear the form fields
+      setSkillFieldValues({ skillName: "", proficiencyLevel: "" });
+      setSkillFieldErrors({});
+      setSkillFormVisible(false); // Hide the skill form after saving
+    }
+  };
+
+  const validateSkillFields = (fields) => {
+    const errors = {};
+
+    if (fields.skillName.trim() === "") {
+      errors.skillName = "Skill Name is required";
+    }
+
+    if (fields.proficiencyLevel.trim() === "") {
+      errors.proficiencyLevel = "Proficiency Level is required";
+    }
+
+    return errors;
+  };
+  const handleDeleteSkill = (index) => {
+    const updatedSkillFields = [...skillFields];
+
+    updatedSkillFields.splice(index, 1);
+
+    setSkillFields(updatedSkillFields);
+  };
+
+  // Logic for lanaguage
+  const handleSaveLanguage = () => {
+    const newLanguageFieldErrors = validateLanguageFields(languageFieldValues);
+
+    if (Object.keys(newLanguageFieldErrors).length > 0) {
+      setLanguageFieldErrors(newLanguageFieldErrors);
+    } else {
+      if (languageEditingIndex !== null) {
+        // Update existing language entry
+        const updatedLanguages = [...languageFields];
+        updatedLanguages[languageEditingIndex] = languageFieldValues;
+        setLanguageFields(updatedLanguages);
+        setLanguageEditingIndex(null);
+      } else {
+        // Save new language entry
+        setLanguageFields([...languageFields, languageFieldValues]);
+      }
+
+      // Clear the form fields
+      setLanguageFieldValues({
+        languageName: "",
+        proficiencySpoken: "",
+        proficiencyWritten: "",
+        isPrimary: false,
+      });
+      setLanguageFieldErrors({});
+      setLanguageFormVisible(false); // Hide the language form after saving
+    }
+  };
+
+  const validateLanguageFields = (fields) => {
+    const errors = {};
+
+    if (fields.languageName.trim() === "") {
+      errors.languageName = "Language Name is required";
+    }
+
+    if (fields.proficiencySpoken.trim() === "") {
+      errors.proficiencySpoken = "Proficiency (Spoken) is required";
+    }
+
+    if (fields.proficiencyWritten.trim() === "") {
+      errors.proficiencyWritten = "Proficiency (Written) is required";
+    }
+
+    return errors;
+  };
+  const handleDeleteLanguage = (indexToDelete) => {
+    const updatedLanguageFields = [...languageFields];
+
+    updatedLanguageFields.splice(indexToDelete, 1);
+
+    setLanguageFields(updatedLanguageFields);
+  };
+
+  // Logic for additional Information
+  const handleAdditionalInfoEditClick = () => {
+    setIsEditing(false);
+  };
+
+  const handleAdditionInfoSaveClick = () => {
+    console.log("Save button clicked");
+    const newAdditionalInfoErrors =
+      validateAdditionalInfoFields(additionalInfo);
+
+    if (additionalInfo.expectedSalary.trim() === "") {
+      newAdditionalInfoErrors.expectedSalary =
+        "Expected Monthly Salary is required";
+    } else {
+      const expectedSalary = parseInt(additionalInfo.expectedSalary, 10);
+      if (isNaN(expectedSalary) || !Number.isInteger(expectedSalary)) {
+        newAdditionalInfoErrors.expectedSalary =
+          "Expected Monthly Salary must be a valid integer";
+      } else {
+        // Update the state with the valid expectedSalary
+        setAdditionalInfo({
+          ...additionalInfo,
+          expectedSalary: expectedSalary.toString(), // Convert it back to string
+        });
+      }
+    }
+
+    if (Object.keys(newAdditionalInfoErrors).length === 0) {
+      setIsEditing(true);
+      setAdditionalInfoErrors({});
+    } else {
+      setAdditionalInfoErrors(newAdditionalInfoErrors);
+    }
+    console.log("newAdditionalInfoErrors:", newAdditionalInfoErrors);
+  };
+  const validateAdditionalInfoFields = (fields) => {
+    const errors = {};
+    if (fields.preferredLocation.trim() === "") {
+      errors.preferredLocation = "Preferred Work Location is required";
+    }
+    return errors;
+  };
+  const handleDeleteAdditionalInfo = () => {
+    setAdditionalInfo({
+      expectedSalary: "",
+      preferredLocation: "",
+    });
+
+    setIsAdditionalInfoVisible(true);
+  };
+
+  // Logic for About me
+  const handleAboutMeEditClick = () => {
+    setIsEditingAboutMe(false);
+  };
+
+  const handleAboutMeSaveClick = () => {
+    const newAboutMeErrors = validateAboutMeFields(aboutMe);
+    console.log("Saving About Me:", aboutMe);
+    if (Object.keys(newAboutMeErrors).length === 0) {
+      setIsEditingAboutMe(true);
+      setAboutMe((prevAboutMe) => ({
+        ...prevAboutMe,
+        address: address || prevAboutMe.address, // Preserve the existing address if it's empty
+      }));
+      setAboutMeErrors({});
+    } else {
+      setAboutMeErrors(newAboutMeErrors);
+      console.log("Validation errors:", newAboutMeErrors);
+    }
+  };
+
+  const handleAboutMeCancelClick = () => {
+    setIsEditingAboutMe(false);
+  };
+
+  const validateAboutMeFields = (fields) => {
+    const errors = {};
+
+    if (fields.name.trim() === "") {
+      errors.name = "Name is required";
+    }
+
+    if (fields.contactNumber.trim() === "") {
+      errors.contactNumber = "Contact number is required";
+    } else if (!/^\d+$/.test(fields.contactNumber.trim())) {
+      errors.contactNumber = "Contact number must be numeric";
+    }
+
+    if (fields.email.trim() === "") {
+      errors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(fields.email.trim())) {
+      errors.email = "Invalid email address";
+    }
+
+    if (fields.address.trim() === "" && !address) {
+      errors.address = "Address is required";
+    }
+
+    if (fields.postalCode.trim() === "") {
+      errors.postalCode = "Postal code is required";
+    } else if (!/^\d+$/.test(fields.postalCode.trim())) {
+      errors.postalCode = "Postal code must be numeric";
+    }
+
+    if (fields.dateOfBirth.trim() === "") {
+      errors.dateOfBirth = "Date of birth is required";
+    }
+
+    if (fields.nationality.trim() === "") {
+      errors.nationality = "Nationality is required";
+    }
+
+    return errors;
+  };
+  const handleDeleteAboutMe = () => {
+    setIsEditingAboutMe(true);
+    setAboutMe({
+      name: "",
+      contactNumber: "",
+      email: "",
+      address: "",
+      postalCode: "",
+      dateOfBirth: "",
+      nationality: "",
+    });
+  };
+  const handleSearchPostal = (e) => {
+    //e.preventDefault();
+    const searchQuery = aboutMe.postalCode;
+    axios
+      .get(
+        `https://developers.onemap.sg/commonapi/search?searchVal=${searchQuery}&returnGeom=Y&getAddrDetails=Y`
+      )
+      .then((info) => {
+        const spreadData = info.data.results.map((info, index) => {
+          console.log(info);
+          console.log(info.ADDRESS);
+          setAddress(info.ADDRESS);
+          return <div key={index}>Address: {info.ADDRESS}</div>;
+        });
+        setDisplayedAddress(spreadData);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+  console.log(address);
+
+  const handleSearchClick = () => {
+    handleSearchPostal(postalCode);
+  };
+
+  // Logic for privacy details
+  const handlePrivacyEditClick = () => {
+    setIsEditingPrivacy(false);
+  };
+
+  const handlePrivacySaveClick = () => {
+    setIsEditingPrivacy(true);
+  };
+
+  const handlePrivacyCancelClick = () => {
+    setIsEditingPrivacy(false);
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <Box>
@@ -461,6 +820,20 @@ function CreateResume() {
                                   return "";
                               }
                             })()}
+                            {radioCollapsed &&
+                              experienceStatementVisible && ( // Display "Edit" button if not collapsed
+                                <Button
+                                  variant="contained"
+                                  classes={{ root: "orange" }}
+                                  onClick={() => {
+                                    setExperienceStatementVisible(false);
+                                    handleEditOptionClick();
+                                  }}
+                                  sx={{ marginLeft: "8px" }}
+                                >
+                                  Edit
+                                </Button>
+                              )}
                           </Typography>
                         )}
                       </Typography>
@@ -702,14 +1075,14 @@ function CreateResume() {
                               variant="contained"
                               classes={{ root: "orange" }}
                               onClick={handleSaveExperience}
-                               sx={{ marginRight: '8px' }} 
+                              sx={{ marginRight: "8px" }}
                             >
                               Save
                             </Button>
                             <Button
                               classes={{ root: "orange" }}
                               onClick={() => {
-                                
+                                handleCancelExperience();
                                 setExperienceFormFieldVisible(false);
                               }}
                             >
@@ -724,7 +1097,12 @@ function CreateResume() {
                         <Typography variant="h6">Saved Experience:</Typography>
                         {savedFieldValues.map((savedValues, index) => (
                           <div key={index}>
-                            <Typography variant="p">
+                            <Typography
+                              variant="p"
+                              sx={{
+                                fontWeight: theme.typography.p.fontWeightBold,
+                              }}
+                            >
                               Position Title: {savedValues.positionTitle}
                               <br />
                               Company Name: {savedValues.companyName}
@@ -745,7 +1123,7 @@ function CreateResume() {
                               <br />
                               Monthly Salary: {savedValues.monthlySalary}
                               <br />
-                              Experience Summary:{" "}
+                              Experience Summary:
                               {savedValues.experienceSummary}
                             </Typography>
                             <br />
@@ -753,7 +1131,7 @@ function CreateResume() {
                               variant="contained"
                               classes={{ root: "orange" }}
                               onClick={() => {
-                                resetFormFields(index);
+                                resetFormFields(savedFieldValues[index]);
                                 setEditingIndex(index);
                                 setExperienceFormFieldVisible(true);
                                 setShowSavedValues(false);
@@ -766,12 +1144,20 @@ function CreateResume() {
                               variant="contained"
                               classes={{ root: "orange" }}
                               onClick={() => {
-                                resetFormFields(index);
+                                resetFormFields();
                                 setExperienceFormFieldVisible(true);
-                                setShowSavedValues(false);
+                                setShowSavedValues(true);
                               }}
+                              style={{ marginRight: "10px" }}
                             >
                               Add Experience
+                            </Button>
+                            <Button
+                              variant="contained"
+                              classes={{ root: "orange" }}
+                              onClick={() => handleDeleteExperience(index)}
+                            >
+                              Delete
                             </Button>
                           </div>
                         ))}
@@ -785,10 +1171,9 @@ function CreateResume() {
                   <Button
                     variant="contained"
                     onClick={() => {
-                      // Handle adding new education
                       setEduFieldsVisible(true);
-                      setEduFieldValues({}); // Clear the fields for a new entry
-                      setEduEditingIndex(null); // Reset the editing index for adding
+                      setEduFieldValues({});
+                      setEduEditingIndex(null);
                     }}
                     classes={{ root: "orange" }}
                   >
@@ -796,31 +1181,79 @@ function CreateResume() {
                   </Button>
                   {educationFields.map((education, index) => (
                     <div key={index}>
-                      <Typography variant="subtitle1">
+                      <Typography
+                        variant="p"
+                        sx={{
+                          fontWeight: theme.typography.p,
+                        }}
+                      >
                         Institute/University: {education.university}
                       </Typography>
-                      <Typography variant="subtitle1">
+                      <br />
+                      <Typography
+                        variant="p"
+                        sx={{
+                          fontWeight: theme.typography.p,
+                        }}
+                      >
                         Graduation Date: {education.graduationDate}
                       </Typography>
-                      <Typography variant="subtitle1">
+                      <br />
+                      <Typography
+                        variant="p"
+                        sx={{
+                          fontWeight: theme.typography.p,
+                        }}
+                      >
                         Qualification: {education.qualification}
                       </Typography>
-                      <Typography variant="subtitle1">
+                      <br />
+                      <Typography
+                        variant="p"
+                        sx={{
+                          fontWeight: theme.typography.p,
+                        }}
+                      >
                         Institute/University Location:
                         {education.universityLocation}
                       </Typography>
-                      <Typography variant="subtitle1">
+                      <br />
+                      <Typography
+                        variant="p"
+                        sx={{
+                          fontWeight: theme.typography.p,
+                        }}
+                      >
                         Field of Study: {education.fieldOfStudy}
                       </Typography>
-                      <Typography variant="subtitle1">
+                      <br />
+                      <Typography
+                        variant="p"
+                        sx={{
+                          fontWeight: theme.typography.p,
+                        }}
+                      >
                         Major: {education.major}
                       </Typography>
-                      <Typography variant="subtitle1">
+                      <br />
+                      <Typography
+                        variant="p"
+                        sx={{
+                          fontWeight: theme.typography.p,
+                        }}
+                      >
                         Grade: {education.grade}
                       </Typography>
-                      <Typography variant="subtitle1">
+                      <br />
+                      <Typography
+                        variant="p"
+                        sx={{
+                          fontWeight: theme.typography.p,
+                        }}
+                      >
                         Awards: {education.awards}
                       </Typography>
+                      <br />
                       <Button
                         variant="contained"
                         classes={{ root: "orange" }}
@@ -829,8 +1262,16 @@ function CreateResume() {
                           setEduFieldValues(education);
                           setEduEditingIndex(index);
                         }}
+                        sx={{ marginRight: "8px" }}
                       >
                         Edit
+                      </Button>
+                      <Button
+                        variant="contained"
+                        classes={{ root: "orange" }}
+                        onClick={() => handleDeleteEducation(index)}
+                      >
+                        Delete
                       </Button>
                     </div>
                   ))}
@@ -962,6 +1403,7 @@ function CreateResume() {
                           handleSaveEducation();
                           setEduFieldsVisible(false);
                         }}
+                        sx={{ marginRight: "8px" }}
                       >
                         Save
                       </Button>
@@ -978,14 +1420,789 @@ function CreateResume() {
                   )}
                 </div>
               )}
-              {selectedContent === "Skills" && <div>Skills Content</div>}
-              {selectedContent === "Languages" && <div>Languages Content</div>}
-              {selectedContent === "Additional Info" && (
-                <div>Additional Info Content</div>
+              {selectedContent === "Skills" && (
+                <div>
+                  <Button
+                    variant="contained"
+                    classes={{ root: "orange" }}
+                    onClick={() => {
+                      setSkillFormVisible(true);
+                      setSkillFieldValues({
+                        skillName: "",
+                        proficiencyLevel: "",
+                      });
+                      setSkillEditingIndex(null);
+                    }}
+                  >
+                    Add Skill
+                  </Button>
+                  <Divider sx={{ margin: "24px 0" }} />
+                  <div>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        marginBottom: "2px",
+                      }}
+                    >
+                      {skillFields.length > 0 && (
+                        <div>
+                          <Typography variant="p" style={{ width: "40%" }}>
+                            Skills
+                          </Typography>
+                          <Typography
+                            variant="p"
+                            style={{ width: "40%", marginRight: "20px" }}
+                          >
+                            Proficiency
+                          </Typography>
+                        </div>
+                      )}
+                      <Typography
+                        variant="subtitle1"
+                        style={{ width: "20%", color: "transparent" }}
+                      >
+                        Edit Button
+                      </Typography>
+                    </div>
+
+                    {skillFields.map((skill, index) => (
+                      <div
+                        key={index}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          marginBottom: "8px",
+                        }}
+                      >
+                        <div style={{ width: "40%" }}>
+                          <Typography variant="p">{skill.skillName}</Typography>
+                        </div>
+                        <div style={{ width: "40%" }}>
+                          <Typography variant="p">
+                            {skill.proficiencyLevel}
+                          </Typography>
+                        </div>
+                        <div
+                          style={{
+                            width: "20%",
+                            display: "flex",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <Button
+                            variant="contained"
+                            classes={{ root: "orange" }}
+                            onClick={() => {
+                              setSkillFormVisible(true);
+                              setSkillFieldValues(skill);
+                              setSkillEditingIndex(index);
+                            }}
+                            sx={{ marginRight: "8px" }}
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            variant="contained"
+                            classes={{ root: "orange" }}
+                            onClick={() => handleDeleteSkill(index)}
+                          >
+                            Delete
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+
+                    {skillFormVisible && (
+                      <div>
+                        <TextField
+                          label="Skill Name"
+                          value={skillFieldValues.skillName}
+                          onChange={(e) =>
+                            setSkillFieldValues({
+                              ...skillFieldValues,
+                              skillName: e.target.value,
+                            })
+                          }
+                          fullWidth
+                          margin="normal"
+                          size="small"
+                          error={!!skillFieldErrors.skillName}
+                          helperText={skillFieldErrors.skillName}
+                        />
+                        <TextField
+                          label="Proficiency Level"
+                          value={skillFieldValues.proficiencyLevel}
+                          onChange={(e) =>
+                            setSkillFieldValues({
+                              ...skillFieldValues,
+                              proficiencyLevel: e.target.value,
+                            })
+                          }
+                          fullWidth
+                          margin="normal"
+                          size="small"
+                          error={!!skillFieldErrors.proficiencyLevel}
+                          helperText={skillFieldErrors.proficiencyLevel}
+                        />
+                        <Button
+                          variant="contained"
+                          classes={{ root: "orange" }}
+                          onClick={handleSaveSkill}
+                          style={{ marginRight: "8px" }}
+                        >
+                          Save
+                        </Button>
+                        <Button
+                          variant="contained"
+                          classes={{ root: "orange" }}
+                          onClick={() => setSkillFormVisible(false)}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
               )}
-              {selectedContent === "About me" && <div>About me Content</div>}
+
+              {selectedContent === "Languages" && (
+                <div>
+                  <Typography
+                    variant="p"
+                    sx={{
+                      fontWeight: theme.typography.p.fontWeightBold,
+                    }}
+                  >
+                    Proficiency Level:0 - Poor, 10 - Excellent
+                  </Typography>
+                  <br />
+                  <Button
+                    variant="contained"
+                    classes={{ root: "orange" }}
+                    onClick={() => {
+                      setLanguageFormVisible(true);
+                      setLanguageFieldValues({
+                        languageName: "",
+                        proficiencySpoken: "",
+                        proficiencyWritten: "",
+                        isPrimary: false,
+                      });
+                      setLanguageEditingIndex(null);
+                    }}
+                  >
+                    Add Language
+                  </Button>
+                  <Divider sx={{ margin: "24px 0" }} />
+                  <div>
+                    {languageFields.length > 0 && (
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          marginBottom: "8px", // Add some spacing between header and input values
+                        }}
+                      >
+                        <Typography
+                          variant="p"
+                          sx={{
+                            fontWeight: theme.typography.p.fontWeightBold,
+                          }}
+                          style={{ width: "20%" }}
+                        >
+                          Language
+                        </Typography>
+                        <Typography
+                          variant="p"
+                          sx={{
+                            fontWeight: theme.typography.p.fontWeightBold,
+                          }}
+                          style={{ width: "20%" }}
+                        >
+                          Spoken
+                        </Typography>
+                        <Typography
+                          variant="p"
+                          sx={{
+                            fontWeight: theme.typography.p.fontWeightBold,
+                          }}
+                          style={{ width: "20%" }}
+                        >
+                          Written
+                        </Typography>
+                        <Typography
+                          variant="p"
+                          sx={{
+                            fontWeight: theme.typography.p.fontWeightBold,
+                          }}
+                          style={{ width: "20%" }}
+                        >
+                          Primary Language
+                        </Typography>
+                        <Typography
+                          variant="p"
+                          sx={{
+                            fontWeight: theme.typography.p.fontWeightBold,
+                            color: "transparent",
+                          }}
+                          style={{ width: "20%" }}
+                        >
+                          Edit Button
+                        </Typography>
+                      </div>
+                    )}
+
+                    {languageFields.map((language, index) => (
+                      <div
+                        key={index}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          marginBottom: "8px", // Add some spacing between input values and buttons
+                        }}
+                      >
+                        <div style={{ width: "20%" }}>
+                          <Typography
+                            variant="p"
+                            sx={{
+                              fontWeight: theme.typography.p,
+                            }}
+                          >
+                            {language.languageName}
+                          </Typography>
+                        </div>
+                        <div style={{ width: "20%" }}>
+                          <Typography
+                            variant="p"
+                            sx={{
+                              fontWeight: theme.typography.p,
+                            }}
+                          >
+                            {language.proficiencySpoken}
+                          </Typography>
+                        </div>
+                        <div style={{ width: "20%" }}>
+                          <Typography
+                            variant="p"
+                            sx={{
+                              fontWeight: theme.typography.p,
+                            }}
+                          >
+                            {language.proficiencyWritten}
+                          </Typography>
+                        </div>
+                        <div style={{ width: "20%" }}>
+                          <Typography
+                            variant="p"
+                            sx={{
+                              fontWeight: theme.typography.p,
+                            }}
+                          >
+                            {language.isPrimary ? "Yes" : "No"}
+                          </Typography>
+                        </div>
+                        <div
+                          style={{
+                            width: "20%",
+                            display: "flex",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <Button
+                            variant="contained"
+                            classes={{ root: "orange" }}
+                            onClick={() => {
+                              setLanguageFormVisible(true);
+                              setLanguageFieldValues(language);
+                              setLanguageEditingIndex(index);
+                            }}
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            variant="contained"
+                            classes={{ root: "orange" }}
+                            onClick={() => handleDeleteLanguage(index)}
+                          >
+                            Delete
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+
+                    {languageFormVisible && (
+                      <div>
+                        <TextField
+                          label="Language Name"
+                          value={languageFieldValues.languageName}
+                          onChange={(e) =>
+                            setLanguageFieldValues({
+                              ...languageFieldValues,
+                              languageName: e.target.value,
+                            })
+                          }
+                          fullWidth
+                          margin="normal"
+                          size="small"
+                          error={!!languageFieldErrors.languageName}
+                          helperText={languageFieldErrors.languageName || " "}
+                        />
+                        <TextField
+                          label="Proficiency (Spoken)"
+                          value={languageFieldValues.proficiencySpoken}
+                          onChange={(e) =>
+                            setLanguageFieldValues({
+                              ...languageFieldValues,
+                              proficiencySpoken: e.target.value,
+                            })
+                          }
+                          fullWidth
+                          margin="normal"
+                          size="small"
+                          error={!!languageFieldErrors.proficiencySpoken}
+                          helperText={
+                            languageFieldErrors.proficiencySpoken || " "
+                          }
+                        />
+                        <TextField
+                          label="Proficiency (Written)"
+                          value={languageFieldValues.proficiencyWritten}
+                          onChange={(e) =>
+                            setLanguageFieldValues({
+                              ...languageFieldValues,
+                              proficiencyWritten: e.target.value,
+                            })
+                          }
+                          fullWidth
+                          margin="normal"
+                          size="small"
+                          error={!!languageFieldErrors.proficiencyWritten}
+                          helperText={
+                            languageFieldErrors.proficiencyWritten || " "
+                          }
+                        />
+                        <div>
+                          <label>
+                            Primary Language:
+                            <input
+                              type="radio"
+                              checked={languageFieldValues.isPrimary === true}
+                              onChange={() =>
+                                setLanguageFieldValues({
+                                  ...languageFieldValues,
+                                  isPrimary: true,
+                                })
+                              }
+                            />
+                            Yes
+                          </label>
+                          <label>
+                            <input
+                              type="radio"
+                              checked={languageFieldValues.isPrimary === false}
+                              onChange={() =>
+                                setLanguageFieldValues({
+                                  ...languageFieldValues,
+                                  isPrimary: false,
+                                })
+                              }
+                            />
+                            No
+                          </label>
+                        </div>
+                        <Button
+                          variant="contained"
+                          classes={{ root: "orange" }}
+                          onClick={handleSaveLanguage}
+                          sx={{ marginRight: "8px" }}
+                        >
+                          Save
+                        </Button>
+                        <Button
+                          variant="contained"
+                          classes={{ root: "orange" }}
+                          onClick={() => setLanguageFormVisible(false)}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {selectedContent === "Additional Info" && (
+                <div>
+                  {!isEditing ? (
+                    <div>
+                      <TextField
+                        label="Expected Monthly Salary"
+                        value={additionalInfo.expectedSalary}
+                        onChange={(e) =>
+                          setAdditionalInfo({
+                            ...additionalInfo,
+                            expectedSalary: e.target.value,
+                          })
+                        }
+                        fullWidth
+                        margin="normal"
+                        size="small"
+                        error={!!additionalInfoErrors.expectedSalary}
+                        helperText={additionalInfoErrors.expectedSalary}
+                      />
+                      <TextField
+                        label="Preferred Work Location"
+                        value={additionalInfo.preferredLocation}
+                        onChange={(e) =>
+                          setAdditionalInfo({
+                            ...additionalInfo,
+                            preferredLocation: e.target.value,
+                          })
+                        }
+                        fullWidth
+                        margin="normal"
+                        size="small"
+                        error={!!additionalInfoErrors.preferredLocation}
+                        helperText={additionalInfoErrors.preferredLocation}
+                      />
+                      <Button
+                        variant="contained"
+                        classes={{ root: "orange" }}
+                        onClick={handleAdditionInfoSaveClick}
+                      >
+                        Save
+                      </Button>
+                    </div>
+                  ) : (
+                    <div>
+                      <Button
+                        variant="contained"
+                        classes={{ root: "orange" }}
+                        onClick={handleAdditionalInfoEditClick}
+                        sx={{ marginRight: "8px" }}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        variant="contained"
+                        classes={{ root: "orange" }}
+                        onClick={() => {
+                          handleDeleteAdditionalInfo();
+                          setAdditionalInfo({
+                            expectedSalary: "",
+                            preferredLocation: "",
+                          });
+                          setIsEditing(false);
+                        }}
+                        disabled={
+                          !additionalInfo.expectedSalary &&
+                          !additionalInfo.preferredLocation
+                        }
+                      >
+                        Delete
+                      </Button>
+                      <Typography variant="subtitle1">
+                        Expected Monthly Salary: {additionalInfo.expectedSalary}
+                      </Typography>
+                      <Typography variant="subtitle1">
+                        Preferred Work Location:{" "}
+                        {additionalInfo.preferredLocation}
+                      </Typography>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {selectedContent === "About me" && (
+                <div>
+                  {isEditingAboutMe ? (
+                    <div>
+                      <Typography variant="p">Name: {aboutMe.name}</Typography>
+                      <br />
+                      <Typography variant="p">
+                        Contact Number: {aboutMe.contactNumber}
+                      </Typography>
+                      <br />
+                      <Typography variant="p">
+                        Email: {aboutMe.email}
+                      </Typography>
+                      <br />
+                      <Typography variant="p">
+                        Address: {aboutMe.address}
+                      </Typography>
+                      <br />
+                      <Typography variant="p">
+                        Postal Code: {aboutMe.postalCode}
+                      </Typography>
+                      <br />
+                      <Typography variant="p">
+                        Date of Birth: {aboutMe.dateOfBirth}
+                      </Typography>
+                      <br />
+                      <Typography variant="p">
+                        Nationality: {aboutMe.nationality}
+                      </Typography>
+                      <br />
+
+                      <Button
+                        variant="contained"
+                        sx={{ marginRight: "8px"
+                       }}
+                        classes={{ root: "orange" }}
+                        onClick={handleAboutMeEditClick}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        variant="contained"
+                        classes={{ root: "orange" }}
+                        onClick={handleDeleteAboutMe}
+                      >
+                        Delete
+                      </Button>
+                    </div>
+                  ) : (
+                    <div>
+                      <TextField
+                        label="Name"
+                        value={aboutMe.name}
+                        onChange={(e) =>
+                          setAboutMe({
+                            ...aboutMe,
+                            name: e.target.value,
+                          })
+                        }
+                        fullWidth
+                        margin="normal"
+                        size="small"
+                        error={!!aboutMeErrors.name}
+                        helperText={aboutMeErrors.name}
+                      />
+                      <TextField
+                        label="Contact Number"
+                        value={aboutMe.contactNumber}
+                        onChange={(e) =>
+                          setAboutMe({
+                            ...aboutMe,
+                            contactNumber: e.target.value,
+                          })
+                        }
+                        fullWidth
+                        margin="normal"
+                        size="small"
+                        error={!!aboutMeErrors.contactNumber}
+                        helperText={aboutMeErrors.contactNumber}
+                      />
+                      <TextField
+                        label="Email"
+                        value={aboutMe.email}
+                        onChange={(e) =>
+                          setAboutMe({
+                            ...aboutMe,
+                            email: e.target.value,
+                          })
+                        }
+                        fullWidth
+                        margin="normal"
+                        size="small"
+                        error={!!aboutMeErrors.email}
+                        helperText={aboutMeErrors.email}
+                      />
+                      <TextField
+                        label="Address"
+                        value={aboutMe.address || address}
+                        onChange={(e) =>
+                          setAboutMe({
+                            ...aboutMe,
+                            address: e.target.value,
+                          })
+                        }
+                        fullWidth
+                        margin="normal"
+                        size="small"
+                        error={!!aboutMeErrors.address}
+                        helperText={aboutMeErrors.address}
+                      />
+                      <div style={{ display: "flex", alignItems: "center" }}>
+                        <TextField
+                          label="Postal Code"
+                          value={aboutMe.postalCode}
+                          onChange={(e) => {
+                            setAboutMe({
+                              ...aboutMe,
+                              postalCode: e.target.value,
+                            });
+                          }}
+                          fullWidth
+                          margin="normal"
+                          size="small"
+                          error={!!aboutMeErrors.postalCode}
+                          helperText={aboutMeErrors.postalCode}
+                        />
+                        <IconButton
+                          style={{ color: "#FF6B2C" }}
+                          aria-label="search"
+                          onClick={handleSearchClick}
+                        >
+                          <SearchOutlinedIcon />
+                        </IconButton>
+                      </div>
+                      <TextField
+                        label="Date of Birth"
+                        value={aboutMe.dateOfBirth}
+                        onChange={(e) =>
+                          setAboutMe({
+                            ...aboutMe,
+                            dateOfBirth: e.target.value,
+                          })
+                        }
+                        fullWidth
+                        margin="normal"
+                        size="small"
+                        error={!!aboutMeErrors.dateOfBirth}
+                        helperText={aboutMeErrors.dateOfBirth}
+                      />
+                      <TextField
+                        label="Nationality"
+                        value={aboutMe.nationality}
+                        onChange={(e) =>
+                          setAboutMe({
+                            ...aboutMe,
+                            nationality: e.target.value,
+                          })
+                        }
+                        fullWidth
+                        margin="normal"
+                        size="small"
+                        error={!!aboutMeErrors.nationality}
+                        helperText={aboutMeErrors.nationality}
+                      />
+
+                      <Button
+                        variant="contained"
+                        classes={{ root: "orange" }}
+                        onClick={handleAboutMeSaveClick}
+                        sx={{ marginRight: "8px" }}
+                      >
+                        Save
+                      </Button>
+                      <Button
+                        variant="contained"
+                        classes={{ root: "orange" }}
+                        onClick={handleAboutMeCancelClick}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {selectedContent === "Privacy Setting(?)" && (
-                <div>Privacy Setting(?) Content</div>
+                <div>
+                  {!isEditingPrivacy ? (
+                    <div>
+                      <FormControl component="fieldset">
+                        <RadioGroup
+                          name="privacySetting"
+                          value={privacySetting}
+                          onChange={(e) => setPrivacySetting(e.target.value)}
+                        >
+                          <FormControlLabel
+                            value="Searchable with Contact Details"
+                            control={<Radio />}
+                            label={
+                              <>
+                                <Typography
+                                  variant="h6"
+                                  sx={{
+                                    fontWeight:
+                                      theme.typography.h6.fontWeightBold,
+                                  }}
+                                >
+                                  Searchable with Contact Details
+                                </Typography>
+                                <Typography
+                                  variant="p"
+                                  sx={{
+                                    fontWeight: theme.typography.p,
+                                    whiteSpace: "nowrap",
+                                  }}
+                                >
+                                  Allow employers to search for my profile and
+                                  see my name and contact details.
+                                </Typography>
+                              </>
+                            }
+                          />
+                          <FormControlLabel
+                            value="Not Searchable"
+                            control={<Radio />}
+                            label={
+                              <>
+                                <Typography
+                                  variant="h6"
+                                  sx={{
+                                    fontWeight:
+                                      theme.typography.h6.fontWeightBold,
+                                  }}
+                                >
+                                  Not Searchable
+                                </Typography>
+                                <Typography
+                                  variant="p"
+                                  sx={{
+                                    fontWeight: theme.typography.p,
+                                    whiteSpace: "nowrap",
+                                  }}
+                                >
+                                  Do not allow employers to search my profile.
+                                </Typography>
+                              </>
+                            }
+                          />
+                        </RadioGroup>
+                      </FormControl>
+                      <br />
+                      <Button
+                        variant="contained"
+                        classes={{ root: "orange" }}
+                        onClick={handlePrivacySaveClick}
+                        sx={{ marginRight: "8px", marginTop: "10px" }}
+                      >
+                        Save
+                      </Button>
+                      <Button
+                        variant="contained"
+                        classes={{ root: "orange" }}
+                        onClick={handlePrivacyCancelClick}
+                        sx={{ marginTop: "10px" }}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  ) : (
+                    <div>
+                      <Typography variant="p">
+                        {privacySetting === "Searchable with Contact Details"
+                          ? "Searchable with Contact Details"
+                          : "Not Searchable"}
+                      </Typography>
+                      <br />
+                      <Button
+                        variant="contained"
+                        classes={{ root: "orange" }}
+                        onClick={handlePrivacyEditClick}
+                      >
+                        Edit
+                      </Button>
+                    </div>
+                  )}
+                </div>
               )}
             </Box>
           </Box>
