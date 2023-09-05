@@ -88,6 +88,7 @@ export const theme = createTheme({
       display: "flex",
       flexDirection: "row",
       justifyContent: "center",
+      flexWrap: "wrap",
     },
     displayFlexRowLeft: {
       display: "flex",
@@ -105,6 +106,7 @@ export const theme = createTheme({
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+        paddingTop: 4,
       },
     },
     categoryBox: {

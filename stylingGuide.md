@@ -72,3 +72,44 @@ use this to make error font (similar to mui error field font in red)
                               fontSize: theme.typography.error.fontSize,
                             }}
                           > -->
+
+###### to use axios loader
+
+import Axios loader, declare state
+
+import AxiosLoader from "../../Components/AxiosLoader";
+const [axiosLoading, setAxiosLoading] = useState(false);
+
+set axiosloading to true right before ur axios call
+e.g.
+setAxiosLoading(true);
+try {
+const newJobInfo = await axios.post(
+`${BACKEND_URL}/company/newjobpost`,
+jobPost,
+{
+headers: {
+Authorization: `Bearer ${currUser.accessToken}`,
+},
+}
+)}
+
+add this .finally after the catch block
+e.g.
+
+try {}
+.catch {}
+.finally {
+setAxiosLoading(false);
+}
+
+###### to use swal msgs
+
+import \* as SwalMsgs from "../../Utils/SwalMsgs";
+
+for those that accept props to personalize msgs (check SwalMsgs.js to see)
+
+Swal.fire(SwalMsgs.numberRequired("Minimum Salary"));
+
+for those that don't accept props
+Swal.fire(SwalMsgs.overwriteCurrentInfo)

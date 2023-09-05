@@ -40,7 +40,7 @@ function JobListingOverall() {
       setAccessToken(localAccess);
       setIsLoaded(true);
     }
-  }, [accessToken]);
+  }, []);
 
   //disable jobseekers and non loggedin people from accessing this page
   useEffect(() => {
