@@ -38,6 +38,7 @@ function Search() {
   const [categoryExpand, setCategoryExpand] = useState(false);
   const [typeExpand, setTypeExpand] = useState(false);
   const [mappedCategory, setMappedCategory] = useState([]);
+  const [jobsData, setJobsData] = useState([]);
   //state to know what category is selected
   const [categoryQuery, setCategoryQuery] = useState("");
   //state to know what type of employment is ticked
@@ -263,6 +264,7 @@ function Search() {
       .post(`${BACKEND_URL}/listings/search/`, dataToSend)
       .then((info) => {
         console.log(info);
+        setJobsData(info.data);
         setJobsDisplay(
           info.data.map((info, index) => {
             return (
@@ -533,10 +535,12 @@ function Search() {
                 </Grid>
               </Grid>
               <Divider sx={{ mt: 3, mb: 3 }} />
-              <Box sx={{ height: "70vh", overflow: "auto" }}>
-                {jobsDisplay.length !== 0 && searchDone ? jobsDisplay : null}
-              </Box>
-              {jobsDisplay.length === 0 && searchDone ? (
+              {jobsData.length !== 0 && searchDone ? (
+                <Box sx={{ height: "70vh", overflow: "auto" }}>
+                  {jobsDisplay}
+                </Box>
+              ) : null}
+              {jobsData.length === 0 && searchDone ? (
                 <Typography variant="h5" sx={{ ml: "10vw", mt: "20vh" }}>
                   No available listings from search parameters provided!
                 </Typography>
