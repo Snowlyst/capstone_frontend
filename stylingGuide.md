@@ -73,7 +73,7 @@ use this to make error font (similar to mui error field font in red)
                             }}
                           > -->
 
-##### to use axios loader
+###### to use axios loader
 
 import Axios loader, declare state
 
@@ -102,3 +102,14 @@ try {}
 .finally {
 setAxiosLoading(false);
 }
+
+###### to use swal msgs
+
+import \* as SwalMsgs from "../../Utils/SwalMsgs";
+
+for those that accept props to personalize msgs (check SwalMsgs.js to see)
+
+Swal.fire(SwalMsgs.numberRequired("Minimum Salary"));
+
+for those that don't accept props
+Swal.fire(SwalMsgs.overwriteCurrentInfo)
