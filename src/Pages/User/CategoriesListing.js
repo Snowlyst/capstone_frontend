@@ -13,7 +13,7 @@ function CategoriesListing() {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8080/listings/categories/${categoryId}`)
+      .get(`http://localhost:8080/listings/categories/bycategory/${categoryId}`)
       .then((response) => {
         if (response.data.success) {
           setListings(response.data.output);
