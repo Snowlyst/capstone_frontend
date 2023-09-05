@@ -218,6 +218,7 @@ export const occupationOptions = [
     </MenuItem>
   ));
 export const incomeOptions = [
+  "None at the moment",
   "Less than $1,000",
   "$1,000 to $2,000",
   "$2,001 to $3,000",

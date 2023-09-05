@@ -17,9 +17,6 @@ import { stateFromHTML } from "draft-js-import-html";
 import "draft-js/dist/Draft.css";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import AxiosLoader from "../../Components/AxiosLoader";
-// import ReactSelect from "react-select";
-// import makeAnimated from "react-select/animated";
-// import { styled } from "@mui/material/styles";
 import {
   Container,
   Box,
@@ -27,13 +24,6 @@ import {
   Paper,
   Grid,
   Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  FormHelperText,
-  InputAdornment,
   Divider,
   Stack,
   Avatar,
@@ -54,7 +44,7 @@ function IndividualJobPage() {
   const [jobId, setJobId] = useState(params.jobId);
   const [displayBanner, setDisplayBanner] = useState(false);
   const [updateDate, setUpdateDate] = useState("");
-  const { currUser, categories, location } = useUserContext();
+  const { currUser } = useUserContext();
   const [description, setDescription] = useState("");
   const [displayAdminButtons, setDisplayAdminButtons] = useState(false);
 
