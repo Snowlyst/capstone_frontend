@@ -21,176 +21,61 @@ import { theme } from "../../Assets/Styles/Theme";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import "../../Assets/Styles/MemberProfile.css";
 import axios from "axios";
-import {
-  cancerDiagnosisOptions,
-  housingOptions,
-  familyCompositionOptions,
-  workStatusOptions,
-  occupationOptions,
-  incomeOptions,
-  impactOnFinancesOptions,
-  scaleOptions,
-  timePeriodOptions,
-  healthStatusOptions,
-  distressOptions,
-} from "./MenuItemsOptions";
+import * as options from "./MenuItemsOptions";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
+import * as SwalMsgs from "../../Utils/SwalMsgs";
+
 function Profile() {
   // Set States
-  // 1st Row of input in the form.
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [identificationNumber, setIdentificationNumber] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
 
-  // 2nd row of input in the form.
-  const [mobileNumber, setMobileNumber] = useState("");
-  const [dateOfBirth, setDateOfBirth] = useState("");
-  const [cancerDiagnosis, setCancerDiagnosis] = useState("");
-  const [newCancerDiagnosis, setNewCancerDiagnosis] = useState("");
-
-  const [activeTreatment, setActiveTreatment] = useState("");
-  const [activeTreatmentError, setActiveTreatmentError] = useState(true);
-  const [gender, setGender] = useState("");
-  const [genderError, setGenderError] = useState(true);
-
-  // 3rd row of input in the form.
-  const [postalCode, setPostalCode] = useState("");
-  const [unitNumber, setUnitNumber] = useState("");
-  const [displayedAddress, setDisplayedAddress] = useState("");
-  const [address, setAddress] = useState("");
-  const [housingType, setHousingType] = useState("");
-  const [newHousingType, setNewHousingType] = useState("");
-  const [livingArrangement, setLivingArrangment] = useState("");
-  const [newLivingArrangement, setNewLivingArrangment] = useState("");
-  // 4th row of input in the form.
-  const [currentWorkStatus, setCurrentWorkStatus] = useState("");
-  const [newCurrentWorkStatus, setNewCurrentWorkStatus] = useState("");
-  const [occupation, setOccupation] = useState("");
-  const [newOccupation, setNewOccupation] = useState("");
-  const [monthlySalary, setMonthlySalary] = useState("");
-  const [cancerImpactOnFinances, setCancerImpactOnFinances] = useState("");
-
-  const [dateOfLastEmployment, setDateOfLastEmployment] = useState("");
-  // 5th row of input in the form.
-  const [employedReadinessScaleToRtw, setEmployedReadinessScaleToRtw] =
-    useState("");
-  const [unemployedReadinessScaleToRtw, setUnemployedReadinessScaleToRtw] =
-    useState("");
-  const [unemployedTimeFrameToRtw, setUnemployedTimeFrameToRtw] = useState("");
-  const [newUnemployedTimeFrameToRtw, setNewUnemployedTimeFrameToRtw] =
-    useState("");
-
-  const [currentHealthStatus, setCurrentHealthStatus] = useState("");
-
-  const [physicalHealthInterference, setPhysicalHealthInterference] =
-    useState("");
-  const [mentalHealthInterference, setMentalHealthInterference] = useState("");
-  // 6th row of input in the form.
-  const [physicalBarriersToRtw, setPhysicalBarriersToRtw] = useState("");
-  const [mentalBarriersToRtw, setMentalBarriersToRtw] = useState("");
-  const [additionalInformation, setAdditionalInformation] = useState("");
-
-  const [formData, setFormData] = useState({
-    firstName: firstName,
-    lastName: lastName,
-    identificationNumber: identificationNumber,
-    mobileNumber: mobileNumber,
-    dateOfBirth: dateOfBirth,
-    cancerDiagnosis: cancerDiagnosis,
-    newCancerDiagnosis: newCancerDiagnosis,
-    activeTreatment: activeTreatment,
-    gender: gender,
-    postalCode: postalCode,
-    unitNumber: unitNumber,
-    address: address,
-    housingType: housingType,
-    newHousingType: newHousingType,
-    livingArrangement: livingArrangement,
-    newLivingArrangement: newLivingArrangement,
-    currentWorkStatus: currentWorkStatus,
-    newCurrentWorkStatus: newCurrentWorkStatus,
-    occupation: occupation,
-    newOccupation: newOccupation,
-    monthlySalary: monthlySalary,
-    cancerImpactOnFinances: cancerImpactOnFinances,
-    dateOfLastEmployment: dateOfLastEmployment,
-    employedReadinessScaleToRtw: employedReadinessScaleToRtw,
-    unemployedReadinessScaleToRtw: unemployedReadinessScaleToRtw,
-    unemployedTimeFrameToRtw: unemployedTimeFrameToRtw,
-    newUnemployedTimeFrameToRtw: newUnemployedTimeFrameToRtw,
-    currentHealthStatus: currentHealthStatus,
-    physicalHealthInterference: physicalHealthInterference,
-    mentalHealthInterference: mentalHealthInterference,
-    physicalBarriersToRtw: physicalBarriersToRtw,
-    mentalBarriersToRtw: mentalBarriersToRtw,
-    additionalInformation: additionalInformation,
+  const [fieldValues, setFieldValues] = useState({
+    firstName: "",
+    lastName: "",
+    identificationNumber: "",
+    mobileNumber: "",
+    dateOfBirth: "",
+    cancerDiagnosis: "",
+    activeTreatment: "",
+    gender: "",
+    postalCode: "",
+    unitNumber: "",
+    displayedAddress: "",
+    address: "",
+    housingType: "",
+    livingArrangement: "",
+    currentWorkStatus: "",
+    occupation: "",
+    monthlySalary: "",
+    cancerImpactOnFinances: "",
+    employedReadinessScaleToRtw: "",
+    unemployedReadinessScaleToRtw: "",
+    unemployedTimeFrameToRtw: "",
+    currentHealthStatus: "",
+    physicalHealthInterference: "",
+    mentalHealthInterference: "",
+    physicalBarriersToRtw: "",
+    mentalBarriersToRtw: "",
+    additionalInformation: "",
+    newCancerDiagnosis: "",
+    newHousingType: "",
+    newLivingArrangement: "",
+    newCurrentWorkStatus: "",
+    newOccupation: "",
+    newUnemployedTimeFrameToRtw: "",
   });
-  const gatherFormData = () => {
-    return formData;
-  };
-  // Functions to handle input
-  // 1st Row of input in the form.
-  const handleFirstNameChange = (e) => {
-    setFirstName(e.target.value);
-  };
-  const handleLastNameChange = (e) => {
-    setLastName(e.target.value);
-  };
-  const handleIdentificationNumberChange = (e) => {
-    setIdentificationNumber(e.target.value);
-  };
-  // 2nd row of input in the form.
-  const handleMobileNumberChange = (e) => {
-    setMobileNumber(e.target.value);
-  };
-  const handleDateOfBirthChange = (e) => {
-    setDateOfBirth(e.target.value);
-  };
 
-  const handleNewCancerDiagnosisChange = (e) => {
-    setNewCancerDiagnosis(e.target.value);
+  const handleChange = (fieldName, value) => {
+    setFieldValues((prevValues) => ({
+      ...prevValues,
+      [fieldName]: value,
+    }));
   };
-  const handleCancerDiagnosisChange = (e) => {
-    const selectedValue = e.target.value;
-    setCancerDiagnosis(selectedValue);
-  };
-
-  console.log(cancerDiagnosis);
-  console.log(newCancerDiagnosis);
-  // useEffect(() => {
-  //   console.log("New Cancer Diagnosis", newCancerDiagnosis);
-  // }, [newCancerDiagnosis]);
-  // useEffect(() => {
-  //   console.log("Cancer Diagnosis", cancerDiagnosis);
-  // }, [cancerDiagnosis]);
-
-  const handleActiveTreatmentChange = (e) => {
-    const value = e.target.value;
-    setActiveTreatment(value);
-    setActiveTreatmentError(false);
-  };
-
-  const handleGenderChange = (e) => {
-    const value = e.target.value;
-    setGender(value);
-    setGenderError(false);
-  };
-  // 3rd row of input in the form.
-  const handlePostalCode = (e) => {
-    setPostalCode(e.target.value);
-  };
-  const handleUnitNumber = (e) => {
-    setUnitNumber(e.target.value);
-  };
-  const handleAddress = (e) => {
-    setAddress(e.target.value);
-  };
-  console.log(address);
 
   const handleSearchPostal = (e) => {
     e.preventDefault();
-    const searchQuery = postalCode;
+    const searchQuery = fieldValues.postalCode;
     axios
       .get(
         `https://developers.onemap.sg/commonapi/search?searchVal=${searchQuery}&returnGeom=Y&getAddrDetails=Y`
@@ -199,121 +84,57 @@ function Profile() {
         const spreadData = info.data.results.map((info, index) => {
           console.log(info);
           console.log(info.ADDRESS);
-          setAddress(info.ADDRESS);
+          handleChange("address", info.ADDRESS);
           return <div key={index}>Address: {info.ADDRESS}</div>;
         });
-        setDisplayedAddress(spreadData);
+        handleChange("displayedAddress", spreadData);
       })
       .catch((error) => {
         console.log(error);
       });
   };
-  const handleHousingTypeChange = (e) => {
-    const selectedValue = e.target.value;
-    setHousingType(selectedValue);
-  };
 
-  const handleNewHousingTypeChange = (e) => {
-    setNewHousingType(e.target.value);
-  };
-  const handleLivingArrangmentChange = (e) => {
-    const selectedValue = e.target.value;
-    setLivingArrangment(selectedValue);
-  };
-  const handleNewLivingArrangmentChange = (e) => {
-    setNewLivingArrangment(e.target.value);
-  };
-  // 4th row of input in the form.
-  const handleCurrentWorkStatus = (e) => {
-    const selectedValue = e.target.value;
-    setCurrentWorkStatus(selectedValue);
-  };
-  const handleNewCurrentWorkStatus = (e) => {
-    setNewCurrentWorkStatus(e.target.value);
-  };
-  const handleOccupation = (e) => {
-    const selectedValue = e.target.value;
-    setOccupation(selectedValue);
-  };
-  const handleNewOccupation = (e) => {
-    setNewOccupation(e.target.value);
-  };
-  const handleMonthlySalary = (e) => {
-    setMonthlySalary(e.target.value);
-  };
-  const handleCancerImpactOnFinances = (e) => {
-    setCancerImpactOnFinances(e.target.value);
-  };
-
-  // 5th row of input in the form.
-  const handleDateOfLastEmployment = (e) => {
-    setDateOfLastEmployment(e.target.value);
-  };
-  const handleUnemployedReadinessScaleToRtw = (e) => {
-    const selectedValue = e.target.value;
-    setUnemployedReadinessScaleToRtw(selectedValue);
-  };
-  const handleUnemployedTimeFrameToRtw = (e) => {
-    const selectedValue = e.target.value;
-    setUnemployedTimeFrameToRtw(selectedValue);
-  };
-  const handleNewUnemployedTimeFrameToRtw = (e) => {
-    setNewUnemployedTimeFrameToRtw(e.target.value);
-  };
-
-  const handleEmployedReadinessScaleToRtw = (e) => {
-    setEmployedReadinessScaleToRtw(e.target.value);
-  };
-  const handleCurrentHealthStatus = (e) => {
-    setCurrentHealthStatus(e.target.value);
-  };
-
-  const handlePhysicalHealthInterference = (e) => {
-    setPhysicalHealthInterference(e.target.value);
-  };
-  const handleMentalHealthInterference = (e) => {
-    setMentalHealthInterference(e.target.value);
-  };
-  // 6th row of input in the form.
-  const handlePhysicalBarriersToRtw = (e) => {
-    setPhysicalBarriersToRtw(e.target.value);
-  };
-  const handleMentalBarriersToRtw = (e) => {
-    setMentalBarriersToRtw(e.target.value);
-  };
-  const handleAdditionalInformation = (e) => {
-    setAdditionalInformation(e.target.value);
-  };
-  const handleSubmit = () => {
-    const updatedFormData = gatherFormData();
-    const requiredFields = [
-      updatedFormData.firstName,
-      updatedFormData.lastName,
-      updatedFormData.identificationNumber,
-      updatedFormData.mobileNumber,
-      updatedFormData.dateOfBirth,
-      updatedFormData.cancerDiagnosis,
-      updatedFormData.activeTreatment,
-      updatedFormData.gender,
-      updatedFormData,
-      postalCode,
-      updatedFormData.unitNumber,
-      updatedFormData.address,
-      updatedFormData.housingType,
-      updatedFormData.livingArrangement,
-      updatedFormData.currentWorkStatus,
-    ];
-    const areAllFieldsFilled = requiredFields.every((field) => field !== "");
-
-    if (!areAllFieldsFilled) {
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Please fill in all required fields before submitting.",
-      });
-      return;
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const newFieldErrors = {};
+    Object.keys(fieldValues).forEach((fieldName) => {
+      if (fieldValues[fieldName].trim() === "") {
+        newFieldErrors[fieldName] = true;
+      }
+    });
+    setFieldErrors(newFieldErrors);
+    if (newFieldErrors.length > 0) {
+      Swal.fire(SwalMsgs.missingFormInfoGentle);
     }
-    console.log("Updated Form Data:", updatedFormData);
+    // else {
+    //   const requiredFields = [
+    //     fieldValues.firstName,
+    //     fieldValues.lastName,
+    //     fieldValues.identificationNumber,
+    //     fieldValues.mobileNumber,
+    //     fieldValues.dateOfBirth,
+    //     fieldValues.cancerDiagnosis,
+    //     fieldValues.activeTreatment,
+    //     fieldValues.gender,
+    //     fieldValues.postalCode,
+    //     fieldValues.unitNumber,
+    //     fieldValues.address,
+    //     fieldValues.housingType,
+    //     fieldValues.livingArrangement,
+    //     fieldValues.currentWorkStatus,
+    //   ];
+    //   const areAllFieldsFilled = requiredFields.every((field) => field !== "");
+
+    //   if (!areAllFieldsFilled) {
+    //     Swal.fire({
+    //       icon: "error",
+    //       title: "Oops...",
+    //       text: "Please fill in all required fields before submitting.",
+    //     });
+    //     return;
+    //   }
+    //   console.log("Updated Form Data:", fieldValues);
+    // }
   };
 
   useEffect(() => {
@@ -322,10 +143,10 @@ function Profile() {
       .get("http://localhost:8080/users/personalinfo/3")
       .then((response) => {
         const fetchedData = response.data;
-        setFormData(fetchedData);
+        setFieldValues(fetchedData);
         console.log(fetchedData);
-        setFirstName(fetchedData.firstName);
-        setLastName(fetchedData.lastName);
+        handleChange("firstName", fetchedData.firstName);
+        handleChange("lastName", fetchedData.lastName);
       })
       .catch((error) => {
         console.error(error);
@@ -347,9 +168,7 @@ function Profile() {
               >
                 Profile
               </Typography>
-              <Typography 
-              variant="p"
-              sx={{fontWeight: theme.typography.p}}>
+              <Typography variant="p" sx={{ fontWeight: theme.typography.p }}>
                 Please fill up your particulars. All fields must be filled in
                 before you can join the programs.
               </Typography>
@@ -368,11 +187,13 @@ function Profile() {
                     fullWidth
                     margin="normal"
                     variant="outlined"
-                    value={firstName}
-                    onChange={handleFirstNameChange}
-                    error={firstName === ""}
+                    value={fieldValues.firstName}
+                    onChange={(e) => handleChange("firstName", e.target.value)}
+                    error={fieldErrors.firstName || false}
                     helperText={
-                      firstName === "" ? "First Name is required" : ""
+                      fieldValues.firstName === ""
+                        ? "First Name is required"
+                        : ""
                     }
                   />
                 </Grid>
@@ -382,10 +203,12 @@ function Profile() {
                     fullWidth
                     margin="normal"
                     variant="outlined"
-                    value={lastName}
-                    onChange={handleLastNameChange}
-                    error={lastName === ""}
-                    helperText={lastName === "" ? "Last Name is required" : ""}
+                    value={fieldValues.lastName}
+                    onChange={(e) => handleChange("lastName", e.target.value)}
+                    error={fieldErrors.lastName || false}
+                    helperText={
+                      fieldValues.lastName === "" ? "Last Name is required" : ""
+                    }
                   />
                 </Grid>
                 <Grid item xs={12} md={3}>
@@ -394,11 +217,13 @@ function Profile() {
                     fullWidth
                     margin="normal"
                     variant="outlined"
-                    value={identificationNumber}
-                    onChange={handleIdentificationNumberChange}
-                    error={identificationNumber === ""}
+                    value={fieldValues.identificationNumber}
+                    onChange={(e) =>
+                      handleChange("identificationNumber", e.target.value)
+                    }
+                    error={fieldErrors.identificationNumber || false}
                     helperText={
-                      identificationNumber === ""
+                      fieldValues.identificationNumber || false
                         ? "Identification Number is required"
                         : ""
                     }
@@ -416,11 +241,15 @@ function Profile() {
                     fullWidth
                     margin="normal"
                     variant="outlined"
-                    value={mobileNumber}
-                    onChange={handleMobileNumberChange}
-                    error={mobileNumber === ""}
+                    value={fieldValues.mobileNumber}
+                    onChange={(e) =>
+                      handleChange("mobileNumber", e.target.value)
+                    }
+                    error={fieldErrors.mobileNumber || false}
                     helperText={
-                      mobileNumber === "" ? "Mobile Number is required" : ""
+                      fieldValues.mobileNumber === ""
+                        ? "Mobile Number is required"
+                        : ""
                     }
                   />
                 </Grid>
@@ -431,11 +260,15 @@ function Profile() {
                     margin="normal"
                     variant="outlined"
                     placeholder="DD/MM/YYYY"
-                    value={dateOfBirth}
-                    onChange={handleDateOfBirthChange}
-                    error={dateOfBirth === ""}
+                    value={fieldValues.dateOfBirth}
+                    onChange={(e) =>
+                      handleChange("dateOfBirth", e.target.value)
+                    }
+                    error={fieldErrors.dateOfBirth || false}
                     helperText={
-                      dateOfBirth === "" ? "Date of Birth is required" : ""
+                      fieldValues.dateOfBirth === ""
+                        ? "Date of Birth is required"
+                        : ""
                     }
                   />
                 </Grid>
@@ -444,30 +277,34 @@ function Profile() {
                     <FormControl
                       fullWidth
                       variant="outlined"
-                      error={cancerDiagnosis === ""}
+                      error={fieldErrors.cancerDiagnosis === ""}
                     >
                       <InputLabel>Cancer Diagnosis</InputLabel>
                       <Select
                         label="Cancer Diagnosis"
-                        value={cancerDiagnosis}
-                        onChange={handleCancerDiagnosisChange}
+                        value={fieldValues.cancerDiagnosis}
+                        onChange={(e) =>
+                          handleChange("cancerDiagnosis", e.target.value)
+                        }
                       >
-                        {cancerDiagnosisOptions}
+                        {options.cancerDiagnosisOptions}
                       </Select>
-                      {cancerDiagnosis === "" && (
+                      {fieldValues.cancerDiagnosis === "" && (
                         <FormHelperText>
                           Cancer Diagnosis is required
                         </FormHelperText>
                       )}
                     </FormControl>
-                    {cancerDiagnosis === "Others" && (
+                    {fieldValues.cancerDiagnosis === "Others" && (
                       <TextField
                         label="Other Cancer Diagnosis"
                         fullWidth
                         margin="normal"
                         variant="outlined"
-                        value={newCancerDiagnosis}
-                        onChange={handleNewCancerDiagnosisChange}
+                        value={fieldValues.newCancerDiagnosis}
+                        onChange={(e) =>
+                          handleChange("newCancerDiagnosis", e.target.value)
+                        }
                       />
                     )}
                   </Box>
@@ -479,8 +316,10 @@ function Profile() {
                     </Typography>
                     <RadioGroup
                       row
-                      value={activeTreatment}
-                      onChange={handleActiveTreatmentChange}
+                      value={fieldValues.activeTreatment}
+                      onChange={(e) =>
+                        handleChange("activeTreatment", e.target.value)
+                      }
                     >
                       <FormControlLabel
                         value="yes"
@@ -499,7 +338,7 @@ function Profile() {
                         }
                       />
                     </RadioGroup>
-                    {activeTreatmentError && (
+                    {fieldErrors.activeTreatment && (
                       <FormHelperText error>
                         Please select an option
                       </FormHelperText>
@@ -511,8 +350,8 @@ function Profile() {
                     <Typography sx={{ fontSize: "small" }}>Gender</Typography>
                     <RadioGroup
                       row
-                      value={gender}
-                      onChange={handleGenderChange}
+                      value={fieldValues.gender}
+                      onChange={(e) => handleChange("gender", e.target.value)}
                     >
                       <FormControlLabel
                         value="male"
@@ -533,7 +372,7 @@ function Profile() {
                         }
                       />
                     </RadioGroup>
-                    {genderError && (
+                    {fieldErrors.genderError && (
                       <FormHelperText error>
                         Please select an option
                       </FormHelperText>
@@ -552,11 +391,13 @@ function Profile() {
                     margin="normal"
                     variant="outlined"
                     type="number"
-                    value={postalCode}
-                    onChange={handlePostalCode}
-                    error={postalCode === ""}
+                    value={fieldValues.postalCode}
+                    onChange={(e) => handleChange("postalCode", e.target.value)}
+                    error={fieldErrors.postalCode === ""}
                     helperText={
-                      postalCode === "" ? "Postal Code is required" : ""
+                      fieldValues.postalCode === ""
+                        ? "Postal Code is required"
+                        : ""
                     }
                   />
                 </Grid>
@@ -582,11 +423,15 @@ function Profile() {
                       margin="normal"
                       variant="outlined"
                       placeholder="#"
-                      value={unitNumber}
-                      onChange={handleUnitNumber}
-                      error={unitNumber === ""}
+                      value={fieldValues.unitNumber}
+                      onChange={(e) =>
+                        handleChange("unitNumber", e.target.value)
+                      }
+                      error={fieldErrors.unitNumber === ""}
                       helperText={
-                        unitNumber === "" ? "Unit Number is required" : ""
+                        fieldValues.unitNumber === ""
+                          ? "Unit Number is required"
+                          : ""
                       }
                     />
                   </Box>
@@ -599,10 +444,12 @@ function Profile() {
                     fullWidth
                     margin="normal"
                     variant="outlined"
-                    value={address}
-                    onChange={handleAddress}
-                    error={address === ""}
-                    helperText={address === "" ? "Address is required" : ""}
+                    value={fieldValues.address}
+                    onChange={(e) => handleChange("address", e.target.value)}
+                    error={fieldErrors.address === ""}
+                    helperText={
+                      fieldValues.address === "" ? "Address is required" : ""
+                    }
                   />
                 </Grid>
                 {/* Housing Type */}
@@ -611,30 +458,34 @@ function Profile() {
                     <FormControl
                       fullWidth
                       variant="outlined"
-                      error={housingType === ""}
+                      error={fieldErrors.housingType === ""}
                     >
                       <InputLabel>Housing Type</InputLabel>
                       <Select
                         label="Housing Type"
-                        value={housingType}
-                        onChange={handleHousingTypeChange}
+                        value={fieldValues.housingType}
+                        onChange={(e) =>
+                          handleChange("housingType", e.target.value)
+                        }
                       >
-                        {housingOptions}
+                        {options.housingOptions}
                       </Select>
-                      {housingType === "" && (
+                      {fieldValues.housingType === "" && (
                         <FormHelperText>
                           Housing Type is required
                         </FormHelperText>
                       )}
                     </FormControl>
-                    {housingType === "Others" && (
+                    {fieldValues.housingType === "Others" && (
                       <TextField
                         label="Others"
                         fullWidth
                         margin="normal"
                         variant="outlined"
-                        value={newHousingType}
-                        onChange={handleNewHousingTypeChange}
+                        value={fieldValues.newHousingType}
+                        onChange={(e) =>
+                          handleChange("newHousingType", e.target.value)
+                        }
                       />
                     )}
                   </Box>
@@ -645,30 +496,34 @@ function Profile() {
                     <FormControl
                       fullWidth
                       variant="outlined"
-                      error={livingArrangement === ""}
+                      error={fieldErrors.livingArrangement === ""}
                     >
                       <InputLabel>Living Arrangement</InputLabel>
                       <Select
                         label="Living Arrangment"
-                        value={livingArrangement}
-                        onChange={handleLivingArrangmentChange}
+                        value={fieldValues.livingArrangement}
+                        onChange={(e) =>
+                          handleChange("livingArrangement", e.target.value)
+                        }
                       >
-                        {familyCompositionOptions}
+                        {options.familyCompositionOptions}
                       </Select>
-                      {livingArrangement === "" && (
+                      {fieldValues.livingArrangement === "" && (
                         <FormHelperText>
                           living Arrangement is required
                         </FormHelperText>
                       )}
                     </FormControl>
-                    {livingArrangement === "Others" && (
+                    {fieldValues.livingArrangement === "Others" && (
                       <TextField
                         label="Others"
                         fullWidth
                         margin="normal"
                         variant="outlined"
-                        value={newLivingArrangement}
-                        onChange={handleNewLivingArrangmentChange}
+                        value={fieldValues.newLivingArrangement}
+                        onChange={(e) =>
+                          handleChange("newLivingArrangement", e.target.value)
+                        }
                       />
                     )}
                   </Box>
@@ -688,28 +543,32 @@ function Profile() {
                     <FormControl
                       fullWidth
                       variant="outlined"
-                      error={currentWorkStatus === ""}
+                      error={fieldErrors.currentWorkStatus === ""}
                     >
                       <InputLabel>Current Work Status</InputLabel>
                       <Select
                         label="Current Work Status"
-                        value={currentWorkStatus}
-                        onChange={handleCurrentWorkStatus}
+                        value={fieldValues.currentWorkStatus}
+                        onChange={(e) =>
+                          handleChange("currentWorkStatus", e.target.value)
+                        }
                       >
-                        {workStatusOptions}
+                        {options.workStatusOptions}
                       </Select>
-                      {currentWorkStatus === "" && (
+                      {fieldValues.currentWorkStatus === "" && (
                         <FormHelperText>Work Status is required</FormHelperText>
                       )}
                     </FormControl>
-                    {currentWorkStatus === "Others" && (
+                    {fieldValues.currentWorkStatus === "Others" && (
                       <TextField
                         label="Other work status"
                         fullWidth
                         margin="normal"
                         variant="outlined"
-                        value={newCurrentWorkStatus}
-                        onChange={handleNewCurrentWorkStatus}
+                        value={fieldValues.newCurrentWorkStatus}
+                        onChange={(e) =>
+                          handleChange("newCurrentWorkStatus", e.target.value)
+                        }
                       />
                     )}
                   </Box>
@@ -719,28 +578,32 @@ function Profile() {
                     <FormControl
                       fullWidth
                       variant="outlined"
-                      error={occupation === ""}
+                      error={fieldErrors.occupation === ""}
                     >
                       <InputLabel>Occupation</InputLabel>
                       <Select
                         label="Occupation"
-                        value={occupation}
-                        onChange={handleOccupation}
+                        value={fieldValues.occupation}
+                        onChange={(e) =>
+                          handleChange("occupation", e.target.value)
+                        }
                       >
-                        {occupationOptions}
+                        {options.occupationOptions}
                       </Select>
-                      {occupation === "" && (
+                      {fieldValues.occupation === "" && (
                         <FormHelperText>Occupation is required</FormHelperText>
                       )}
                     </FormControl>
-                    {occupation === "Others" && (
+                    {fieldValues.occupation === "Others" && (
                       <TextField
                         label="Others"
                         fullWidth
                         margin="normal"
                         variant="outlined"
-                        value={newOccupation}
-                        onChange={handleNewOccupation}
+                        value={fieldValues.newOccupation}
+                        onChange={(e) =>
+                          handleChange("newOccupation", e.target.value)
+                        }
                       />
                     )}
                     <Typography
@@ -758,17 +621,19 @@ function Profile() {
                     <FormControl
                       fullWidth
                       variant="outlined"
-                      error={monthlySalary === ""}
+                      error={fieldErrors.monthlySalary === ""}
                     >
                       <InputLabel>Basic Monthly Salary</InputLabel>
                       <Select
                         label="Basic Monthly Salary"
-                        value={monthlySalary}
-                        onChange={handleMonthlySalary}
+                        value={fieldValues.monthlySalary}
+                        onChange={(e) =>
+                          handleChange("monthlySalary", e.target.value)
+                        }
                       >
-                        {incomeOptions}
+                        {options.incomeOptions}
                       </Select>
-                      {monthlySalary === "" && (
+                      {fieldValues.monthlySalary === "" && (
                         <FormHelperText>
                           Monthly Salary is required
                         </FormHelperText>
@@ -788,21 +653,23 @@ function Profile() {
                     <FormControl
                       fullWidth
                       variant="outlined"
-                      error={cancerImpactOnFinances === ""}
+                      error={fieldErrors.cancerImpactOnFinances === ""}
                     >
                       <InputLabel>Cancer impact on finances </InputLabel>
                       <Select
                         label="Cancer imapct on finances"
-                        value={cancerImpactOnFinances}
-                        onChange={handleCancerImpactOnFinances}
+                        value={fieldValues.cancerImpactOnFinances}
+                        onChange={(e) =>
+                          handleChange("cancerImpactOnFinances", e.target.value)
+                        }
                       >
-                        {impactOnFinancesOptions.map((option) => (
+                        {options.impactOnFinancesOptions.map((option) => (
                           <MenuItem key={option} value={option}>
                             {option}
                           </MenuItem>
                         ))}
                       </Select>
-                      {cancerImpactOnFinances === "" && (
+                      {fieldValues.cancerImpactOnFinances === "" && (
                         <FormHelperText>
                           Cancer Impact on Finances is required
                         </FormHelperText>
@@ -836,11 +703,13 @@ function Profile() {
                     margin="normal"
                     variant="outlined"
                     placeholder="MM/YYYY"
-                    value={dateOfLastEmployment}
-                    onChange={handleDateOfLastEmployment}
-                    error={dateOfLastEmployment === ""}
+                    value={fieldValues.dateOfLastEmployment}
+                    onChange={(e) =>
+                      handleChange("dateOfLastEmployment", e.target.value)
+                    }
+                    error={fieldErrors.dateOfLastEmployment === ""}
                     helperText={
-                      dateOfLastEmployment === ""
+                      fieldValues.dateOfLastEmployment === ""
                         ? "Date of last Employment is required"
                         : ""
                     }
@@ -851,17 +720,22 @@ function Profile() {
                     <FormControl
                       fullWidth
                       variant="outlined"
-                      error={unemployedReadinessScaleToRtw === ""}
+                      error={fieldErrors.unemployedReadinessScaleToRtw === ""}
                     >
                       <InputLabel>Readiness Scale to RTW </InputLabel>
                       <Select
                         label="Readiness Scale to RTW"
-                        value={unemployedReadinessScaleToRtw}
-                        onChange={handleUnemployedReadinessScaleToRtw}
+                        value={fieldValues.unemployedReadinessScaleToRtw}
+                        onChange={(e) =>
+                          handleChange(
+                            "unemployedReadinessScaleToRtw",
+                            e.target.value
+                          )
+                        }
                       >
-                        {scaleOptions}
+                        {options.scaleOptions}
                       </Select>
-                      {unemployedReadinessScaleToRtw === "" && (
+                      {fieldValues.unemployedReadinessScaleToRtw === "" && (
                         <FormHelperText> Input is required</FormHelperText>
                       )}
                     </FormControl>
@@ -879,29 +753,39 @@ function Profile() {
                     <FormControl
                       fullWidth
                       variant="outlined"
-                      error={unemployedTimeFrameToRtw === ""}
+                      error={fieldErrors.unemployedTimeFrameToRtw === ""}
                     >
                       <InputLabel>Time frame to RTW </InputLabel>
                       <Select
                         label="Time Frame to RTW"
-                        value={unemployedTimeFrameToRtw}
-                        onChange={handleUnemployedTimeFrameToRtw}
+                        value={fieldValues.unemployedTimeFrameToRtw}
+                        onChange={(e) =>
+                          handleChange(
+                            "unemployedTimeFrameToRtw",
+                            e.target.value
+                          )
+                        }
                       >
-                        {timePeriodOptions}
+                        {options.timePeriodOptions}
                       </Select>
-                      {unemployedTimeFrameToRtw === "" && (
+                      {fieldValues.unemployedTimeFrameToRtw === "" && (
                         <FormHelperText> Input is required</FormHelperText>
                       )}
                     </FormControl>
-                    {unemployedTimeFrameToRtw === "Others" && (
+                    {fieldValues.unemployedTimeFrameToRtw === "Others" && (
                       <TextField
                         label="Others"
                         fullWidth
                         margin="normal"
                         variant="outlined"
                         placeholder="MM/YYYY"
-                        value={newUnemployedTimeFrameToRtw}
-                        onChange={handleNewUnemployedTimeFrameToRtw}
+                        value={fieldValues.newUnemployedTimeFrameToRtw}
+                        onChange={(e) =>
+                          handleChange(
+                            "newUnemployedTimeFrameToRtw",
+                            e.target.value
+                          )
+                        }
                       />
                     )}
                   </Box>
@@ -924,17 +808,22 @@ function Profile() {
                     <FormControl
                       fullWidth
                       variant="outlined"
-                      error={employedReadinessScaleToRtw === ""}
+                      error={fieldErrors.employedReadinessScaleToRtw === ""}
                     >
                       <InputLabel>Readiness Scale to RTW </InputLabel>
                       <Select
                         label="Readiness Scale to RTW"
-                        value={employedReadinessScaleToRtw}
-                        onChange={handleEmployedReadinessScaleToRtw}
+                        value={fieldValues.employedReadinessScaleToRtw}
+                        onChange={(e) =>
+                          handleChange(
+                            "employedReadinessScaleToRtw",
+                            e.target.value
+                          )
+                        }
                       >
-                        {scaleOptions}
+                        {options.scaleOptions}
                       </Select>
-                      {employedReadinessScaleToRtw === "" && (
+                      {fieldValues.employedReadinessScaleToRtw === "" && (
                         <FormHelperText> Input is required</FormHelperText>
                       )}
                     </FormControl>
@@ -964,17 +853,19 @@ function Profile() {
                     <FormControl
                       fullWidth
                       variant="outlined"
-                      error={currentHealthStatus === ""}
+                      error={fieldErrors.currentHealthStatus === ""}
                     >
                       <InputLabel>Current Health</InputLabel>
                       <Select
                         label="Current Health"
-                        value={currentHealthStatus}
-                        onChange={handleCurrentHealthStatus}
+                        value={fieldValues.currentHealthStatus}
+                        onChange={(e) =>
+                          handleChange("currentHealthStatus", e.target.value)
+                        }
                       >
-                        {healthStatusOptions}
+                        {options.healthStatusOptions}
                       </Select>
-                      {currentHealthStatus === "" && (
+                      {fieldValues.currentHealthStatus === "" && (
                         <FormHelperText error>
                           Please select an option
                         </FormHelperText>
@@ -987,19 +878,24 @@ function Profile() {
                     <FormControl
                       fullWidth
                       variant="outlined"
-                      error={physicalHealthInterference === ""}
+                      error={fieldErrors.physicalHealthInterference === ""}
                     >
                       <InputLabel>
                         Physical health interfered with normal activities?
                       </InputLabel>
                       <Select
                         label="Physical health interfered with normal activities?"
-                        value={physicalHealthInterference}
-                        onChange={handlePhysicalHealthInterference}
+                        value={fieldValues.physicalHealthInterference}
+                        onChange={(e) =>
+                          handleChange(
+                            "physicalHealthInterference",
+                            e.target.value
+                          )
+                        }
                       >
-                        {distressOptions}
+                        {options.distressOptions}
                       </Select>
-                      {physicalHealthInterference === "" && (
+                      {fieldValues.physicalHealthInterference === "" && (
                         <FormHelperText error>
                           Please select an option
                         </FormHelperText>
@@ -1022,19 +918,24 @@ function Profile() {
                     <FormControl
                       fullWidth
                       variant="outlined"
-                      error={mentalHealthInterference === ""}
+                      error={fieldErrors.mentalHealthInterference === ""}
                     >
                       <InputLabel>
                         Mental health interfered with normal activities?
                       </InputLabel>
                       <Select
                         label="Mental health interfered with normal activities?"
-                        value={mentalHealthInterference}
-                        onChange={handleMentalHealthInterference}
+                        value={fieldValues.mentalHealthInterference}
+                        onChange={(e) =>
+                          handleChange(
+                            "mentalHealthInterference",
+                            e.target.value
+                          )
+                        }
                       >
-                        {distressOptions}
+                        {options.distressOptions}
                       </Select>
-                      {mentalHealthInterference === "" && (
+                      {fieldValues.mentalHealthInterference === "" && (
                         <FormHelperText error>
                           Please select an option
                         </FormHelperText>
@@ -1062,11 +963,16 @@ function Profile() {
                           fullWidth
                           multiline
                           rows={4}
-                          value={physicalBarriersToRtw}
-                          onChange={handlePhysicalBarriersToRtw}
-                          error={physicalBarriersToRtw === ""}
+                          value={fieldValues.physicalBarriersToRtw}
+                          onChange={(e) =>
+                            handleChange(
+                              "physicalBarriersToRtw",
+                              e.target.value
+                            )
+                          }
+                          error={fieldErrors.physicalBarriersToRtw === ""}
                           helperText={
-                            physicalBarriersToRtw === ""
+                            fieldValues.physicalBarriersToRtw === ""
                               ? "Input is required, if no input put N/A"
                               : ""
                           }
@@ -1079,11 +985,13 @@ function Profile() {
                           fullWidth
                           multiline
                           rows={4}
-                          value={mentalBarriersToRtw}
-                          onChange={handleMentalBarriersToRtw}
-                          error={mentalBarriersToRtw === ""}
+                          value={fieldValues.mentalBarriersToRtw}
+                          onChange={(e) =>
+                            handleChange("mentalBarriersToRtw", e.target.value)
+                          }
+                          error={fieldErrors.mentalBarriersToRtw === ""}
                           helperText={
-                            mentalBarriersToRtw === ""
+                            fieldValues.mentalBarriersToRtw === ""
                               ? "Input is required, if no input put N/A"
                               : ""
                           }
@@ -1096,11 +1004,16 @@ function Profile() {
                           fullWidth
                           multiline
                           rows={4}
-                          value={additionalInformation}
-                          onChange={handleAdditionalInformation}
-                          error={additionalInformation === ""}
+                          value={fieldValues.additionalInformation}
+                          onChange={(e) =>
+                            handleChange(
+                              "additionalInformation",
+                              e.target.value
+                            )
+                          }
+                          error={fieldErrors.additionalInformation === ""}
                           helperText={
-                            additionalInformation === ""
+                            fieldValues.additionalInformation === ""
                               ? "Input is required, if no input put N/A"
                               : ""
                           }

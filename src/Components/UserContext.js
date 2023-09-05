@@ -14,37 +14,43 @@ export function UserProvider({ children }) {
   const [companies, setCompanies] = useState([]);
 
   useEffect(() => {
-    // get categories
-    axios
-      .get(`${process.env.REACT_APP_BACKEND_URL}/listings/categories/sorted`)
-      .then((response) => {
-        setCategories(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching categories:", error);
-      });
+    const loadData = async () => {
+      // get categories
 
-    // get location
-    axios
-      .get(`${process.env.REACT_APP_BACKEND_URL}/company/location`)
-      .then((response) => {
-        console.log("Locations from context: ", response.data);
-        setLocation(response.data);
-      })
-      .catch((error) => {
-        console.log("Error fetching locations: ", error);
-      });
+      await axios
+        .get(
+          `${process.env.REACT_APP_BACKEND_URL}/listings/allcategories/sorted`
+        )
+        .then((response) => {
+          setCategories(response.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching categories:", error);
+        });
 
-    // get companies
-    axios
-      .get(`${process.env.REACT_APP_BACKEND_URL}/company/`)
-      .then((response) => {
-        console.log("List of Companies from context: ", response.data);
-        setCompanies(response.data);
-      })
-      .catch((error) => {
-        console.log("Error fetching companies: ", error);
-      });
+      // get location
+      await axios
+        .get(`${process.env.REACT_APP_BACKEND_URL}/company/location`)
+        .then((response) => {
+          console.log("Locations from context: ", response.data);
+          setLocation(response.data);
+        })
+        .catch((error) => {
+          console.log("Error fetching locations: ", error);
+        });
+
+      // get companies
+      await axios
+        .get(`${process.env.REACT_APP_BACKEND_URL}/company/`)
+        .then((response) => {
+          console.log("List of Companies from context: ", response.data);
+          setCompanies(response.data);
+        })
+        .catch((error) => {
+          console.log("Error fetching companies: ", error);
+        });
+    };
+    loadData();
   }, []);
 
   const contextValue = {
