@@ -84,13 +84,17 @@ function IndividualJobPage() {
     console.log(jobInfo);
     if (!jobInfo) {
       setAxiosLoading(true);
-    } else if (
-      jobInfo &&
-      jobInfo.company_profile_info &&
-      jobInfo.company_profile_info.bannerUrl !== null
-    ) {
-      setDisplayBanner(true);
-      setAxiosLoading(false);
+    }
+
+    if (jobInfo) {
+      if (jobInfo.company_profile_info.bannerUrl === null) {
+        setAxiosLoading(false);
+        setDisplayBanner(false);
+      } else {
+        setDisplayBanner(true);
+        setAxiosLoading(false);
+      }
+
       const dateTime = new Date(jobInfo.updatedAt);
       const date = dateTime.toDateString();
       const time = dateTime.toTimeString().split(" ")[0];
@@ -103,74 +107,56 @@ function IndividualJobPage() {
       } else {
         setDisplayAdminButtons(false);
       }
-    } else {
-      setDisplayBanner(false);
-      setAxiosLoading(false);
     }
   }, [jobInfo]);
 
-  // sx={{
-  //             justifyContent: "center",
-  //             display: "flex",
-  //             flexDirection: "column",
-  //             width: "80%",
-  //             flexWrap: "wrap",
-  //           }}
-  //           mt={4}
-
   return (
     <ThemeProvider theme={theme}>
-      <Grid container sx={theme.customStyles.centered.container} pt={4}>
-        <ThemeProvider theme={{ theme }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
+      <Grid container sx={theme.customStyles.centered.container}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <Container
+            sx={{
+              maxWidth: "880px",
             }}
           >
-            <Container
-              sx={{
-                maxWidth: "880px",
-              }}
-            >
-              <Grid item justifySelf="center">
-                {/* row 1 - banner */}
+            <Grid item>
+              {/* row 1 - banner */}
 
-                <Box sx={{ maxWidth: "838px" }} p={1} mb={3}>
-                  <Paper elevation={2} color="FFF" className="boxpaper">
-                    {displayBanner ? (
-                      <Box
-                        component="img"
-                        sx={{
-                          borderTopLeftRadius: 20,
-                          borderTopRightRadius: 20,
-                          height: "auto",
-                          width: "100%",
-                          maxHeight: { xs: 262 },
-                          maxWidth: { xs: 838 },
-                        }}
-                        alt="Company Banner"
-                        src={jobInfo.company_profile_info.bannerUrl}
-                      />
-                    ) : (
-                      ""
-                    )}
+              <Box sx={{ maxWidth: "838px", flexWrap: "wrap" }} p={1} mb={3}>
+                <Paper elevation={2} color="FFF" className="boxpaper">
+                  {displayBanner ? (
+                    <Box
+                      component="img"
+                      sx={{
+                        borderTopLeftRadius: 20,
+                        borderTopRightRadius: 20,
+                        height: "auto",
+                        width: "100%",
+                        maxHeight: { xs: 262 },
+                        maxWidth: { xs: 838 },
+                      }}
+                      alt="Company Banner"
+                      src={jobInfo.company_profile_info.bannerUrl}
+                    />
+                  ) : (
+                    <Box mb={3} component="div"></Box>
+                  )}
 
-                    {/* row 2 - co logo , title , name, employment type, location, post date */}
+                  {/* row 2 - co logo , title , name, employment type, location, post date */}
 
-                    {jobInfo ? (
-                      <Box
-                        mt={4}
-                        mb={3}
-                        sx={theme.customStyles.displayFlexRowLeft}
-                      >
-                        <Stack direction="row" spacing={1}>
-                          <Avatar
-                            alt="logo"
-                            src={jobInfo.company_profile_info.companyLogo || ""}
-                            sx={{ width: 150, height: 150 }}
-                          />
-                        </Stack>
+                  {jobInfo ? (
+                    <Box m={3} p={3} sx={theme.customStyles.displayFlexRowLeft}>
+                      <Stack direction="row" spacing={3}>
+                        <Avatar
+                          alt="logo"
+                          src={jobInfo.company_profile_info.companyLogo || ""}
+                          sx={{ width: 150, height: 150 }}
+                        />
 
                         <Stack direction="column" spacing={1}>
                           <Typography
@@ -196,7 +182,7 @@ function IndividualJobPage() {
                           <Stack direction="row" spacing={2}>
                             <WorkHistoryIcon />
                             <Typography
-                              textAlign="center"
+                              textAlign="left"
                               variant="p"
                               sx={{
                                 color: theme.typography.p.color,
@@ -209,7 +195,7 @@ function IndividualJobPage() {
                           <Stack direction="row" spacing={2}>
                             <PlaceIcon />
                             <Typography
-                              textAlign="center"
+                              textAlign="left"
                               variant="p"
                               sx={{
                                 color: theme.typography.p.color,
@@ -222,7 +208,7 @@ function IndividualJobPage() {
                           <Stack direction="row" spacing={2}>
                             <UpdateIcon />
                             <Typography
-                              textAlign="center"
+                              textAlign="left"
                               variant="p"
                               sx={{
                                 color: theme.typography.p.color,
@@ -233,199 +219,84 @@ function IndividualJobPage() {
                             </Typography>
                           </Stack>
                         </Stack>
-                      </Box>
-                    ) : (
-                      axiosLoading && <AxiosLoader />
-                    )}
-
-                    {/* row 3 - 2 buttons edit listing and delete listing */}
-                    {displayAdminButtons ? (
-                      <Box
-                        mt={4}
-                        mb={4}
-                        sx={theme.customStyles.displayFlexRowCenter}
-                      >
-                        <Stack direction="row" spacing={5}>
-                          <Button
-                            classes={{ root: "orange" }}
-                            variant="contained"
-                          >
-                            Check Applicants
-                          </Button>
-                          <Button
-                            classes={{ root: "blue" }}
-                            variant="contained"
-                          >
-                            Edit Listing
-                          </Button>
-                          <Button classes={{ root: "red" }} variant="contained">
-                            Delete Listing
-                          </Button>
-                        </Stack>
-                      </Box>
-                    ) : (
-                      ""
-                    )}
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Divider
-                        sx={{
-                          borderBottomWidth: 3,
-
-                          width: "90%",
-                        }}
-                      />
-                    </div>
-                    {/* row 4 - job details */}
-                    <Box m={4} sx={theme.customStyles.displayFlexRowLeft}>
-                      <Stack direction="column" spacing={2}>
-                        <Typography
-                          textAlign="left"
-                          variant="h5"
-                          sx={{
-                            fontWeight: theme.typography.h6.fontWeightBold,
-                          }}
-                        >
-                          Job Details
-                        </Typography>
-                        <div
-                          dangerouslySetInnerHTML={{
-                            __html: description || "",
-                          }}
-                        />
                       </Stack>
                     </Box>
+                  ) : (
+                    axiosLoading && <AxiosLoader />
+                  )}
 
-                    {/* row 5 - 1 button to check current applicants */}
+                  {/* row 3 - 2 buttons edit listing and delete listing */}
+                  {displayAdminButtons ? (
                     <Box
-                      m={4}
-                      pb={5}
+                      mt={4}
+                      mb={4}
                       sx={theme.customStyles.displayFlexRowCenter}
-                    ></Box>
-                  </Paper>
-                </Box>
-              </Grid>
-            </Container>
-          </div>
-        </ThemeProvider>
-      </Grid>
-      {/* <Dialog open={modalOpen} onClose={() => setModalOpen(false)}>
-        <Grid container direction="column">
-          <Grid item>
-            <Box mt={2} justifyContent="center" display="flex">
-              <DialogTitle>
-                <Typography
-                  variant="h4"
-                  sx={{
-                    fontWeight: theme.typography.h4.fontWeightBold,
-                  }}
-                >
-                  New Job Post
-                </Typography>
-              </DialogTitle>
-            </Box>
-          </Grid>
-
-          <Grid item xs={12}>
-            <DialogContent>
-              <DialogContentText
-                style={{ marginBottom: "16px", textAlign: "center" }}
-              >
-                <Typography
-                  variant="h5"
-                  sx={{
-                    fontWeight: theme.typography.h5.fontWeightBold,
-                  }}
-                >
-                  {fieldValues.jobTitle
-                    ? fieldValues.jobTitle
-                    : "Please key in Job Title!"}
-                </Typography>{" "}
-              </DialogContentText>
-
-              <DialogContentText>
-                <Typography
-                  variant="p"
-                  sx={{
-                    fontWeight: theme.typography.p.fontWeightBold,
-                  }}
-                >
-                  {fieldValues.employmentType ? fieldValues.employmentType : ""}
-                </Typography>
-              </DialogContentText>
-
-              <DialogContentText>
-                <Typography
-                  variant="p"
-                  sx={{
-                    fontWeight: theme.typography.p.fontWeightBold,
-                  }}
-                >
-                  Location:{" "}
-                </Typography>
-                {fieldValues.location && fieldValues.location.name
-                  ? fieldValues.location.name
-                  : "Please select a location."}
-              </DialogContentText>
-
-              <DialogContentText style={{ marginBottom: "16px" }}>
-                <Typography
-                  variant="p"
-                  sx={{
-                    fontWeight: theme.typography.p.fontWeightBold,
-                  }}
-                >
-                  Category:{" "}
-                </Typography>
-                {fieldValues.jobCategory && fieldValues.jobCategory.name
-                  ? fieldValues.jobCategory.name
-                  : "Please select a category."}
-              </DialogContentText>
-              <DialogContentText>
-                <Box>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontWeight: theme.typography.h6.fontWeightBold,
+                    >
+                      <Stack direction="row" spacing={5}>
+                        <Button
+                          classes={{ root: "orange" }}
+                          variant="contained"
+                        >
+                          Check Applicants
+                        </Button>
+                        <Button classes={{ root: "blue" }} variant="contained">
+                          Edit Listing
+                        </Button>
+                        <Button classes={{ root: "red" }} variant="contained">
+                          Delete Listing
+                        </Button>
+                      </Stack>
+                    </Box>
+                  ) : (
+                    ""
+                  )}
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
                     }}
                   >
-                    Job Details{" "}
-                  </Typography>
-                  <div
-                    dangerouslySetInnerHTML={{
-                      __html: fieldValues.jobDescription,
-                    }}
-                  />
-                </Box>
-              </DialogContentText>
-            </DialogContent>
-          </Grid>
+                    <Divider
+                      sx={{
+                        borderBottomWidth: 3,
 
-          <DialogActions>
-            <Button
-              disabled={disableSubmit}
-              onClick={() => setModalOpen(false)}
-              classes={{ root: "blue" }}
-              variant="contained"
-            >
-              edit
-            </Button>
-            <Button
-              disabled={disableSubmit}
-              onClick={handleSubmit}
-              classes={{ root: "orange" }}
-              variant="contained"
-            >
-              submit
-            </Button>
-          </DialogActions>
-        </Grid>
-      </Dialog> */}
+                        width: "90%",
+                      }}
+                    />
+                  </div>
+                  {/* row 4 - job details */}
+                  <Box m={4} sx={theme.customStyles.displayFlexRowLeft}>
+                    <Stack direction="column" spacing={2}>
+                      <Typography
+                        textAlign="left"
+                        variant="h5"
+                        sx={{
+                          fontWeight: theme.typography.h6.fontWeightBold,
+                        }}
+                      >
+                        Job Details
+                      </Typography>
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: description || "",
+                        }}
+                      />
+                    </Stack>
+                  </Box>
+
+                  {/* row 5 - 1 button to check current applicants */}
+                  <Box
+                    m={4}
+                    pb={5}
+                    sx={theme.customStyles.displayFlexRowCenter}
+                  ></Box>
+                </Paper>
+              </Box>
+            </Grid>
+          </Container>
+        </div>
+      </Grid>
     </ThemeProvider>
   );
 }

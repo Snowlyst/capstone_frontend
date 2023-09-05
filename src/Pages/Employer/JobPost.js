@@ -20,7 +20,9 @@ import {
   Box,
   Typography,
   Grid,
+  Container,
   Paper,
+  Stack,
   TextField,
   IconButton,
   Tooltip,
@@ -47,6 +49,7 @@ function JobPost() {
   const [descriptionError, setDescriptionError] = useState(false);
   const [jobInfo, setJobInfo] = useState("");
   const [maxSalary, setMaxSalary] = useState("");
+  const [displayBanner, setDisplayBanner] = useState(false);
   const [disableSubmit, setDisableSubmit] = useState(false);
   const [url, setUrl] = useState("");
   const [fieldErrors, setFieldErrors] = useState({});
@@ -133,15 +136,23 @@ function JobPost() {
   useEffect(() => {
     console.log("currUser: ", currUser);
 
-    if (currUser && currUser.id !== null && !currUser.approvedByAdmin) {
-      Swal.fire(SwalMsgs.awaitingAccountApproval("Home")).then((result) => {
-        if (result.isConfirmed) {
-          setDisableSubmit(true);
-          navigate("/");
-        } else {
-          setDisableSubmit(false);
-        }
-      });
+    if (currUser) {
+      if (currUser.id !== null && !currUser.approvedByAdmin) {
+        Swal.fire(SwalMsgs.awaitingAccountApproval("Home")).then((result) => {
+          if (result.isConfirmed) {
+            setDisableSubmit(true);
+            navigate("/");
+          } else {
+            setDisableSubmit(false);
+          }
+        });
+      }
+
+      if (currUser.companyInfo && currUser.companyInfo.bannerUrl) {
+        setDisplayBanner(true);
+      } else {
+        setDisplayBanner(false);
+      }
     }
   }, [currUser]);
 
@@ -382,9 +393,13 @@ function JobPost() {
           Swal.fire(SwalMsgs.successPostingAwaitApprovalWButtons).then(
             (result) => {
               if (result.isConfirmed) {
-                navigate("/");
+                setModalOpen(false);
+                resetFields();
+                fieldValues.jobTitle = "";
+                fieldValues.description = "";
+                setEditorState(EditorState.createEmpty());
               } else if (result.isDenied) {
-                navigate("/");
+                navigate(`/`);
               }
             }
           );
@@ -407,108 +422,104 @@ function JobPost() {
   };
 
   return (
-    <Grid
-      container
-      direction="column"
-      sx={theme.customStyles.centered.container}
-    >
-      {axiosLoading && <AxiosLoader />}
-      <ThemeProvider theme={theme}>
-        <Grid container direction="row" justifyContent="center">
-          <Box mb={4} p={4} width="80%">
-            <Paper elevation={2} color="FFF">
-              <Grid item xs={12}>
-                <Box pt={3}>
-                  <Typography
-                    variant="h4"
-                    sx={{
-                      fontWeight: theme.typography.h4.fontWeightBold,
-                      textAlign: "center",
-                    }}
-                  >
-                    List a New Job
-                  </Typography>
-                </Box>
-              </Grid>
-
-              <Grid item xs={12}>
-                <Box m={2} pt={2} display="flex" justifyContent="center">
-                  <Typography
-                    variant="p"
-                    sx={{
-                      fontWeight: theme.typography.p.fontWeightBold,
-                      color: theme.typography.p.color,
-                    }}
-                  >
-                    Please fill in all particulars to list a job. Do note that
-                    jobs have to be approved before they can be listed.
-                  </Typography>
-                </Box>
-              </Grid>
-              <Grid item>
-                <Box m={4}>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontWeight: theme.typography.h6.fontWeightBold,
-                    }}
-                  >
-                    Job Details Import
-                  </Typography>
-                </Box>
-              </Grid>
-              <Grid item xs={12}>
-                <Box ml={4} mt={2} mr={3}>
-                  <Typography
-                    variant="p"
-                    sx={{
-                      color: theme.typography.p.color,
-                    }}
-                  >
-                    To import a job from Linkedin, please enter the url in this
-                    format{" "}
-                    <Typography
-                      variant="p"
+    <ThemeProvider theme={theme}>
+      <Grid container sx={theme.customStyles.centered.container}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <Container
+            sx={{
+              maxWidth: "880px",
+            }}
+          >
+            <Grid item>
+              {/* row 1 - banner */}
+              {axiosLoading && <AxiosLoader />}
+              <Box sx={{ maxWidth: "838px", flexWrap: "wrap" }} p={1} mb={3}>
+                <Paper elevation={2} color="FFF" className="boxpaper">
+                  {displayBanner ? (
+                    <Box
+                      component="img"
                       sx={{
-                        color: theme.typography.darkP.color,
-                        fontWeight: theme.typography.darkP.fontWeightBold,
+                        borderTopLeftRadius: 20,
+                        borderTopRightRadius: 20,
+                        height: "auto",
+                        width: "100%",
+                        maxHeight: { xs: 262 },
+                        maxWidth: { xs: 838 },
                       }}
-                    >
-                      https://www.linkedin.com/jobs/view/jobId
-                    </Typography>{" "}
-                    and click search.
-                  </Typography>
-                </Box>
-              </Grid>
-              <Grid item>
-                <Box ml={3} mb={3} mt={3}>
-                  <Grid
-                    container
-                    alignItems="top"
-                    direction="row"
-                    justifyContent="center"
-                  >
-                    {" "}
-                    <Box display="flex" justifyContent="center">
-                      <Grid item xs={12}>
-                        <TextField
-                          id="search"
-                          type="search"
-                          label="Linkedin URL"
-                          placeholder="Job Post URL"
-                          helperText="Optional"
-                          value={url.url || ""}
-                          size="small"
+                      alt="Company Banner"
+                      src={currUser.companyInfo.bannerUrl || ""}
+                    />
+                  ) : (
+                    <Box mb={3} component="div"></Box>
+                  )}
+
+                  {/* row 2 - co logo , title , name, employment type, location, post date */}
+
+                  <Box m={3} p={3} sx={theme.customStyles.displayFlexRowLeft}>
+                    <Stack direction="row" spacing={3}>
+                      <Stack direction="column" spacing={1}>
+                        <Typography
+                          textAlign="left"
+                          variant="h5"
                           sx={{
-                            width: "50ch",
-                            m: 1,
+                            fontWeight: theme.typography.h6.fontWeightBold,
                           }}
-                          onChange={(e) => setUrl({ url: e.target.value })}
-                          onBlur={(e) => setUrl({ url: e.target.value })}
-                        />
-                      </Grid>
-                      <Grid item>
-                        <Box mt={2}>
+                        >
+                          New Job Post
+                        </Typography>
+                        <Typography
+                          variant="p"
+                          sx={{
+                            fontWeight: theme.typography.p.fontWeightBold,
+                            color: theme.typography.p.color,
+                          }}
+                        >
+                          Please fill in all particulars to list a job. Do note
+                          that jobs have to be approved before they can be
+                          listed.
+                        </Typography>
+                        <Typography
+                          variant="p"
+                          sx={{
+                            color: theme.typography.p.color,
+                          }}
+                        >
+                          To import a job from Linkedin, please enter the url in
+                          this format{" "}
+                          <Box
+                            component="span"
+                            fontWeight={theme.typography.p.fontWeightBold}
+                          >
+                            https://www.linkedin.com/jobs/view/jobId{" "}
+                          </Box>
+                          and click search.
+                        </Typography>
+                        <Stack
+                          direction="row"
+                          spacing={2}
+                          justifyContent="center"
+                          alignContent="center"
+                        >
+                          <TextField
+                            id="search"
+                            type="search"
+                            label="Linkedin URL"
+                            placeholder="Job Post URL"
+                            helperText="Optional"
+                            value={url.url || ""}
+                            size="small"
+                            sx={{
+                              width: "50ch",
+                              m: 1,
+                            }}
+                            onChange={(e) => setUrl({ url: e.target.value })}
+                            onBlur={(e) => setUrl({ url: e.target.value })}
+                          />
                           <Tooltip title="Import via Linkedin Job Post">
                             <IconButton
                               sx={{ p: 0 }}
@@ -521,419 +532,528 @@ function JobPost() {
                               />
                             </IconButton>
                           </Tooltip>
-                        </Box>
-                      </Grid>
-                    </Box>
-                  </Grid>
-                </Box>
-              </Grid>
-
-              <Grid item>
-                <Box ml={4} mt={2}>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontWeight: theme.typography.h6.fontWeightBold,
-                    }}
-                  >
-                    Job Information
-                  </Typography>
-                </Box>
-              </Grid>
-
-              <Grid item>
-                <Box ml={3} mt={2} width="80%">
-                  <FormControl>
-                    <Typography
-                      variant="p"
-                      sx={{
-                        color: theme.typography.p.color,
-                      }}
-                    >
-                      <TextField
-                        sx={{ width: "60ch", m: 1 }}
-                        required
-                        id="jobTitle"
-                        type="search"
-                        label="Job Title"
-                        size="small"
-                        value={fieldValues.jobTitle}
-                        placeholder="Job title of the position"
-                        onChange={(e) =>
-                          handleChange("jobTitle", e.target.value)
-                        }
-                        error={fieldErrors.jobTitle || false}
-                        helperText={
-                          fieldErrors.jobTitle && "Job Title is required!"
-                        }
-                      />
-                    </Typography>
-                  </FormControl>
-                </Box>
-              </Grid>
-
-              <Grid item>
-                <Box ml={3} mt={2}>
-                  <Grid
-                    container
-                    direction="row"
-                    alignItems="flex-end"
-                    spacing={2}
-                  >
-                    <Grid item xs={12} sm={4} md={3}>
-                      <FormControl
-                        variant="standard"
-                        sx={{ ml: 2, minWidth: 200 }}
-                        error={fieldErrors.employmentType || false}
-                      >
-                        <InputLabel id="employmentTypeLabel">
-                          Employment Type
-                        </InputLabel>
-                        <Select
-                          labelId="employmentTypeLabel"
-                          label="Employment Type"
-                          id="employmentType"
-                          value={fieldValues.employmentType}
-                          onChange={(e) =>
-                            handleChange(`employmentType`, e.target.value)
-                          }
+                        </Stack>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: theme.typography.h6.fontWeightBold,
+                          }}
                         >
-                          <MenuItem value="any">
-                            <em>Any</em>
-                          </MenuItem>
-                          <MenuItem value="Full-Time">Full-Time</MenuItem>
-                          <MenuItem value="Part-Time">Part-Time</MenuItem>
-                          <MenuItem value="Contract">Contract</MenuItem>
-                          <MenuItem value="Remote">Remote</MenuItem>
-                        </Select>
-                        <FormHelperText>
-                          {fieldErrors.employmentType &&
-                            "Employment Type is required!"}
-                        </FormHelperText>
-                      </FormControl>
-                    </Grid>
-                    <Grid item xs={12} sm={4} md={3}>
-                      <FormControl
-                        variant="standard"
-                        sx={{ ml: 4, minWidth: 200 }}
-                        error={fieldErrors.location || false}
-                      >
-                        <Autocomplete
-                          disablePortal
-                          id="location"
-                          value={fieldValues.location.name || ""}
-                          options={locationOptions}
-                          isOptionEqualToValue={(option, value) =>
-                            option.id === Number(value.id)
-                          }
-                          sx={{ width: 200 }}
-                          onChange={(e, selectedOption) => {
-                            console.log(selectedOption);
-                            if (selectedOption) {
-                              handleChange(`location`, selectedOption);
+                          Job Information
+                        </Typography>
+                        <Typography
+                          variant="p"
+                          sx={{
+                            color: theme.typography.p.color,
+                          }}
+                        >
+                          <TextField
+                            sx={{ maxWidth: "60ch", m: 1 }}
+                            required
+                            id="jobTitle"
+                            type="search"
+                            label="Job Title"
+                            size="small"
+                            value={fieldValues.jobTitle}
+                            placeholder="Job title of the position"
+                            onChange={(e) =>
+                              handleChange("jobTitle", e.target.value)
                             }
-                          }}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              required
-                              label="Location"
-                              variant="standard"
-                            />
-                          )}
-                        />
-                        <FormHelperText>
-                          {fieldErrors.location && "Location is required!"}
-                        </FormHelperText>
-                      </FormControl>
-                    </Grid>
-                    <Grid item xs={12} sm={4} md={3}>
-                      <FormControl
-                        variant="standard"
-                        sx={{ ml: 4, minWidth: 200 }}
-                        error={fieldErrors.jobCategory || false}
-                      >
-                        <Autocomplete
-                          disablePortal
-                          id="jobCategory"
-                          options={categoryOptions}
-                          value={fieldValues.jobCategory.name || ""}
-                          sx={{ width: 200 }}
-                          isOptionEqualToValue={(option, value) =>
-                            option.id === Number(value.id)
-                          }
-                          onChange={(e, selectedOption) => {
-                            console.log(selectedOption);
-                            if (selectedOption) {
-                              handleChange(`jobCategory`, selectedOption);
+                            error={fieldErrors.jobTitle || false}
+                            helperText={
+                              fieldErrors.jobTitle && "Job Title is required!"
                             }
+                          />
+                        </Typography>
+                        <Stack
+                          direction={{ xs: "column", sm: "row" }}
+                          sx={{
+                            flexWrap: "wrap",
+                            justifyContent: "flex-start",
+                            alignItems: "flex-start",
                           }}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              required
-                              label="Job Category"
-                              variant="standard"
+                        >
+                          <FormControl
+                            variant="standard"
+                            sx={{
+                              pb: { xs: 2, sm: 0 },
+                              ml: 2,
+                              width: 200,
+                              mb: { xs: 4, sm: 2 },
+                            }}
+                            error={fieldErrors.employmentType || false}
+                          >
+                            <InputLabel id="employmentTypeLabel">
+                              Employment Type
+                            </InputLabel>
+                            <Select
+                              labelId="employmentTypeLabel"
+                              label="Employment Type"
+                              id="employmentType"
+                              value={fieldValues.employmentType}
+                              onChange={(e) =>
+                                handleChange(`employmentType`, e.target.value)
+                              }
+                            >
+                              <MenuItem value="any">
+                                <em>Any</em>
+                              </MenuItem>
+                              <MenuItem value="Full-Time">Full-Time</MenuItem>
+                              <MenuItem value="Part-Time">Part-Time</MenuItem>
+                              <MenuItem value="Contract">Contract</MenuItem>
+                              <MenuItem value="Remote">Remote</MenuItem>
+                            </Select>
+                            <FormHelperText>
+                              {fieldErrors.employmentType &&
+                                "Employment Type is required!"}
+                            </FormHelperText>
+                          </FormControl>
+                          <FormControl
+                            variant="standard"
+                            sx={{
+                              ml: { xs: 2, sm: 4 },
+                              maxWidth: 200,
+                              mb: { xs: 2, sm: 0 },
+                            }}
+                            error={fieldErrors.location || false}
+                          >
+                            <Autocomplete
+                              disablePortal
+                              id="location"
+                              value={fieldValues.location.name || ""}
+                              options={locationOptions}
+                              isOptionEqualToValue={(option, value) =>
+                                option.id === Number(value.id)
+                              }
+                              sx={{ minWidth: 200 }}
+                              onChange={(e, selectedOption) => {
+                                console.log(selectedOption);
+                                if (selectedOption) {
+                                  handleChange(`location`, selectedOption);
+                                }
+                              }}
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  required
+                                  label="Location"
+                                  variant="standard"
+                                />
+                              )}
                             />
-                          )}
-                        />
-                        <FormHelperText>
-                          {fieldErrors.jobCategory &&
-                            "Job category is required!"}
-                        </FormHelperText>
-                      </FormControl>
-                    </Grid>
-                  </Grid>
-                </Box>
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Box ml={3} mt={5}>
-                  <Grid container direction="row" alignItems="top" spacing={5}>
-                    <Grid item xs={12} sm={6}>
-                      <FormControl
-                        sx={{ m: 1, width: "25ch" }}
-                        variant="outlined"
-                      >
-                        <TextField
-                          required
-                          id="minSalary"
-                          InputProps={{
-                            startAdornment: (
-                              <InputAdornment position="start">
-                                $
-                              </InputAdornment>
-                            ),
-                            endAdornment: (
-                              <InputAdornment position="end">
-                                /mth
-                              </InputAdornment>
-                            ),
-                          }}
-                          label="Minimum Salary / mth"
-                          value={fieldValues.minSalary}
-                          onChange={(e) =>
-                            handleChange(`minSalary`, e.target.value)
-                          }
-                          error={fieldErrors.minSalary || false}
-                          helperText={
-                            fieldErrors.minSalary &&
-                            "Minimum Salary is required for Approval!"
-                          }
-                        ></TextField>
-                      </FormControl>
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <FormControl
-                        sx={{ m: 1, width: "25ch" }}
-                        variant="outlined"
-                      >
-                        <TextField
-                          id="maxSalary"
-                          InputProps={{
-                            startAdornment: (
-                              <InputAdornment position="start">
-                                $
-                              </InputAdornment>
-                            ),
-                            endAdornment: (
-                              <InputAdornment position="end">
-                                /mth
-                              </InputAdornment>
-                            ),
-                          }}
-                          label="Maximum Salary / mth"
-                          helperText={"Optional"}
-                          value={maxSalary}
-                          onChange={(e) =>
-                            handleMaxSalaryChange(e.target.value)
-                          }
-                        />
-                      </FormControl>
-                    </Grid>
-                  </Grid>
-                </Box>
-              </Grid>
-              <Grid item>
-                <Box ml={3} mt={2} mr={5}>
-                  <Tooltip title="Please include Responsibilities and Requirements here, where possible.">
+                            <FormHelperText>
+                              {fieldErrors.location && "Location is required!"}
+                            </FormHelperText>
+                          </FormControl>
+                          <FormControl
+                            variant="standard"
+                            sx={{
+                              width: 200,
+                            }}
+                            error={fieldErrors.jobCategory || false}
+                          >
+                            <Autocomplete
+                              disablePortal
+                              id="jobCategory"
+                              options={categoryOptions}
+                              value={fieldValues.jobCategory.name || ""}
+                              sx={{
+                                ml: { xs: 2 },
+                                mb: { xs: 4, m: 0 },
+                              }}
+                              isOptionEqualToValue={(option, value) =>
+                                option.id === Number(value.id)
+                              }
+                              onChange={(e, selectedOption) => {
+                                console.log(selectedOption);
+                                if (selectedOption) {
+                                  handleChange(`jobCategory`, selectedOption);
+                                }
+                              }}
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  required
+                                  label="Job Category"
+                                  variant="standard"
+                                />
+                              )}
+                            />
+                            <FormHelperText>
+                              {fieldErrors.jobCategory &&
+                                "Job category is required!"}
+                            </FormHelperText>
+                          </FormControl>
+                        </Stack>
+                        <Stack
+                          direction={{ xs: "column", sm: "row" }}
+                          spacing={3}
+                          sx={{ flexWrap: "wrap" }}
+                        >
+                          <FormControl
+                            sx={{
+                              width: "23ch",
+                              mb: { xs: 4, sm: 4 },
+                            }}
+                            variant="outlined"
+                          >
+                            <TextField
+                              size="small"
+                              required
+                              id="minSalary"
+                              sx={{
+                                ml: 1,
+                              }}
+                              InputProps={{
+                                startAdornment: (
+                                  <InputAdornment position="start">
+                                    $
+                                  </InputAdornment>
+                                ),
+                                endAdornment: (
+                                  <InputAdornment position="end">
+                                    /mth
+                                  </InputAdornment>
+                                ),
+                              }}
+                              label="Minimum Salary / mth"
+                              value={fieldValues.minSalary}
+                              onChange={(e) =>
+                                handleChange(`minSalary`, e.target.value)
+                              }
+                              error={fieldErrors.minSalary || false}
+                              helperText={
+                                fieldErrors.minSalary &&
+                                "Minimum Salary is required for Approval!"
+                              }
+                            ></TextField>
+                          </FormControl>
+                          <FormControl
+                            sx={{
+                              ml: { xs: 2, sm: 4 },
+                              maxWidth: "23ch",
+                              mb: { xs: 2, sm: 0 },
+                            }}
+                            variant="outlined"
+                          >
+                            <TextField
+                              id="maxSalary"
+                              size="small"
+                              InputProps={{
+                                startAdornment: (
+                                  <InputAdornment position="start">
+                                    $
+                                  </InputAdornment>
+                                ),
+                                endAdornment: (
+                                  <InputAdornment position="end">
+                                    /mth
+                                  </InputAdornment>
+                                ),
+                              }}
+                              label="Maximum Salary / mth"
+                              helperText={"Optional"}
+                              value={maxSalary}
+                              onChange={(e) =>
+                                handleMaxSalaryChange(e.target.value)
+                              }
+                            />
+                          </FormControl>
+                        </Stack>
+                        <Stack direction="row" spacing={2}>
+                          <Grid container direction="column">
+                            <Grid item>
+                              <Tooltip title="Please include Responsibilities and Requirements here, where possible.">
+                                <Box mt={3} ml={1}>
+                                  <Typography
+                                    variant="p"
+                                    sx={{
+                                      color: descriptionError
+                                        ? theme.typography.error.color
+                                        : theme.typography.p.color,
+                                    }}
+                                  >
+                                    Job Description
+                                  </Typography>
+
+                                  <Editor
+                                    initialEditorState={editorState}
+                                    wrapperClassName="wrapper-class"
+                                    wrapperStyle={wrapperStyle}
+                                    editorStyle={editorStyle}
+                                    editorState={editorState}
+                                    onEditorStateChange={onEditorStateChange}
+                                    toolbar={toolbarOptions}
+                                  />
+
+                                  {descriptionError && (
+                                    <Typography
+                                      variant="p"
+                                      sx={{
+                                        color: theme.typography.error.color,
+                                        fontSize:
+                                          theme.typography.error.fontSize,
+                                      }}
+                                    >
+                                      Job Description is required!
+                                    </Typography>
+                                  )}
+                                </Box>
+                              </Tooltip>
+                            </Grid>
+                            <Grid item>
+                              <Box mb={3} mt={2}>
+                                <Grid
+                                  container
+                                  justifyContent="flex-end"
+                                  direction="row"
+                                >
+                                  <Button
+                                    disabled={disableSubmit}
+                                    classes={{ root: "orange" }}
+                                    variant="contained"
+                                    onClick={handleEditorStateToMessage}
+                                  >
+                                    preview
+                                  </Button>
+                                </Grid>
+                              </Box>
+                            </Grid>
+                          </Grid>
+                        </Stack>
+                      </Stack>
+                    </Stack>
+                  </Box>
+                  <Dialog open={modalOpen} onClose={() => setModalOpen(false)}>
                     <Grid container direction="column">
                       <Grid item>
-                        <Box mt={3} ml={1}>
-                          <Typography
-                            variant="p"
-                            sx={{
-                              color: descriptionError
-                                ? theme.typography.error.color
-                                : theme.typography.p.color,
-                            }}
-                          >
-                            Job Description
-                          </Typography>
-                          <Editor
-                            initialEditorState={editorState}
-                            wrapperClassName="wrapper-class"
-                            wrapperStyle={wrapperStyle}
-                            editorStyle={editorStyle}
-                            editorState={editorState}
-                            onEditorStateChange={onEditorStateChange}
-                            toolbar={toolbarOptions}
-                          />
-
-                          {descriptionError && (
+                        <Box mt={2} justifyContent="center" display="flex">
+                          <DialogTitle>
                             <Typography
-                              variant="p"
+                              variant="h4"
                               sx={{
-                                color: theme.typography.error.color,
-                                fontSize: theme.typography.error.fontSize,
+                                fontWeight: theme.typography.h4.fontWeightBold,
                               }}
                             >
-                              Job Description is required!
+                              New Job Post
                             </Typography>
-                          )}
+                          </DialogTitle>
                         </Box>
                       </Grid>
-                      <Grid item>
-                        <Box mb={3} mt={2}>
-                          <Grid
-                            container
-                            justifyContent="flex-end"
-                            direction="row"
-                          >
+
+                      <Dialog
+                        open={modalOpen}
+                        onClose={() => setModalOpen(false)}
+                      >
+                        <Grid container direction="column">
+                          <Grid item>
+                            <Box mt={2} justifyContent="center" display="flex">
+                              <DialogTitle>
+                                <Typography
+                                  variant="h4"
+                                  sx={{
+                                    fontWeight:
+                                      theme.typography.h4.fontWeightBold,
+                                  }}
+                                >
+                                  New Job Post
+                                </Typography>
+                              </DialogTitle>
+                            </Box>
+                          </Grid>
+
+                          <Grid item xs={12}>
+                            <DialogContent>
+                              <DialogContentText
+                                style={{
+                                  marginBottom: "16px",
+                                  textAlign: "center",
+                                }}
+                              >
+                                <Typography
+                                  variant="h5"
+                                  sx={{
+                                    fontWeight:
+                                      theme.typography.h5.fontWeightBold,
+                                  }}
+                                >
+                                  {fieldValues.jobTitle
+                                    ? fieldValues.jobTitle
+                                    : "Please key in Job Title!"}
+                                </Typography>{" "}
+                              </DialogContentText>
+
+                              <DialogContentText>
+                                <Typography
+                                  variant="p"
+                                  sx={{
+                                    fontWeight:
+                                      theme.typography.p.fontWeightBold,
+                                  }}
+                                >
+                                  {fieldValues.employmentType
+                                    ? fieldValues.employmentType
+                                    : ""}
+                                </Typography>
+                              </DialogContentText>
+
+                              <DialogContentText>
+                                <Typography
+                                  variant="p"
+                                  sx={{
+                                    fontWeight:
+                                      theme.typography.p.fontWeightBold,
+                                  }}
+                                >
+                                  Location:{" "}
+                                </Typography>
+                                {fieldValues.location &&
+                                fieldValues.location.name
+                                  ? fieldValues.location.name
+                                  : "Please select a location."}
+                              </DialogContentText>
+
+                              <DialogContentText
+                                style={{ marginBottom: "16px" }}
+                              >
+                                <Typography
+                                  variant="p"
+                                  sx={{
+                                    fontWeight:
+                                      theme.typography.p.fontWeightBold,
+                                  }}
+                                >
+                                  Category:{" "}
+                                </Typography>
+                                {fieldValues.jobCategory &&
+                                fieldValues.jobCategory.name
+                                  ? fieldValues.jobCategory.name
+                                  : "Please select a category."}
+                              </DialogContentText>
+                              <DialogContentText>
+                                <Box>
+                                  <Typography
+                                    variant="h6"
+                                    sx={{
+                                      fontWeight:
+                                        theme.typography.h6.fontWeightBold,
+                                    }}
+                                  >
+                                    Job Details{" "}
+                                  </Typography>
+                                  <div
+                                    dangerouslySetInnerHTML={{
+                                      __html: fieldValues.jobDescription,
+                                    }}
+                                  />
+                                </Box>
+                              </DialogContentText>
+                            </DialogContent>
+                          </Grid>
+
+                          <DialogActions>
                             <Button
                               disabled={disableSubmit}
+                              onClick={() => setModalOpen(false)}
+                              classes={{ root: "blue" }}
+                              variant="contained"
+                            >
+                              edit
+                            </Button>
+                            <Button
+                              disabled={disableSubmit}
+                              onClick={handleSubmit}
                               classes={{ root: "orange" }}
                               variant="contained"
-                              onClick={handleEditorStateToMessage}
                             >
-                              preview
+                              submit
                             </Button>
-                          </Grid>
-                        </Box>
-                      </Grid>
-                    </Grid>
-                  </Tooltip>
-                </Box>
-              </Grid>
-            </Paper>
-          </Box>
-        </Grid>
+                          </DialogActions>
+                        </Grid>
+                      </Dialog>
 
-        <Dialog open={modalOpen} onClose={() => setModalOpen(false)}>
-          <Grid container direction="column">
-            <Grid item>
-              <Box mt={2} justifyContent="center" display="flex">
-                <DialogTitle>
-                  <Typography
-                    variant="h4"
-                    sx={{
-                      fontWeight: theme.typography.h4.fontWeightBold,
-                    }}
-                  >
-                    New Job Post
-                  </Typography>
-                </DialogTitle>
-              </Box>
-            </Grid>
-
-            <Grid item xs={12}>
-              <DialogContent>
-                <DialogContentText
-                  style={{ marginBottom: "16px", textAlign: "center" }}
-                >
-                  <Typography
-                    variant="h5"
-                    sx={{
-                      fontWeight: theme.typography.h5.fontWeightBold,
-                    }}
-                  >
-                    {fieldValues.jobTitle
-                      ? fieldValues.jobTitle
-                      : "Please key in Job Title!"}
-                  </Typography>{" "}
-                </DialogContentText>
-
-                <DialogContentText>
-                  <Typography
-                    variant="p"
-                    sx={{
-                      fontWeight: theme.typography.p.fontWeightBold,
-                    }}
-                  >
-                    {fieldValues.employmentType
-                      ? fieldValues.employmentType
-                      : ""}
-                  </Typography>
-                </DialogContentText>
-
-                <DialogContentText>
-                  <Typography
-                    variant="p"
-                    sx={{
-                      fontWeight: theme.typography.p.fontWeightBold,
-                    }}
-                  >
-                    Location:{" "}
-                  </Typography>
-                  {fieldValues.location && fieldValues.location.name
-                    ? fieldValues.location.name
-                    : "Please select a location."}
-                </DialogContentText>
-
-                <DialogContentText style={{ marginBottom: "16px" }}>
-                  <Typography
-                    variant="p"
-                    sx={{
-                      fontWeight: theme.typography.p.fontWeightBold,
-                    }}
-                  >
-                    Category:{" "}
-                  </Typography>
-                  {fieldValues.jobCategory && fieldValues.jobCategory.name
-                    ? fieldValues.jobCategory.name
-                    : "Please select a category."}
-                </DialogContentText>
-                <DialogContentText>
-                  <Box>
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontWeight: theme.typography.h6.fontWeightBold,
-                      }}
+                      {/* row 3 - 2 buttons edit listing and delete listing
+                  {displayAdminButtons ? (
+                    <Box
+                      mt={4}
+                      mb={4}
+                      sx={theme.customStyles.displayFlexRowCenter}
                     >
-                      Job Details{" "}
-                    </Typography>
-                    <div
-                      dangerouslySetInnerHTML={{
-                        __html: fieldValues.jobDescription,
+                      <Stack direction="row" spacing={5}>
+                        <Button
+                          classes={{ root: "orange" }}
+                          variant="contained"
+                        >
+                          Check Applicants
+                        </Button>
+                        <Button classes={{ root: "blue" }} variant="contained">
+                          Edit Listing
+                        </Button>
+                        <Button classes={{ root: "red" }} variant="contained">
+                          Delete Listing
+                        </Button>
+                      </Stack>
+                    </Box>
+                  ) : (
+                    ""
+                  )}
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Divider
+                      sx={{
+                        borderBottomWidth: 3,
+
+                        width: "90%",
                       }}
                     />
+                  </div>
+                  {/* row 4 - job details */}
+                      {/* <Box m={4} sx={theme.customStyles.displayFlexRowLeft}>
+                    <Stack direction="column" spacing={2}>
+                      <Typography
+                        textAlign="left"
+                        variant="h5"
+                        sx={{
+                          fontWeight: theme.typography.h6.fontWeightBold,
+                        }}
+                      >
+                        Job Details
+                      </Typography>
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: description || "",
+                        }}
+                      />
+                    </Stack>
                   </Box>
-                </DialogContentText>
-              </DialogContent>
-            </Grid>
 
-            <DialogActions>
-              <Button
-                disabled={disableSubmit}
-                onClick={() => setModalOpen(false)}
-                classes={{ root: "blue" }}
-                variant="contained"
-              >
-                edit
-              </Button>
-              <Button
-                disabled={disableSubmit}
-                onClick={handleSubmit}
-                classes={{ root: "orange" }}
-                variant="contained"
-              >
-                submit
-              </Button>
-            </DialogActions>
-          </Grid>
-        </Dialog>
-      </ThemeProvider>
-    </Grid>
+                  {/* row 5 - 1 button to check current applicants */}
+                      {/* <Box
+                    m={4}
+                    pb={5}
+                    sx={theme.customStyles.displayFlexRowCenter}
+                  ></Box>
+                </Paper>
+              </Box>
+            </Grid>
+          </Container>
+        </div>
+      </Grid>
+    </ThemeProvider>  */}
+                    </Grid>{" "}
+                  </Dialog>
+                </Paper>
+              </Box>
+            </Grid>
+          </Container>
+        </div>
+      </Grid>
+    </ThemeProvider>
   );
 }
 
