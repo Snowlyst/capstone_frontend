@@ -394,6 +394,88 @@ function ReviewApplication() {
     }
   };
 
+  // const hireApplicant = () => {
+  //   const idToEdit = usersData[currentEntitySelection].id;
+  //   const dataToSend = {
+  //     idToEdit: idToEdit,
+  //   };
+  //   axios
+  //     .put(`${BACKEND_URL}/application/hireapplicant`, dataToSend, {
+  //       headers: {
+  //         Authorization: `Bearer ${accessToken}`,
+  //       },
+  //     })
+  //     .then((info) => {
+  //       console.log(info);
+  //       return Swal.fire(
+  //         "Success",
+  //         "The event has been created on your Google calendar!",
+  //         "success"
+  //       );
+  //     })
+  //     .catch((error) => {
+  //       console.log(error);
+  //     });
+  // };
+
+  const hireApplicant = async () => {
+    try {
+      const idToEdit = usersData[currentEntitySelection].id;
+      const dataToSend = {
+        idToEdit: idToEdit,
+      };
+
+      const response = await axios.put(
+        `${BACKEND_URL}/application/hireapplicant`,
+        dataToSend,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      console.log(response);
+
+      Swal.fire("Success", "The applicant has been hired!", "success").then(
+        () => {
+          window.location.reload();
+        }
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const rejectApplicant = async () => {
+    try {
+      const idToEdit = usersData[currentEntitySelection].id;
+      const dataToSend = {
+        idToEdit: idToEdit,
+      };
+
+      const response = await axios.put(
+        `${BACKEND_URL}/application/rejectapplicant`,
+        dataToSend,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      console.log(response);
+
+      Swal.fire("Success", "The applicant has been rejected!", "success").then(
+        () => {
+          window.location.reload();
+        }
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   // this must be at bottom layer right before return if not useeffect kills itself
   if (isLoading) {
     return <></>;
@@ -455,7 +537,15 @@ function ReviewApplication() {
                   Applications
                 </Typography>
                 <Stack direction="column" sx={{ pl: 1.5 }}>
-                  {sideDisplay ? sideDisplay : null}
+                  {sideDisplay ? (
+                    sideDisplay
+                  ) : (
+                    <Box sx={{ mt: "15vh", pl: "2vw" }}>
+                      <Typography variant="darkP">
+                        No current applicants for this listing yet!
+                      </Typography>
+                    </Box>
+                  )}
                 </Stack>
               </Grid>
             </Grid>
@@ -471,7 +561,7 @@ function ReviewApplication() {
                 ml: "5vw",
               }}
             >
-              {usersData && currentEntitySelection !== "" ? (
+              {usersData.length !== 0 && currentEntitySelection !== "" ? (
                 <Box sx={{ ml: "1vw" }}>
                   <Stack direction="row" sx={{ width: "44vw", mt: "2vh" }}>
                     <Typography
@@ -791,6 +881,7 @@ function ReviewApplication() {
                               <Button
                                 classes={{ root: "orange" }}
                                 variant="contained"
+                                onClick={hireApplicant}
                                 style={{
                                   width: "18vw",
                                   height: "12vh",
@@ -804,6 +895,7 @@ function ReviewApplication() {
                               <Button
                                 classes={{ root: "red" }}
                                 variant="contained"
+                                onClick={rejectApplicant}
                                 style={{
                                   width: "18vw",
                                   height: "12vh",
@@ -834,6 +926,20 @@ function ReviewApplication() {
                       </Box>
                     ) : null}
                   </Grid>
+                </Box>
+              ) : null}
+              {usersData.length !== 0 && currentEntitySelection === "" ? (
+                <Box sx={{ mt: "15vh", pl: "2vw" }}>
+                  <Typography variant="darkP">
+                    Select an applicant to get started!
+                  </Typography>
+                </Box>
+              ) : null}
+              {usersData.length === 0 && currentEntitySelection === "" ? (
+                <Box sx={{ mt: "15vh", pl: "2vw" }}>
+                  <Typography variant="darkP">
+                    No current applicants available!
+                  </Typography>
                 </Box>
               ) : null}
             </Grid>
