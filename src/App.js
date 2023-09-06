@@ -26,14 +26,11 @@ import IndividualJobPage from "./Pages/Employer/IndividualJobPage";
 import AdminDashboard from "./Pages/Administrator/AdminDashboard";
 import AdminApproveDenyJob from "./Pages/Administrator/AdminApproveDenyJob";
 import AdminApproveDenyUserCompanies from "./Pages/Administrator/AdminApproveDenyUser";
-<<<<<<< HEAD
 import EditProfile from "./Pages/User/EditProfile";
 import Swal from "sweetalert2";
 
-=======
 import AdminManageExistingUserCompany from "./Pages/Administrator/AdminManageExistingUserCompany";
 import ReviewApplication from "./Pages/Employer/ReviewApplication";
->>>>>>> main
 function App() {
   const { isAuthenticated, isLoading } = useAuth0();
   const [authLoading, setAuthLoading] = useState(false);
@@ -91,53 +88,27 @@ function App() {
         <Route path="/categories" element={<Categories />} />
         <Route path="/search" element={<Search />} />
         <Route path="/company/jobs/:jobId" element={<IndividualJobPage />} />
-<<<<<<< HEAD
-        <Route path="/companyprofile/:companyId" element={<CompanyProfile />} />
         <Route path="/categories/:categoryId" element={<CategoriesListing />} />
-=======
-        <Route
-          path="/jobpost"
-          element={<AuthenticationGuard component={JobPost} />}
-        />
-        <Route
-          path="/userresumelist"
-          element={<AuthenticationGuard component={ResumeList} />}
-        />
-        <Route
-          path="/companyprofile/:companyId"
-          element={<AuthenticationGuard component={CompanyProfile} />}
-        />
+        <Route path="/jobpost" element={<JobPost />} />
+        <Route path="/userresumelist" element={<ResumeList />} />
+        <Route path="/companyprofile/:companyId" element={<CompanyProfile />} />
         <Route path="createresume" element={<CreateResume />} />
-        <Route
-          path="/joblisting"
-          element={<AuthenticationGuard component={JobListingOverall} />}
-        />
-        <Route
-          path="/admin/dashboard"
-          element={<AuthenticationGuard component={AdminDashboard} />}
-        />
-        <Route
-          path="/admin/checkjobs"
-          element={<AuthenticationGuard component={AdminApproveDenyJob} />}
-        />
+        <Route path="/joblisting" element={<JobListingOverall />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/admin/checkjobs" element={<AdminApproveDenyJob />} />
         <Route
           path="/admin/checkusercompanies"
-          element={
-            <AuthenticationGuard component={AdminApproveDenyUserCompanies} />
-          }
+          element={<AdminApproveDenyUserCompanies />}
         />
         <Route
           path="/admin/manageusercompanies"
-          element={
-            <AuthenticationGuard component={AdminManageExistingUserCompany} />
-          }
+          element={<AdminManageExistingUserCompany />}
         />
 
         <Route
           path="/checkapplication/:jobId"
-          element={<AuthenticationGuard component={ReviewApplication} />}
+          element={<ReviewApplication />}
         />
->>>>>>> main
         {/* These 4 Pages are Test pages, to be deleted near the end */}
         <Route path="/onemap" element={<OnemapApiTest />} />
         <Route path="/pdf" element={<PDFReadingTest />} />
