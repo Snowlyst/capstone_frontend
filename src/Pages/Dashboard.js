@@ -22,28 +22,23 @@ function AdminDashboard() {
   const navigate = useNavigate();
 
   //make sure currUser is set or else the navigate gonna boot everyone off the screen
-  // useEffect(() => {
-  //   console.log(currUser);
-  //   if (!accessToken) {
-  //     const localAccess = JSON.parse(localStorage.getItem("verveToken"));
-  //     console.log("access token ready");
-  //     setAccessToken(localAccess);
-  //     setIsLoaded(true);
-  //   }
-  // }, []);
+  useEffect(() => {
+    console.log(currUser);
+    if (!accessToken) {
+      const localAccess = JSON.parse(localStorage.getItem("verveToken"));
+      console.log("access token ready");
+      setAccessToken(localAccess);
+      setIsLoaded(true);
+    }
+  }, []);
 
   //differentiating users
-  // useEffect(() => {
-  //   if (currUser) {
-  //     const userType = currUser.userRoleId;
-  //     setDisplayMode(userType);
-  //   }
-  // }, [currUser]);
-
-  //temporary hardcode to see while building
   useEffect(() => {
-    setDisplayMode(3);
-  }, []);
+    if (currUser) {
+      const userType = currUser.userRoleId;
+      setDisplayMode(userType);
+    }
+  }, [currUser]);
 
   return (
     <Box>
