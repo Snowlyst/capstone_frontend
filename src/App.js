@@ -12,7 +12,7 @@ import IndividualListing from "./Pages/IndividualListing";
 import Profile from "./Pages/User/Profile";
 import Search from "./Pages/Search";
 import UpdateProfile from "./Pages/UpdateProfile";
-import Error from "./Pages/Error";
+// import Error from "./Pages/Error";
 import JobPost from "./Pages/Employer/JobPost";
 import OnemapApiTest from "./TestPages(TO_BE_DELETED)/OnemapApiTest";
 import PDFReadingTest from "./TestPages(TO_BE_DELETED)/PDFReaderTest";
@@ -27,7 +27,7 @@ import AdminDashboard from "./Pages/Administrator/AdminDashboard";
 import AdminApproveDenyJob from "./Pages/Administrator/AdminApproveDenyJob";
 import AdminApproveDenyUserCompanies from "./Pages/Administrator/AdminApproveDenyUser";
 import EditProfile from "./Pages/User/EditProfile";
-import Swal from "sweetalert2";
+// import Swal from "sweetalert2";
 
 import AdminManageExistingUserCompany from "./Pages/Administrator/AdminManageExistingUserCompany";
 import ReviewApplication from "./Pages/Employer/ReviewApplication";
@@ -85,30 +85,53 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Homepage />} />
-        <Route path="/categories" element={<Categories />} />
-        <Route path="/search" element={<Search />} />
+        <Route path="/job-categories" element={<Categories />} />
+        <Route path="/job-search" element={<Search />} />
         <Route path="/company/jobs/:jobId" element={<IndividualJobPage />} />
-        <Route path="/categories/:categoryId" element={<CategoriesListing />} />
-        <Route path="/jobpost" element={<JobPost />} />
-        <Route path="/userresumelist" element={<ResumeList />} />
         <Route path="/companyprofile/:companyId" element={<CompanyProfile />} />
+        <Route path="/categories/:categoryId" element={<CategoriesListing />} />
+        {/* <Route
+          path="/jobpost"
+          element={<AuthenticationGuard component={JobPost} />}
+        />
+        <Route
+          path="/userresumelist"
+          element={<AuthenticationGuard component={ResumeList} />}
+        />
+        <Route
+          path="/companyprofile/:companyId"
+          element={<AuthenticationGuard component={CompanyProfile} />}
+        />
         <Route path="createresume" element={<CreateResume />} />
-        <Route path="/joblisting" element={<JobListingOverall />} />
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path="/admin/checkjobs" element={<AdminApproveDenyJob />} />
+        <Route
+          path="/joblisting"
+          element={<AuthenticationGuard component={JobListingOverall} />}
+        />
+        <Route
+          path="/admin/dashboard"
+          element={<AuthenticationGuard component={AdminDashboard} />}
+        />
+        <Route
+          path="/admin/checkjobs"
+          element={<AuthenticationGuard component={AdminApproveDenyJob} />}
+        />
         <Route
           path="/admin/checkusercompanies"
-          element={<AdminApproveDenyUserCompanies />}
+          element={
+            <AuthenticationGuard component={AdminApproveDenyUserCompanies} />
+          }
         />
         <Route
           path="/admin/manageusercompanies"
-          element={<AdminManageExistingUserCompany />}
+          element={
+            <AuthenticationGuard component={AdminManageExistingUserCompany} />
+          }
         />
 
         <Route
           path="/checkapplication/:jobId"
-          element={<ReviewApplication />}
-        />
+          element={<AuthenticationGuard component={ReviewApplication} />}
+        /> */}
         {/* These 4 Pages are Test pages, to be deleted near the end */}
         <Route path="/onemap" element={<OnemapApiTest />} />
         <Route path="/pdf" element={<PDFReadingTest />} />
@@ -125,16 +148,20 @@ function App() {
 
         <Route path="/profile" element={<Profile />} />
         <Route path="/editprofile/:userId" element={<EditProfile />} />
-        <Route path="/jobpost" element={<JobPost />} />
-        <Route path="/userresumelist" element={<ResumeList />} />
+        <Route path="/post-job" element={<JobPost />} />
+        <Route path="/resume" element={<ResumeList />} />
         <Route path="/updateprofile" element={<UpdateProfile />} />
-        <Route path="createresume" element={<CreateResume />} />
+        <Route path="/createresume" element={<CreateResume />} />
         <Route path="/joblisting" element={<JobListingOverall />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/admin/checkjobs" element={<AdminApproveDenyJob />} />
         <Route
           path="/admin/checkusercompanies"
           element={<AdminApproveDenyUserCompanies />}
+        />
+        <Route
+          path="/admin/manageusercompanies"
+          element={<AdminManageExistingUserCompany />}
         />
         {/* </Routes>
             </RequireAuth>
