@@ -708,6 +708,309 @@ function AdminApproveDenyUserCompanies() {
                     </Grid>
                   </>
                 ) : null}
+                {currentEntitySelection === "" && !userMode ? (
+                  <Box sx={{ mt: "15vh", width: "20vw", ml: "15vw" }}>
+                    <Typography variant="darkP">
+                      No Company Selected Yet!
+                    </Typography>
+                  </Box>
+                ) : null}
+                {currentEntitySelection !== "" && userMode ? (
+                  <>
+                    <Grid item xs={2.5} sx={{ ml: "2.5vw" }}>
+                      <Box sx={{ ml: "13.5vw", mt: "3vh" }}>
+                        <img
+                          src={
+                            usersData[currentEntitySelection].avatarUrl ||
+                            "https://firebasestorage.googleapis.com/v0/b/verve-55239.appspot.com/o/images%2FImage_not_available.png?alt=media&token=0a5a0495-5de3-4fea-93a2-3b4b95b22f64"
+                          }
+                          alt="Alt"
+                          style={{
+                            height: "10vh",
+                            width: "10vw",
+                            objectFit: "fill",
+                            borderTopLeftRadius: "40px",
+                            borderTopRightRadius: "40px",
+                          }}
+                        />
+                      </Box>
+                    </Grid>
+                    <Grid item xs={9.5} sx={{ ml: "2.5vw", width: "20vw" }}>
+                      <Stack direction="row" sx={{ width: "45vw" }}>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: theme.typography.h6.fontWeightBold,
+                            fontSize: "1.3vw",
+                            width: "22.5vw",
+                          }}
+                        >
+                          Name:
+                          <Typography
+                            variant="darkP"
+                            sx={{ fontSize: "1.3vw", width: "22.5vh" }}
+                          >
+                            {" "}
+                            {usersData[currentEntitySelection].firstName}{" "}
+                            {usersData[currentEntitySelection].lastName}
+                          </Typography>
+                        </Typography>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: theme.typography.h6.fontWeightBold,
+                            fontSize: "1.3vw",
+                          }}
+                        >
+                          Date of Birth:
+                          <Typography
+                            variant="darkP"
+                            sx={{ fontSize: "1.3vw", width: "22.5vh" }}
+                          >
+                            {
+                              usersData[currentEntitySelection]
+                                .user_personal_detail.dateOfBirth
+                            }
+                          </Typography>
+                        </Typography>
+                      </Stack>
+                      <Stack direction="row" sx={{ width: "45vw", mt: "2vh" }}>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: theme.typography.h6.fontWeightBold,
+                            fontSize: "1.3vw",
+                            width: "22.5vw",
+                          }}
+                        >
+                          IC:
+                          <Typography
+                            variant="darkP"
+                            sx={{ fontSize: "1.3vw ", width: "22.5vw" }}
+                          >
+                            {
+                              usersData[currentEntitySelection]
+                                .user_personal_detail.identificationNumber
+                            }
+                          </Typography>
+                        </Typography>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: theme.typography.h6.fontWeightBold,
+                            fontSize: "1.3vw",
+                          }}
+                        >
+                          Gender:
+                          <Typography
+                            variant="darkP"
+                            sx={{ fontSize: "1.3vw" }}
+                          >
+                            {
+                              usersData[currentEntitySelection]
+                                .user_personal_detail.gender
+                            }
+                          </Typography>
+                        </Typography>
+                      </Stack>
+                      <Stack direction="row" sx={{ width: "45vw", mt: "2vh" }}>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: theme.typography.h6.fontWeightBold,
+                            fontSize: "1.3vw",
+                            width: "22.5vw",
+                          }}
+                        >
+                          Mobile:
+                          <Typography
+                            variant="darkP"
+                            sx={{ fontSize: "1.3vw ", width: "22.5vw" }}
+                          >
+                            {
+                              usersData[currentEntitySelection]
+                                .user_personal_detail.mobileNumber
+                            }
+                          </Typography>
+                        </Typography>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: theme.typography.h6.fontWeightBold,
+                            fontSize: "1.3vw",
+                          }}
+                        >
+                          Email:
+                          <Typography
+                            variant="darkP"
+                            sx={{ fontSize: "1.3vw" }}
+                          >
+                            {usersData[currentEntitySelection].email}
+                          </Typography>
+                        </Typography>
+                      </Stack>
+                      <Stack
+                        direction="row"
+                        sx={{ width: "45vw", mt: "2vh", height: "7vh" }}
+                      >
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: theme.typography.h6.fontWeightBold,
+                            fontSize: "1.3vw",
+                            width: "45vw",
+                          }}
+                        >
+                          Address:
+                          <Typography
+                            variant="darkP"
+                            sx={{
+                              fontSize: "1.3vw ",
+                              width: "45vw",
+                            }}
+                          >
+                            {
+                              usersData[currentEntitySelection]
+                                .user_personal_detail.streetAddress
+                            }
+                          </Typography>
+                        </Typography>
+                      </Stack>
+                      <Stack direction="row" sx={{ width: "45vw", mt: "2vh" }}>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: theme.typography.h6.fontWeightBold,
+                            fontSize: "1.3vw",
+                            width: "45vw",
+                          }}
+                        >
+                          Current Work Status:
+                          <Typography
+                            variant="darkP"
+                            sx={{
+                              fontSize: "1.3vw ",
+                              width: "45vw",
+                              height: "7vh",
+                            }}
+                          >
+                            {
+                              usersData[currentEntitySelection]
+                                .user_personal_detail.currentWorkStatus
+                            }
+                          </Typography>
+                        </Typography>
+                      </Stack>
+                      <Stack direction="row" sx={{ width: "45vw", mt: "2vh" }}>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: theme.typography.h6.fontWeightBold,
+                            fontSize: "1.3vw",
+                            width: "45vw",
+                          }}
+                        >
+                          Readiness to RTW:
+                          <Typography
+                            variant="darkP"
+                            sx={{
+                              fontSize: "1.3vw ",
+                              width: "45vw",
+                              height: "7vh",
+                            }}
+                          >
+                            {
+                              usersData[currentEntitySelection]
+                                .user_personal_detail.readinessToRtw
+                            }
+                          </Typography>
+                        </Typography>
+                      </Stack>
+                      <Stack direction="row" sx={{ width: "45vw", mt: "2vh" }}>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: theme.typography.h6.fontWeightBold,
+                            fontSize: "1.3vw",
+                            width: "45vw",
+                          }}
+                        >
+                          Physical Barriers to RTW:
+                          <Typography
+                            variant="darkP"
+                            sx={{
+                              fontSize: "1.3vw ",
+                              width: "45vw",
+                              height: "7vh",
+                            }}
+                          >
+                            {
+                              usersData[currentEntitySelection]
+                                .user_personal_detail.physicalBarriersToRtw
+                            }
+                          </Typography>
+                        </Typography>
+                      </Stack>
+                      <Stack direction="row" sx={{ width: "45vw", mt: "2vh" }}>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: theme.typography.h6.fontWeightBold,
+                            fontSize: "1.3vw",
+                            width: "45vw",
+                          }}
+                        >
+                          Time frame to RTW:
+                          <Typography
+                            variant="darkP"
+                            sx={{
+                              fontSize: "1.3vw ",
+                              width: "45vw",
+                              height: "7vh",
+                            }}
+                          >
+                            {
+                              usersData[currentEntitySelection]
+                                .user_personal_detail.timeFrameToRtw
+                            }
+                          </Typography>
+                        </Typography>
+                      </Stack>
+                      <Stack direction="row" sx={{ width: "45vw", mt: "2vh" }}>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: theme.typography.h6.fontWeightBold,
+                            fontSize: "1.3vw",
+                            width: "45vw",
+                          }}
+                        >
+                          Active Treatment:
+                          <Typography
+                            variant="darkP"
+                            sx={{
+                              fontSize: "1.3vw ",
+                              width: "45vw",
+                              height: "7vh",
+                            }}
+                          >
+                            {
+                              usersData[currentEntitySelection]
+                                .user_personal_detail.activeTreatment
+                            }
+                          </Typography>
+                        </Typography>
+                      </Stack>
+                    </Grid>
+                  </>
+                ) : null}
+                {currentEntitySelection === "" && userMode ? (
+                  <Box sx={{ mt: "15vh", width: "20vw", ml: "15vw" }}>
+                    <Typography variant="darkP">
+                      No User Selected Yet!
+                    </Typography>
+                  </Box>
+                ) : null}
               </Grid>
               <Box sx={{ mt: "3vh" }}>
                 <Stack direction="row" spacing={7}>

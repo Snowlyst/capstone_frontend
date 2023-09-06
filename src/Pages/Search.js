@@ -77,6 +77,7 @@ function Search() {
         .post(`${BACKEND_URL}/listings/search/mount`, dataToSend)
         .then((info) => {
           console.log(info);
+          setJobsData(info.data);
           setJobsDisplay(
             info.data.map((info, index) => {
               return (
@@ -170,14 +171,16 @@ function Search() {
                     </Stack>
                   </Grid>
                   <Grid item xs={2} sx={{ mt: 4.1 }}>
-                    <Button
-                      variant="contained"
-                      component="span"
-                      style={{ backgroundColor: "#0E0140", color: "white" }}
-                    >
-                      <VisibilityIcon />
-                      View
-                    </Button>
+                    <Link href={`/company/jobs/${info.id}`}>
+                      <Button
+                        variant="contained"
+                        component="span"
+                        style={{ backgroundColor: "#0E0140", color: "white" }}
+                      >
+                        <VisibilityIcon />
+                        View
+                      </Button>
+                    </Link>
                   </Grid>
                 </Grid>
               );
@@ -540,11 +543,11 @@ function Search() {
                   {jobsDisplay}
                 </Box>
               ) : null}
-              {jobsData.length === 0 && searchDone ? (
+              {/* {jobsData.length === 0 && searchDone ? (
                 <Typography variant="h5" sx={{ ml: "10vw", mt: "20vh" }}>
                   No available listings from search parameters provided!
                 </Typography>
-              ) : null}
+              ) : null} */}
               {searchDone ? null : (
                 <Typography variant="h5" sx={{ ml: "10vw", mt: "20vh" }}>
                   Start a search to get listings here!

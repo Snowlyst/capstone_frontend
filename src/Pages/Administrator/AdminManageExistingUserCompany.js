@@ -761,7 +761,7 @@ function AdminManageExistingUserCompany() {
                           >
                             {
                               usersData[currentEntitySelection]
-                                .user_personal_detail.address
+                                .user_personal_detail.streetAddress
                             }
                           </Typography>
                         </Typography>
@@ -811,7 +811,7 @@ function AdminManageExistingUserCompany() {
                           >
                             {
                               usersData[currentEntitySelection]
-                                .user_personal_detail.ReadinessToRtw
+                                .user_personal_detail.readinessToRtw
                             }
                           </Typography>
                         </Typography>

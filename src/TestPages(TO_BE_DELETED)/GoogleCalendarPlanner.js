@@ -24,6 +24,7 @@ function GoogleCalendar() {
   useEffect(() => {
     console.log(calendarId);
   }, [calendarId]);
+
   if (isLoading) {
     return <></>;
   }
@@ -35,6 +36,7 @@ function GoogleCalendar() {
         scopes: "https://www.googleapis.com/auth/calendar",
       },
     });
+
     if (error) {
       alert("Error logging in");
       console.log(error);

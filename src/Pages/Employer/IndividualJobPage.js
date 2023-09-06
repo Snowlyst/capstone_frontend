@@ -60,7 +60,10 @@ function IndividualJobPage(props) {
 
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
   useEffect(() => {
-    setJobId(props.jobsId);
+    if (props) {
+      console.log(props.jobsId);
+      setJobId(props.jobsId);
+    }
   }, [props]);
 
   useEffect(() => {
@@ -107,7 +110,7 @@ function IndividualJobPage(props) {
       console.log(jobInfo.description);
       setDescription(jobInfo.description);
 
-      if (props || currUser.userRoleId === 2) {
+      if (props.jobsId || currUser.userRoleId === 2) {
         setDisplayAdminButtons(false);
       } else {
         setDisplayAdminButtons(true);

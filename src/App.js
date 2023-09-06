@@ -28,6 +28,7 @@ import AdminDashboard from "./Pages/Administrator/AdminDashboard";
 import AdminApproveDenyJob from "./Pages/Administrator/AdminApproveDenyJob";
 import AdminApproveDenyUserCompanies from "./Pages/Administrator/AdminApproveDenyUser";
 import AdminManageExistingUserCompany from "./Pages/Administrator/AdminManageExistingUserCompany";
+import ReviewApplication from "./Pages/Employer/ReviewApplication";
 function App() {
   const { isAuthenticated, isLoading } = useAuth0();
   useEffect(() => {
@@ -102,6 +103,11 @@ function App() {
           element={
             <AuthenticationGuard component={AdminManageExistingUserCompany} />
           }
+        />
+
+        <Route
+          path="/checkapplication/:jobId"
+          element={<AuthenticationGuard component={ReviewApplication} />}
         />
         {/* These 4 Pages are Test pages, to be deleted near the end */}
         <Route path="/onemap" element={<OnemapApiTest />} />
