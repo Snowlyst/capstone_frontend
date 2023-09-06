@@ -4,7 +4,6 @@ import {
   Box,
   Divider,
   Typography,
-  Grid,
   Button,
   Avatar,
   FormControlLabel,
@@ -20,8 +19,18 @@ import { theme } from "../../Assets/Styles/Theme";
 import Swal from "sweetalert2";
 import axios from "axios";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
+import { useUserContext } from "../../Components/UserContext";
 function CreateResume() {
   // All the states
+  const { currUser, setCurrUser } = useUserContext();
+  const [id, setId] = useState("");
+  useEffect(() => {
+    if (currUser) {
+      console.log(currUser.id);
+      setId(currUser.id);
+    }
+  }, [currUser]);
+
   // States for the Experience
   const [selectedContent, setSelectedContent] = useState(null);
   const [selectedOption, setSelectedOption] = useState("");
@@ -38,15 +47,15 @@ function CreateResume() {
   const [fieldValues, setFieldValues] = useState({
     positionTitle: "",
     companyName: "",
-    joinedDate: "",
-    leftDate: "",
+    startPeriod: "",
+    endPeriod: "",
     specialization: "",
     role: "",
     country: "",
     industry: "",
     positionLevel: "",
     monthlySalary: "",
-    experienceSummary: "",
+    executiveSummary: "",
   });
   const [savedFieldValues, setSavedFieldValues] = useState([]);
   const [editingIndex, setEditingIndex] = useState(null);
@@ -102,6 +111,7 @@ function CreateResume() {
     email: "",
     address: "",
     postalCode: "",
+    unitNumber: "",
     dateOfBirth: "",
     nationality: "",
   });
@@ -114,6 +124,7 @@ function CreateResume() {
   // State for privacy setting
   const [privacySetting, setPrivacySetting] = useState("searchable");
   const [isEditingPrivacy, setIsEditingPrivacy] = useState(false);
+
   // Logic for experience
   const handleContentClick = (content) => {
     setSelectedContent(content);
@@ -156,10 +167,10 @@ function CreateResume() {
   };
 
   const handleExperienceChange = (fieldName, value) => {
-    if (fieldName === "leftDate" && isLeftDateDisabled) {
+    if (fieldName === "endPeriod" && isLeftDateDisabled) {
       setFieldValues((prevValues) => ({
         ...prevValues,
-        leftDate: "Present",
+        endPeriod: "Present",
       }));
     } else {
       setFieldValues((prevValues) => ({
@@ -170,80 +181,74 @@ function CreateResume() {
   };
 
   const handleSaveExperience = () => {
-    const newFieldErrors = {};
-    Object.keys(fieldValues).forEach((fieldName) => {
-      if (fieldValues[fieldName].trim() === "") {
-        newFieldErrors[fieldName] = true;
-      }
-    });
+    const newFieldErrors = Object.keys(fieldValues).reduce(
+      (errors, fieldName) => {
+        if (fieldValues[fieldName].trim() === "") {
+          errors[fieldName] = true;
+        }
+        return errors;
+      },
+      {}
+    );
+
     setFieldErrors(newFieldErrors);
+
     if (Object.keys(newFieldErrors).length > 0) {
       Swal.fire("Ooops!", "You need to fill up the required fields!", "error");
     } else {
-      // Check if we are editing an existing entry
+      const updatedSavedFieldValues = [...savedFieldValues];
       if (editingIndex !== null) {
-        // Update the existing entry at the specified index
-        const updatedSavedFieldValues = [...savedFieldValues];
         updatedSavedFieldValues[editingIndex] = fieldValues;
-        setSavedFieldValues(updatedSavedFieldValues);
-        setEditingIndex(null); // Exit edit mode
+        setEditingIndex(null);
       } else {
-        // Append the new entry to the array if not editing
-        setSavedFieldValues([...savedFieldValues, fieldValues]);
+        updatedSavedFieldValues.push(fieldValues);
       }
-
-      // Reset form fields and show saved values
+      setSavedFieldValues(updatedSavedFieldValues);
       setExperienceFormFieldVisible(false);
       setShowSavedValues(true);
     }
   };
+
   const handleCancelExperience = () => {
-    setExperienceFormFieldVisible(false); // Hide the editing fields
-    setShowSavedValues(true); // Show the saved values
+    setExperienceFormFieldVisible(false);
+    setShowSavedValues(true);
   };
+
   useEffect(() => {
     console.log("Save button clicked");
     console.log(showSavedValues);
   }, [showSavedValues]);
 
   const resetFormFields = (entry) => {
+    const defaultValues = {
+      positionTitle: "",
+      companyName: "",
+      startPeriod: "",
+      endPeriod: "",
+      specialization: "",
+      role: "",
+      country: "",
+      industry: "",
+      positionLevel: "",
+      monthlySalary: "",
+      executiveSummary: "",
+    };
+
     if (entry) {
       setFieldValues({
-        positionTitle: entry.positionTitle,
-        companyName: entry.companyName,
-        joinedDate: entry.joinedDate,
-        leftDate: entry.leftDate,
-        specialization: entry.specialization,
-        role: entry.role,
-        country: entry.country,
-        industry: entry.industry,
-        positionLevel: entry.positionLevel,
-        monthlySalary: entry.monthlySalary,
-        experienceSummary: entry.experienceSummary,
+        ...defaultValues,
+        ...entry,
       });
     } else {
-      setFieldValues({
-        positionTitle: "",
-        companyName: "",
-        joinedDate: "",
-        leftDate: "",
-        specialization: "",
-        role: "",
-        country: "",
-        industry: "",
-        positionLevel: "",
-        monthlySalary: "",
-        experienceSummary: "",
-      });
+      setFieldValues(defaultValues);
     }
   };
 
   console.log(savedFieldValues);
+
   const handleDeleteExperience = (index) => {
     const updatedSavedFieldValues = [...savedFieldValues];
-
     updatedSavedFieldValues.splice(index, 1);
-
     setSavedFieldValues(updatedSavedFieldValues);
   };
 
@@ -252,17 +257,14 @@ function CreateResume() {
     const newEduFieldErrors = eduValidateFields(eduFieldValues);
 
     if (Object.keys(newEduFieldErrors).length > 0) {
-      // Display validation errors
       setEduFieldErrors(newEduFieldErrors);
     } else {
       if (eduEditingIndex !== null) {
-        // Update the existing education entry
         const updatedEducationFields = [...educationFields];
         updatedEducationFields[eduEditingIndex] = eduFieldValues;
         setEducationFields(updatedEducationFields);
         setEduEditingIndex(null);
       } else {
-        // Save the new education entry
         setEducationFields([...educationFields, eduFieldValues]);
       }
 
@@ -284,42 +286,28 @@ function CreateResume() {
     }
   };
   const eduValidateFields = (fields) => {
-    const eduErrors = {};
+  const requiredFields = [
+    "university",
+    "graduationDate",
+    "qualification",
+    "universityLocation",
+    "fieldOfStudy",
+    "major",
+    "grade",
+    "awards",
+  ];
 
-    // Add validation logic for each field here
-    if (fields.university.trim() === "") {
-      eduErrors.university = "Institute/University is required";
-    }
-    if (fields.graduationDate.trim() === "") {
-      eduErrors.graduationDate = "Graduation Date is required";
-    }
+  const eduErrors = {};
 
-    if (fields.qualification.trim() === "") {
-      eduErrors.qualification = "Qualification is required";
+  requiredFields.forEach((fieldName) => {
+    if (fields[fieldName].trim() === "") {
+      eduErrors[fieldName] = `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} is required`;
     }
+  });
 
-    if (fields.universityLocation.trim() === "") {
-      eduErrors.universityLocation =
-        "Institute/University Location is required";
-    }
+  return eduErrors;
+};
 
-    if (fields.fieldOfStudy.trim() === "") {
-      eduErrors.fieldOfStudy = "Field of Study is required";
-    }
-
-    if (fields.major.trim() === "") {
-      eduErrors.major = "Major is required";
-    }
-
-    if (fields.grade.trim() === "") {
-      eduErrors.grade = "Grade is required";
-    }
-
-    if (fields.awards.trim() === "") {
-      eduErrors.awards = "Awards is required";
-    }
-    return eduErrors;
-  };
   const resetEduFormFields = () => {
     setFieldValues({
       university: "",
@@ -351,20 +339,18 @@ function CreateResume() {
       setSkillFieldErrors(newSkillFieldErrors);
     } else {
       if (skillEditingIndex !== null) {
-        // Update existing skill entry
         const updatedSkills = [...skillFields];
         updatedSkills[skillEditingIndex] = skillFieldValues;
         setSkillFields(updatedSkills);
         setSkillEditingIndex(null);
       } else {
-        // Save new skill entry
         setSkillFields([...skillFields, skillFieldValues]);
       }
 
       // Clear the form fields
       setSkillFieldValues({ skillName: "", proficiencyLevel: "" });
       setSkillFieldErrors({});
-      setSkillFormVisible(false); // Hide the skill form after saving
+      setSkillFormVisible(false);
     }
   };
 
@@ -397,17 +383,13 @@ function CreateResume() {
       setLanguageFieldErrors(newLanguageFieldErrors);
     } else {
       if (languageEditingIndex !== null) {
-        // Update existing language entry
         const updatedLanguages = [...languageFields];
         updatedLanguages[languageEditingIndex] = languageFieldValues;
         setLanguageFields(updatedLanguages);
         setLanguageEditingIndex(null);
       } else {
-        // Save new language entry
         setLanguageFields([...languageFields, languageFieldValues]);
       }
-
-      // Clear the form fields
       setLanguageFieldValues({
         languageName: "",
         proficiencySpoken: "",
@@ -415,7 +397,7 @@ function CreateResume() {
         isPrimary: false,
       });
       setLanguageFieldErrors({});
-      setLanguageFormVisible(false); // Hide the language form after saving
+      setLanguageFormVisible(false);
     }
   };
 
@@ -463,10 +445,9 @@ function CreateResume() {
         newAdditionalInfoErrors.expectedSalary =
           "Expected Monthly Salary must be a valid integer";
       } else {
-        // Update the state with the valid expectedSalary
         setAdditionalInfo({
           ...additionalInfo,
-          expectedSalary: expectedSalary.toString(), // Convert it back to string
+          expectedSalary: expectedSalary.toString(),
         });
       }
     }
@@ -507,7 +488,7 @@ function CreateResume() {
       setIsEditingAboutMe(true);
       setAboutMe((prevAboutMe) => ({
         ...prevAboutMe,
-        address: address || prevAboutMe.address, // Preserve the existing address if it's empty
+        address: address || prevAboutMe.address,
       }));
       setAboutMeErrors({});
     } else {
@@ -548,7 +529,9 @@ function CreateResume() {
     } else if (!/^\d+$/.test(fields.postalCode.trim())) {
       errors.postalCode = "Postal code must be numeric";
     }
-
+    if (fields.unitNumber.trim() === "") {
+      errors.unitNumber = "Unit Number is required";
+    }
     if (fields.dateOfBirth.trim() === "") {
       errors.dateOfBirth = "Date of birth is required";
     }
@@ -567,6 +550,7 @@ function CreateResume() {
       email: "",
       address: "",
       postalCode: "",
+      unitNumber: "",
       dateOfBirth: "",
       nationality: "",
     });
@@ -625,17 +609,12 @@ function CreateResume() {
         </Typography>
         <Box
           display="flex"
-          justifyContent="center" // Center the content horizontally
-          alignItems="flex-start" // Center the content vertically
-          minHeight="50vh" // Make sure the content occupies at least the full viewport height
-          width="100%" // Make sure the content occupies the full width of the viewport
+          justifyContent="center"
+          alignItems="flex-start"
+          minHeight="50vh"
+          width="100%"
         >
-          <Box
-            display="flex"
-            justifyContent="center" // Center the content horizontally within the main box
-            width="70%" // Adjust the width of the main content
-            p={0} // Add some padding for spacing
-          >
+          <Box display="flex" justifyContent="center" width="70%" p={0}>
             {/* Left Panel: Headings */}
             <Box width="30%" padding="10px" marginRight="-15%">
               <Avatar
@@ -885,19 +864,19 @@ function CreateResume() {
                               style={{ marginBottom: "12px" }}
                             />
                             <TextField
-                              label="Joined Date"
-                              id="joinedDate"
-                              value={fieldValues.joinedDate}
+                              label="Start Period"
+                              id="startPeriod"
+                              value={fieldValues.startPeriod}
                               onChange={(e) =>
                                 handleExperienceChange(
-                                  "joinedDate",
+                                  "startPeriod",
                                   e.target.value
                                 )
                               }
-                              error={fieldErrors.joinedDate || false}
+                              error={fieldErrors.startPeriod || false}
                               helperText={
-                                fieldErrors.joinedDate &&
-                                "Joined Date is required!"
+                                fieldErrors.startPeriod &&
+                                "Start Date is required!"
                               }
                               fullWidth
                               size="small"
@@ -912,11 +891,11 @@ function CreateResume() {
                                     setIsLeftDateDisabled(e.target.checked);
                                     if (e.target.checked) {
                                       handleExperienceChange(
-                                        "leftDate",
+                                        "endPeriod",
                                         "Present"
                                       );
                                     } else {
-                                      handleExperienceChange("leftDate", "");
+                                      handleExperienceChange("endPeriod", "");
                                     }
                                   }}
                                 />
@@ -924,18 +903,19 @@ function CreateResume() {
                               label="Present"
                             />
                             <TextField
-                              label="Left Date"
-                              id="leftDate"
-                              value={fieldValues.leftDate}
+                              label="End Period"
+                              id="endPeriod"
+                              value={fieldValues.endPeriod}
                               onChange={(e) =>
                                 handleExperienceChange(
-                                  "leftDate",
+                                  "endPeriod",
                                   e.target.value
                                 )
                               }
-                              error={fieldErrors.leftDate || false}
+                              error={fieldErrors.endPeriod || false}
                               helperText={
-                                fieldErrors.leftDate && "LeftDate is required!"
+                                fieldErrors.endPeriod &&
+                                "End Period is required!"
                               }
                               fullWidth
                               size="small"
@@ -1051,19 +1031,19 @@ function CreateResume() {
                               style={{ marginBottom: "12px" }}
                             />
                             <TextField
-                              label="Experience Summary"
-                              id="experienceSummary"
+                              label="Executive Summary"
+                              id="executiveSummary"
                               value={fieldValues.experienceSummary}
                               onChange={(e) =>
                                 handleExperienceChange(
-                                  "experienceSummary",
+                                  "executiveSummary",
                                   e.target.value
                                 )
                               }
-                              error={fieldErrors.experienceSummary || false}
+                              error={fieldErrors.executiveSummary || false}
                               helperText={
-                                fieldErrors.experienceSummary &&
-                                "Experience Summary is required!"
+                                fieldErrors.executiveSummary &&
+                                "Executive Summary is required!"
                               }
                               fullWidth
                               size="small"
@@ -1107,9 +1087,9 @@ function CreateResume() {
                               <br />
                               Company Name: {savedValues.companyName}
                               <br />
-                              Joined Date: {savedValues.joinedDate}
+                              Start Period: {savedValues.startPeriod}
                               <br />
-                              Left Date: {savedValues.leftDate}
+                              End Period: {savedValues.endPeriod}
                               <br />
                               Specialization: {savedValues.specialization}
                               <br />
@@ -1123,8 +1103,8 @@ function CreateResume() {
                               <br />
                               Monthly Salary: {savedValues.monthlySalary}
                               <br />
-                              Experience Summary:
-                              {savedValues.experienceSummary}
+                              Executive Summary:
+                              {savedValues.executiveSummary}
                             </Typography>
                             <br />
                             <Button
@@ -1940,6 +1920,10 @@ function CreateResume() {
                       </Typography>
                       <br />
                       <Typography variant="p">
+                        Unit Number: {aboutMe.unitNumber}
+                      </Typography>
+                      <br />
+                      <Typography variant="p">
                         Date of Birth: {aboutMe.dateOfBirth}
                       </Typography>
                       <br />
@@ -1950,8 +1934,7 @@ function CreateResume() {
 
                       <Button
                         variant="contained"
-                        sx={{ marginRight: "8px"
-                       }}
+                        sx={{ marginRight: "8px" }}
                         classes={{ root: "orange" }}
                         onClick={handleAboutMeEditClick}
                       >
@@ -2051,6 +2034,21 @@ function CreateResume() {
                           <SearchOutlinedIcon />
                         </IconButton>
                       </div>
+                      <TextField
+                        label="Unit Number"
+                        value={aboutMe.unitNumber}
+                        onChange={(e) =>
+                          setAboutMe({
+                            ...aboutMe,
+                            unitNumber: e.target.value,
+                          })
+                        }
+                        fullWidth
+                        margin="normal"
+                        size="small"
+                        error={!!aboutMeErrors.unitNumber}
+                        helperText={aboutMeErrors.unitNumber}
+                      />
                       <TextField
                         label="Date of Birth"
                         value={aboutMe.dateOfBirth}
