@@ -59,7 +59,7 @@ function JobListingOverall() {
   }, [isLoaded]);
 
   useEffect(() => {
-    if (isLoaded) {
+    if (isLoaded && currUser) {
       const userId = currUser.id;
       axios
         .get(`${BACKEND_URL}/listings/companysearchbyuserid/${userId}`)
