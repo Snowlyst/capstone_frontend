@@ -50,14 +50,11 @@ function Homepage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-<<<<<<< HEAD
     console.log("component running");
-=======
     const url = window.location.href;
     if (url === "http://localhost:3000/#") {
       navigate("dashboard");
     }
->>>>>>> main
   }, []);
 
   useEffect(() => {
