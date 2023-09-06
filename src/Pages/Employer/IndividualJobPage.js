@@ -46,7 +46,7 @@ import UpdateIcon from "@mui/icons-material/Update";
 import { ThemeProvider } from "@emotion/react";
 import "../../Assets/Styles/Homepage.css";
 
-function IndividualJobPage() {
+function IndividualJobPage(props) {
   const [modalOpen, setModalOpen] = useState(true);
   const [axiosLoading, setAxiosLoading] = useState(false);
   const [jobInfo, setJobInfo] = useState(null);
@@ -59,6 +59,9 @@ function IndividualJobPage() {
   const [displayAdminButtons, setDisplayAdminButtons] = useState(false);
 
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+  useEffect(() => {
+    setJobId(props.jobsId);
+  }, [props]);
 
   useEffect(() => {
     const retrieveJobInfo = async () => {
@@ -67,6 +70,7 @@ function IndividualJobPage() {
           axios
             .get(`${BACKEND_URL}/company/jobs/${jobId}`)
             .then((response) => {
+              console.log(response.data);
               setJobInfo(response.data[0]);
             })
             .catch((error) => {
@@ -102,10 +106,11 @@ function IndividualJobPage() {
       setUpdateDate(formattedDateTime);
       console.log(jobInfo.description);
       setDescription(jobInfo.description);
-      if (currUser.userRoleId === 1 || currUser.userRoleId === 3) {
-        setDisplayAdminButtons(true);
-      } else {
+
+      if (props || currUser.userRoleId === 2) {
         setDisplayAdminButtons(false);
+      } else {
+        setDisplayAdminButtons(true);
       }
     }
   }, [jobInfo]);

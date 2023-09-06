@@ -20,7 +20,7 @@ import { useUserContext } from "../../Components/UserContext";
 import AxiosLoader from "../../Components/AxiosLoader";
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
-function AdminApproveDenyUserCompanies() {
+function AdminManageExistingUserCompany() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [usersData, setUsersData] = useState("");
   const [usersDisplay, setUsersDisplay] = useState("");
@@ -29,25 +29,10 @@ function AdminApproveDenyUserCompanies() {
   const { currUser } = useUserContext();
   const [accessToken, setAccessToken] = useState("");
   const [currentEntitySelection, setCurrentEntitySelection] = useState("");
-  const [openModal, setOpenModal] = useState(false);
-  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [userMode, setUserMode] = useState(true);
   const [axiosLoading, setAxiosLoading] = useState(false);
 
   const navigate = useNavigate();
-
-  //for modal
-  const style = {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: 400,
-    bgcolor: "background.paper",
-    border: "2px solid #000",
-    boxShadow: 24,
-    p: 4,
-  };
 
   //make sure currUser is set or else the navigate gonna boot everyone off the screen
   useEffect(() => {
@@ -81,7 +66,7 @@ function AdminApproveDenyUserCompanies() {
       if (currUser.userRoleId === 1) {
         setAxiosLoading(true);
         axios
-          .get(`${BACKEND_URL}/users/admin/checkunverifieduserandcompany`, {
+          .get(`${BACKEND_URL}/users/admin/checkverifiedusersandcompany`, {
             headers: {
               Authorization: `Bearer ${accessToken}`,
             },
@@ -299,60 +284,22 @@ function AdminApproveDenyUserCompanies() {
     }
   }, [isLoaded, currUser]);
 
-  const onRequestChange = (e) => {
-    e.preventDefault();
-    if (currentEntitySelection === "") {
-      Swal.fire(
-        "Error",
-        "You have not selected Any Entity to Reject!",
-        "error"
-      );
-      return;
-    }
-    console.log(currentEntitySelection);
-    setIsButtonDisabled(true);
-
-    setTimeout(() => {
-      setIsButtonDisabled(false);
-    }, 5000);
-    handleOpen();
-  };
-
-  // these are for modal use
-
-  const handleOpen = () => {
-    setOpenModal(true);
-  };
-
-  const handleClose = () => {
-    setOpenModal(false);
-  };
-
-  //accepting a user
-  const onAcceptUser = (e) => {
-    e.preventDefault();
-    if (currentEntitySelection === "") {
-      Swal.fire("Error", "You have not selected Any User to Accept!", "error");
-      return;
-    }
-    const selection = usersData[currentEntitySelection].id;
-    console.log(selection);
-
+  //unverifying a user (removing verify perms)
+  const unverifyUser = () => {
+    const userId = usersData[currentEntitySelection].id;
+    console.log(userId);
     const dataToSend = {
-      entityId: selection,
+      userId: userId,
     };
-    setAxiosLoading(true);
     axios
-      .put(`${BACKEND_URL}/users/admin/approveunverifieduser/`, dataToSend, {
+      .put(`${BACKEND_URL}/users/admin/unverifyuser`, dataToSend, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       })
-      .then(() => {
-        return Swal.fire("Success", "User has been approved", "success");
-      })
-      .then(() => {
-        setAxiosLoading(false);
+      .then((info) => {
+        console.log(info);
+        return Swal.fire("Success", "User has been unverified", "success");
       })
       .catch((error) => {
         console.log(error);
@@ -361,80 +308,23 @@ function AdminApproveDenyUserCompanies() {
         window.location.reload();
       });
   };
-  //handle Reject
-  const handleReject = () => {
-    setAxiosLoading(true);
-    if (userMode) {
-      const entityId = usersData[currentEntitySelection].id;
-      axios
-        .delete(`${BACKEND_URL}/users/admin/deleteunverifieduser/${entityId}`, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        })
-        .then((output) => {
-          console.log(output);
-          handleClose();
-          setAxiosLoading(false);
-          return Swal.fire("Success", "User has been Deleted", "success");
-        })
-        .catch((error) => {
-          console.log(error);
-        })
-        .finally(() => {
-          window.location.reload();
-        });
-    } else {
-      const entityId = companyData[currentEntitySelection].id;
-      console.log(entityId);
-      axios
-        .delete(
-          `${BACKEND_URL}/company/admin/deleteunverifiedcompany/${entityId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        )
-        .then((output) => {
-          console.log(output);
-          handleClose();
-          setAxiosLoading(false);
-          return Swal.fire("Success", "Company has been Deleted", "success");
-        })
-        .catch((error) => {
-          console.log(error);
-        })
-        .finally(() => {
-          window.location.reload();
-        });
-    }
-  };
 
-  // accept company
-  const onAcceptCompany = (e) => {
-    e.preventDefault();
-    if (currentEntitySelection === "") {
-      Swal.fire("Error", "You have not selected Any User to Accept!", "error");
-      return;
-    }
-    const selection = companyData[currentEntitySelection].id;
-    console.log(selection);
+  //unverifying a company (removing verify perms)
+  const unverifyCompany = () => {
+    const companyId = companyData[currentEntitySelection].id;
+    console.log(companyId);
     const dataToSend = {
-      entityId: selection,
+      companyId: companyId,
     };
-    setAxiosLoading(true);
     axios
-      .put(`${BACKEND_URL}/company/admin/acceptunverifiedcompany`, dataToSend, {
+      .put(`${BACKEND_URL}/company/admin/unverifycompany`, dataToSend, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       })
       .then((info) => {
-        return Swal.fire("Success", "Company has been approved", "success");
-      })
-      .then(() => {
-        setAxiosLoading(false);
+        console.log(info);
+        return Swal.fire("Success", "Company has been unverified", "success");
       })
       .catch((error) => {
         console.log(error);
@@ -479,13 +369,13 @@ function AdminApproveDenyUserCompanies() {
                       fontSize: "1.5vw",
                     }}
                   >
-                    Users pending Approval
+                    Current Verified Users
                   </Typography>
                   <Stack direction="column" sx={{ pl: 1.5 }}>
                     <Box
                       sx={{
                         width: "20vw",
-                        height: "79vh",
+                        height: "72vh",
                         overflow: "auto",
                         textOverflow: "ellipsis",
                         WebkitLineClamp: "3",
@@ -496,7 +386,7 @@ function AdminApproveDenyUserCompanies() {
                       {usersDisplay.length === 0 && userMode ? (
                         <Box sx={{ mt: "5vh", width: "10vw", ml: "5vw" }}>
                           <Typography variant="darkP">
-                            No Users require Approval as of now!
+                            No current verified users in Database!
                           </Typography>
                         </Box>
                       ) : null}
@@ -506,7 +396,7 @@ function AdminApproveDenyUserCompanies() {
                       {companyDisplay.length === 0 && !userMode ? (
                         <Box sx={{ mt: "5vh", width: "10vw", ml: "5vw" }}>
                           <Typography variant="darkP">
-                            No Companies require Approval as of now!
+                            No current verified companies in Database!
                           </Typography>
                         </Box>
                       ) : null}
@@ -672,7 +562,7 @@ function AdminApproveDenyUserCompanies() {
                               Address:{" "}
                               <Typography variant="p">
                                 {companyData[currentEntitySelection].address ||
-                                  "KEK ROAD VOLUME 1 HIGH ROAD HAHAHAHAHAHA"}
+                                  "RANDOM ROAD 1"}
                               </Typography>
                             </Typography>
                           </Box>
@@ -708,104 +598,336 @@ function AdminApproveDenyUserCompanies() {
                     </Grid>
                   </>
                 ) : null}
-              </Grid>
-              <Box sx={{ mt: "3vh" }}>
-                <Stack direction="row" spacing={7}>
-                  {userMode ? (
-                    <Button
-                      classes={{ root: "orange" }}
-                      variant="contained"
-                      onClick={onAcceptUser}
-                      style={{
-                        height: "3vh",
-                        width: "20vw",
-                      }}
-                    >
-                      Approve User
-                    </Button>
-                  ) : (
-                    <Button
-                      classes={{ root: "orange" }}
-                      variant="contained"
-                      onClick={onAcceptCompany}
-                      style={{
-                        height: "3vh",
-                        width: "20vw",
-                      }}
-                    >
-                      Approve Company
-                    </Button>
-                  )}
-                  {userMode ? (
-                    <Button
-                      classes={{ root: "red" }}
-                      variant="contained"
-                      onClick={onRequestChange}
-                      style={{
-                        height: "3vh",
-                        width: "20vw",
-                      }}
-                    >
-                      Reject(Delete) User
-                    </Button>
-                  ) : (
-                    <Button
-                      classes={{ root: "red" }}
-                      variant="contained"
-                      onClick={onRequestChange}
-                      style={{
-                        height: "3vh",
-                        width: "20vw",
-                      }}
-                    >
-                      Reject(Delete) Company
-                    </Button>
-                  )}
-                </Stack>
-
-                <Modal open={openModal} onClose={() => handleClose()}>
-                  <Box sx={style}>
-                    <Typography
-                      variant="h5"
-                      sx={{ fontWeight: theme.typography.h5.fontWeightBold }}
-                    >
-                      Are you SURE? This process is irreversible, and all
-                      RELATED records to this Entity will be deleted.
+                {currentEntitySelection === "" && !userMode ? (
+                  <Box sx={{ mt: "15vh", width: "20vw", ml: "15vw" }}>
+                    <Typography variant="darkP">
+                      No Company Selected Yet!
                     </Typography>
-                    <Typography
-                      variant="darkP"
-                      sx={{ fontWeight: theme.typography.darkP.fontWeightBold }}
-                    >
-                      Delete button is disabled for 5 seconds to prevent
-                      accidents.
-                    </Typography>
-                    <Stack direction="row" spacing={15}>
-                      <Button
-                        classes={{ root: "orange" }}
-                        variant="contained"
-                        component="span"
-                        onClick={handleClose}
-                        style={{
-                          marginTop: "1vh",
-                        }}
-                      >
-                        Do Not Delete
-                      </Button>
-                      <Button
-                        classes={{ root: "red" }}
-                        variant="contained"
-                        component="span"
-                        onClick={handleReject}
-                        style={{
-                          marginTop: "1vh",
-                        }}
-                        disabled={isButtonDisabled}
-                      >
-                        Delete
-                      </Button>
-                    </Stack>
                   </Box>
-                </Modal>
+                ) : null}
+                {currentEntitySelection !== "" && userMode ? (
+                  <>
+                    <Grid item xs={2.5} sx={{ ml: "2.5vw" }}>
+                      <Box sx={{ ml: "13.5vw", mt: "3vh" }}>
+                        <img
+                          src={
+                            usersData[currentEntitySelection].avatarUrl ||
+                            "https://firebasestorage.googleapis.com/v0/b/verve-55239.appspot.com/o/images%2FImage_not_available.png?alt=media&token=0a5a0495-5de3-4fea-93a2-3b4b95b22f64"
+                          }
+                          alt="Alt"
+                          style={{
+                            height: "10vh",
+                            width: "10vw",
+                            objectFit: "fill",
+                            borderTopLeftRadius: "40px",
+                            borderTopRightRadius: "40px",
+                          }}
+                        />
+                      </Box>
+                    </Grid>
+                    <Grid item xs={9.5} sx={{ ml: "2.5vw", width: "20vw" }}>
+                      <Stack direction="row" sx={{ width: "45vw" }}>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: theme.typography.h6.fontWeightBold,
+                            fontSize: "1.3vw",
+                            width: "22.5vw",
+                          }}
+                        >
+                          Name:
+                          <Typography
+                            variant="darkP"
+                            sx={{ fontSize: "1.3vw", width: "22.5vh" }}
+                          >
+                            {" "}
+                            {usersData[currentEntitySelection].firstName}{" "}
+                            {usersData[currentEntitySelection].lastName}
+                          </Typography>
+                        </Typography>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: theme.typography.h6.fontWeightBold,
+                            fontSize: "1.3vw",
+                          }}
+                        >
+                          Date of Birth:
+                          <Typography
+                            variant="darkP"
+                            sx={{ fontSize: "1.3vw", width: "22.5vh" }}
+                          >
+                            {
+                              usersData[currentEntitySelection]
+                                .user_personal_detail.dateOfBirth
+                            }
+                          </Typography>
+                        </Typography>
+                      </Stack>
+                      <Stack direction="row" sx={{ width: "45vw", mt: "2vh" }}>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: theme.typography.h6.fontWeightBold,
+                            fontSize: "1.3vw",
+                            width: "22.5vw",
+                          }}
+                        >
+                          IC:
+                          <Typography
+                            variant="darkP"
+                            sx={{ fontSize: "1.3vw ", width: "22.5vw" }}
+                          >
+                            {
+                              usersData[currentEntitySelection]
+                                .user_personal_detail.identificationNumber
+                            }
+                          </Typography>
+                        </Typography>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: theme.typography.h6.fontWeightBold,
+                            fontSize: "1.3vw",
+                          }}
+                        >
+                          Gender:
+                          <Typography
+                            variant="darkP"
+                            sx={{ fontSize: "1.3vw" }}
+                          >
+                            {
+                              usersData[currentEntitySelection]
+                                .user_personal_detail.gender
+                            }
+                          </Typography>
+                        </Typography>
+                      </Stack>
+                      <Stack direction="row" sx={{ width: "45vw", mt: "2vh" }}>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: theme.typography.h6.fontWeightBold,
+                            fontSize: "1.3vw",
+                            width: "22.5vw",
+                          }}
+                        >
+                          Mobile:
+                          <Typography
+                            variant="darkP"
+                            sx={{ fontSize: "1.3vw ", width: "22.5vw" }}
+                          >
+                            {
+                              usersData[currentEntitySelection]
+                                .user_personal_detail.mobileNumber
+                            }
+                          </Typography>
+                        </Typography>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: theme.typography.h6.fontWeightBold,
+                            fontSize: "1.3vw",
+                          }}
+                        >
+                          Email:
+                          <Typography
+                            variant="darkP"
+                            sx={{ fontSize: "1.3vw" }}
+                          >
+                            {usersData[currentEntitySelection].email}
+                          </Typography>
+                        </Typography>
+                      </Stack>
+                      <Stack
+                        direction="row"
+                        sx={{ width: "45vw", mt: "2vh", height: "7vh" }}
+                      >
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: theme.typography.h6.fontWeightBold,
+                            fontSize: "1.3vw",
+                            width: "45vw",
+                          }}
+                        >
+                          Address:
+                          <Typography
+                            variant="darkP"
+                            sx={{
+                              fontSize: "1.3vw ",
+                              width: "45vw",
+                            }}
+                          >
+                            {
+                              usersData[currentEntitySelection]
+                                .user_personal_detail.address
+                            }
+                          </Typography>
+                        </Typography>
+                      </Stack>
+                      <Stack direction="row" sx={{ width: "45vw", mt: "2vh" }}>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: theme.typography.h6.fontWeightBold,
+                            fontSize: "1.3vw",
+                            width: "45vw",
+                          }}
+                        >
+                          Current Work Status:
+                          <Typography
+                            variant="darkP"
+                            sx={{
+                              fontSize: "1.3vw ",
+                              width: "45vw",
+                              height: "7vh",
+                            }}
+                          >
+                            {
+                              usersData[currentEntitySelection]
+                                .user_personal_detail.currentWorkStatus
+                            }
+                          </Typography>
+                        </Typography>
+                      </Stack>
+                      <Stack direction="row" sx={{ width: "45vw", mt: "2vh" }}>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: theme.typography.h6.fontWeightBold,
+                            fontSize: "1.3vw",
+                            width: "45vw",
+                          }}
+                        >
+                          Readiness to RTW:
+                          <Typography
+                            variant="darkP"
+                            sx={{
+                              fontSize: "1.3vw ",
+                              width: "45vw",
+                              height: "7vh",
+                            }}
+                          >
+                            {
+                              usersData[currentEntitySelection]
+                                .user_personal_detail.ReadinessToRtw
+                            }
+                          </Typography>
+                        </Typography>
+                      </Stack>
+                      <Stack direction="row" sx={{ width: "45vw", mt: "2vh" }}>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: theme.typography.h6.fontWeightBold,
+                            fontSize: "1.3vw",
+                            width: "45vw",
+                          }}
+                        >
+                          Physical Barriers to RTW:
+                          <Typography
+                            variant="darkP"
+                            sx={{
+                              fontSize: "1.3vw ",
+                              width: "45vw",
+                              height: "7vh",
+                            }}
+                          >
+                            {
+                              usersData[currentEntitySelection]
+                                .user_personal_detail.physicalBarriersToRtw
+                            }
+                          </Typography>
+                        </Typography>
+                      </Stack>
+                      <Stack direction="row" sx={{ width: "45vw", mt: "2vh" }}>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: theme.typography.h6.fontWeightBold,
+                            fontSize: "1.3vw",
+                            width: "45vw",
+                          }}
+                        >
+                          Time frame to RTW:
+                          <Typography
+                            variant="darkP"
+                            sx={{
+                              fontSize: "1.3vw ",
+                              width: "45vw",
+                              height: "7vh",
+                            }}
+                          >
+                            {
+                              usersData[currentEntitySelection]
+                                .user_personal_detail.timeFrameToRtw
+                            }
+                          </Typography>
+                        </Typography>
+                      </Stack>
+                      <Stack direction="row" sx={{ width: "45vw", mt: "2vh" }}>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: theme.typography.h6.fontWeightBold,
+                            fontSize: "1.3vw",
+                            width: "45vw",
+                          }}
+                        >
+                          Active Treatment:
+                          <Typography
+                            variant="darkP"
+                            sx={{
+                              fontSize: "1.3vw ",
+                              width: "45vw",
+                              height: "7vh",
+                            }}
+                          >
+                            {
+                              usersData[currentEntitySelection]
+                                .user_personal_detail.activeTreatment
+                            }
+                          </Typography>
+                        </Typography>
+                      </Stack>
+                    </Grid>
+                  </>
+                ) : null}
+                {currentEntitySelection === "" && userMode ? (
+                  <Box sx={{ mt: "15vh", width: "20vw", ml: "15vw" }}>
+                    <Typography variant="darkP">
+                      No User Selected Yet!
+                    </Typography>
+                  </Box>
+                ) : null}
+              </Grid>
+              <Box sx={{ mt: "3vh", ml: "12vw" }}>
+                {userMode ? (
+                  <Button
+                    classes={{ root: "red" }}
+                    variant="contained"
+                    onClick={unverifyUser}
+                    style={{
+                      height: "3vh",
+                      width: "20vw",
+                    }}
+                  >
+                    Remove Verification from User
+                  </Button>
+                ) : (
+                  <Button
+                    classes={{ root: "red" }}
+                    variant="contained"
+                    onClick={unverifyCompany}
+                    style={{
+                      height: "3vh",
+                      width: "20vw",
+                    }}
+                  >
+                    Remove Verification from Company
+                  </Button>
+                )}
               </Box>
             </Stack>
           </Stack>
@@ -815,4 +937,4 @@ function AdminApproveDenyUserCompanies() {
   );
 }
 
-export default AdminApproveDenyUserCompanies;
+export default AdminManageExistingUserCompany;
