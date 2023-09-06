@@ -1,9 +1,8 @@
 import { Box } from "@mui/material";
 import { Route, Routes } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import PageLoader from "./Components/PageLoader";
-import { AuthenticationGuard } from "./Components/AuthenticationGuard";
 import Navbar from "./Components/Navbar";
 import Homepage from "./Pages/Homepage";
 import Categories from "./Pages/Categories";
@@ -27,13 +26,26 @@ import IndividualJobPage from "./Pages/Employer/IndividualJobPage";
 import AdminDashboard from "./Pages/Administrator/AdminDashboard";
 import AdminApproveDenyJob from "./Pages/Administrator/AdminApproveDenyJob";
 import AdminApproveDenyUserCompanies from "./Pages/Administrator/AdminApproveDenyUser";
+import EditProfile from "./Pages/User/EditProfile";
+import Swal from "sweetalert2";
+
 function App() {
   const { isAuthenticated, isLoading } = useAuth0();
+  const [authLoading, setAuthLoading] = useState(false);
+
   useEffect(() => {
     console.log(isAuthenticated);
   }, [isAuthenticated]);
 
-  if (isLoading) {
+  useEffect(() => {
+    if (isLoading) {
+      setAuthLoading(true);
+    } else {
+      setAuthLoading(false);
+    }
+  }, [isLoading]);
+
+  if (authLoading) {
     return (
       <div className="page-layout">
         <PageLoader />
@@ -41,72 +53,72 @@ function App() {
     );
   }
 
+  // function RequireAuth({ children, redirectTo }) {
+  //   const { isAuthenticated, loginWithRedirect } = useAuth0(); // Get Auth0 authentication status and functions
+
+  //   useEffect(() => {
+  //     // Redirect to Auth0 login if not authenticated
+  //     const login = async () => {
+  //       if (!isAuthenticated) {
+  //         await loginWithRedirect({
+  //           appState: {
+  //             returnTo: "/",
+  //           },
+  //           authorizationParams: {
+  //             screen_hint: "Login/Register",
+  //           },
+  //         });
+  //       } else {
+  //         return;
+  //       }
+  //     };
+  //     login();
+  //   }, [isAuthenticated, loginWithRedirect]);
+
+  //   return isAuthenticated ? children : null;
+  // }
+
   return (
     <Box>
       <Navbar />
       <Routes>
-        {/* {isAuthenticated ? (
-          <div> */}
         <Route path="/" element={<Homepage />} />
         <Route path="/categories" element={<Categories />} />
-        <Route path="/categories/:categoryId" element={<CategoriesListing />} />
-        <Route
-          path="/dashboard"
-          element={<AuthenticationGuard component={Dashboard} />}
-        />
-        <Route path="/listing/:listingId" element={<IndividualListing />} />
-        <Route
-          path="/profile"
-          element={<AuthenticationGuard component={Profile} />}
-        />
-        <Route
-          path="/search"
-          element={<AuthenticationGuard component={Search} />}
-        />
-        <Route path="/updateprofile" element={<UpdateProfile />} />
+        <Route path="/search" element={<Search />} />
         <Route path="/company/jobs/:jobId" element={<IndividualJobPage />} />
-        <Route
-          path="/jobpost"
-          element={<AuthenticationGuard component={JobPost} />}
-        />
-        <Route
-          path="/userresumelist"
-          element={<AuthenticationGuard component={ResumeList} />}
-        />
-        <Route
-          path="/companyprofile/:companyId"
-          element={<AuthenticationGuard component={CompanyProfile} />}
-        />
-        <Route path="createresume" element={<CreateResume />} />
-        <Route
-          path="/joblisting"
-          element={<AuthenticationGuard component={JobListingOverall} />}
-        />
-        <Route
-          path="/admin/dashboard"
-          element={<AuthenticationGuard component={AdminDashboard} />}
-        />
-        <Route
-          path="/admin/checkjobs"
-          element={<AuthenticationGuard component={AdminApproveDenyJob} />}
-        />
-        <Route
-          path="/admin/checkusercompanies"
-          element={
-            <AuthenticationGuard component={AdminApproveDenyUserCompanies} />
-          }
-        />
+        <Route path="/companyprofile/:companyId" element={<CompanyProfile />} />
+        <Route path="/categories/:categoryId" element={<CategoriesListing />} />
         {/* These 4 Pages are Test pages, to be deleted near the end */}
         <Route path="/onemap" element={<OnemapApiTest />} />
         <Route path="/pdf" element={<PDFReadingTest />} />
         <Route path="/googlecalendar" element={<GoogleCalendar />} />
         <Route path="/firebaseupload" element={<FirebaseUpload />} />
-        {/* Error Page */}
-        <Route path="*" element={<Error />} />
-        {/* </div>
-        ) : (
-          ""
-        )} */}
+        <Route path="/listing/:listingId" element={<IndividualListing />} />
+
+        {/* <Route
+          path="*"
+          element={
+            <RequireAuth> */}
+        {/* <Routes> */}
+        <Route path="/dashboard" element={<Dashboard />} />
+
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/editprofile/:userId" element={<EditProfile />} />
+        <Route path="/jobpost" element={<JobPost />} />
+        <Route path="/userresumelist" element={<ResumeList />} />
+        <Route path="/updateprofile" element={<UpdateProfile />} />
+        <Route path="createresume" element={<CreateResume />} />
+        <Route path="/joblisting" element={<JobListingOverall />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/admin/checkjobs" element={<AdminApproveDenyJob />} />
+        <Route
+          path="/admin/checkusercompanies"
+          element={<AdminApproveDenyUserCompanies />}
+        />
+        {/* </Routes>
+            </RequireAuth>
+          }
+        ></Route> */}
       </Routes>
     </Box>
   );

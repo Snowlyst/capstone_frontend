@@ -4,9 +4,9 @@ import {
   Grid,
   Typography,
   InputLabel,
-  InputAdornment,
+  // InputAdornment,
   FormControl,
-  Input,
+  // Input,
   Stack,
   Button,
   Select,
@@ -18,8 +18,8 @@ import { useAuth0 } from "@auth0/auth0-react";
 import axios from "axios";
 import { theme } from "../Assets/Styles/Theme";
 import { useUserContext } from "../Components/UserContext";
-import PlaceIcon from "@mui/icons-material/Place";
-import WorkHistoryIcon from "@mui/icons-material/WorkHistory";
+// import PlaceIcon from "@mui/icons-material/Place";
+// import WorkHistoryIcon from "@mui/icons-material/WorkHistory";
 import SearchIcon from "@mui/icons-material/Search";
 import desktop from "../Assets/Images/homeBackground/desktop2.png";
 import mobile from "../Assets/Images/homeBackground/mobile.png";
@@ -45,9 +45,13 @@ function Homepage() {
   const imgHeight = windowHeight >= 900 ? "80%" : "65%";
   const vh = windowHeight >= 950 ? "80vh" : "70vh";
   const { currUser, setCurrUser } = useUserContext();
-  const roles = { user: 1, admin: 2, employer: 3 };
+  const roles = { admin: 1, user: 2, employer: 3 };
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
   const navigate = useNavigate();
+
+  useEffect(() => {
+    console.log("component running");
+  }, []);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -68,6 +72,9 @@ function Homepage() {
             currentUser.role = roles.user;
             console.log("Role is: ", currentUser);
           } else if (role === "employer") {
+            currentUser.role = roles.employer;
+            console.log("Role: ", role);
+          } else if (role === "admin") {
             currentUser.role = roles.employer;
             console.log("Role: ", role);
           }

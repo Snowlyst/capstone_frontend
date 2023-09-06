@@ -34,53 +34,53 @@ import "sweetalert2/dist/sweetalert2.min.css";
 import * as SwalMsgs from "../../Utils/SwalMsgs";
 import { useUserContext } from "../../Components/UserContext";
 import AxiosLoader from "../../Components/AxiosLoader";
+import { useNavigate } from "react-router-dom";
 
 function Profile() {
   // Set States
-  const { isAuthenticated } = useAuth0();
+  let navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth0();
   const [axiosLoading, setAxiosLoading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
   const { currUser, categories, location } = useUserContext();
-  const [currentlyWorking, setCurrentlyWorking] = useState(false);
+  const [currentlyWorking, setCurrentlyWorking] = useState("");
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
   const cancerDiag = options.cancerDiag.sort(
     (a, b) => -b.firstLetter.localeCompare(a.firstLetter)
   );
-  // combinedAddress: "", // To display combined Add
-  const [fieldValues, setFieldValues] = useState({
-    userId: "",
-    firstName: "", // users 1
-    lastName: "", // users 2
-    identificationNumber: "", // UPD 3
-    mobileNumber: "", // UPD 4
-    dateOfBirth: "", // UPD 5
-    cancerDiagnosis: "", // UPD 6
-    activeTreatment: "", // UPD 7
-    gender: "", // UPD 8
-    postalCode: "", // UPD 9
-    housingType: "", // UPD 10
-    displayedAddress: "", // STREET ADDRESS AFTER POSTAL CODE UPD 11
-    unitNumber: "", // UPD 12
-    livingArrangement: "", // UPD 13
-    currentWorkStatus: "", // UPD 14
-    occupation: "", // UPD 15
-    monthlySalary: "", // where is this ??? UPD 27
-    cancerImpactOnFinances: "", // UPD 16
-    dateOfLastEmployment: "", // UPD 17
-    readinessScaleToRtw: "", // readiness_to_rtw UPD 18
-    timeFrameToRtw: "", // time_frame_to_rtw UPD 19
-    employedReadinessScale: "", // employed_readiness_scale UPD 20
-    currentHealthStatus: "", // UPD 21
-    physicalHealthStatus: "", //current physical health status UPD 22
-    currentMentalHealthStatus: "", // current mental health status UPD 23
-    physicalBarriersToRtw: "", // UPD 24
-    psychosocialBarriersToRtw: "", // psychosocial barriers to rtw UPD 25
-    additionalInformation: "", // UPD 26
-  });
+  const [combinedAddress, setCombinedAddress] = useState(""); // To display combined Add
+  const initialFieldValues = {
+    identificationNumber: "",
+    mobileNumber: "",
+    dateOfBirth: "",
+    cancerDiagnosis: "",
+    activeTreatment: "",
+    gender: "",
+    postalCode: "",
+    housingType: "",
+    streetAddress: "",
+    unitNumber: "",
+    livingArrangement: "",
+    currentWorkStatus: "",
+    occupation: "",
+    monthlySalary: "",
+    cancerImpactOnFinance: "",
+    dateOfLastEmployment: "",
+    readinessToRtw: "",
+    timeFrameToRtw: "",
+    employmentReadinessScale: "",
+    currentHealthStatus: "",
+    currentPhysicalHealthStatus: "",
+    currentMentalHealthStatus: "",
+    physicalBarriersToRtw: "",
+    psychosocialBarriersToRtw: "",
+    additionalInformation: "",
+  };
+  const [fieldValues, setFieldValues] = useState(initialFieldValues);
 
   useEffect(() => {
     console.log(currUser);
     if (isAuthenticated && currUser) {
-      handleChange("userId", currUser.id);
       handleChange("firstName", currUser.firstName);
       handleChange("lastName", currUser.lastName);
     }
@@ -103,65 +103,123 @@ function Profile() {
   const handleSearchPostal = (e) => {
     e.preventDefault();
     handleChange("postalCode", "");
+    delete fieldValues.streetAddress;
     const searchQuery = fieldValues.postalCode;
     axios
       .get(
         `https://developers.onemap.sg/commonapi/search?searchVal=${searchQuery}&returnGeom=Y&getAddrDetails=Y`
       )
       .then((info) => {
-        const spreadData = info.data.results.map((info, index) => {
+        info.data.results.map((info, index) => {
           console.log(info);
           console.log(info.ADDRESS);
+
           // handleChange("address", info.ADDRESS);
+          if (info.ADDRESS === "" || info.ADDRESS === null) {
+            Swal.fire(
+              "Error",
+              "There is no such postal code. Please try again.",
+              "error"
+            );
+          } else {
+            handleChange("streetAddress", info.ADDRESS);
+          }
           return <div key={index}>Address: {info.ADDRESS}</div>;
         });
-        handleChange("displayedAddress", spreadData);
       })
       .catch((error) => {
         console.log(error);
       });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const newFieldErrors = {};
     Object.keys(fieldValues).forEach((fieldName) => {
-      if (fieldValues[fieldName].trim() === "") {
-        newFieldErrors[fieldName] = true;
+      if (typeof fieldValues[fieldName] === "string") {
+        if (fieldValues[fieldName].trim() === "") {
+          newFieldErrors[fieldName] = true;
+        }
+      } else if (typeof fieldValues[fieldName] === "object") {
+        // Check if the object is empty (no keys)
+        if (Object.keys(fieldValues[fieldName]).length === 0) {
+          newFieldErrors[fieldName] = true;
+        }
       }
     });
+
+    if (currentlyWorking) {
+      delete newFieldErrors.dateOfLastEmployment;
+      delete newFieldErrors.readinessToRtw;
+      delete fieldValues.dateOfLastEmployment;
+      delete fieldValues.readinessToRtw;
+    }
+
     setFieldErrors(newFieldErrors);
     if (newFieldErrors && newFieldErrors.length > 0) {
+      setAxiosLoading(false);
       Swal.fire(SwalMsgs.missingFormInfoGentle);
     } else {
+      setAxiosLoading(true);
       console.log(fieldValues);
-      // do form checks b4 axios call to submit
-      // if (fieldValues && fieldValues.housingType === "Private Landed") {
-      //   const combinedAdd = `${fieldValues.unitNumber} ${fieldValues.displayedAddress}, Singapore ${fieldValues.postalCode}`;
-      //   handleChange("combinedAddress", combinedAdd);
-      // } else {
-      //   const combinedAdd = `${fieldValues.displayedAddress}, ${fieldValues.unitNumber}, Singapore ${fieldValues.postalCode}`;
-      //   handleChange("combinedAddress", combinedAdd);
-      // }
-      // const objToSend = {}
-    }
-  };
 
-  useEffect(() => {
-    // Fetch user data from the API
-    axios
-      .get("http://localhost:8080/users/personalinfo/3")
-      .then((response) => {
-        const fetchedData = response.data;
-        setFieldValues(fetchedData);
-        console.log(fetchedData);
-        handleChange("firstName", fetchedData.firstName);
-        handleChange("lastName", fetchedData.lastName);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }, []);
+      if (fieldValues && fieldValues.housingType === "Private Landed") {
+        const combinedAdd = `${fieldValues.unitNumber} ${fieldValues.streetAddress}, Singapore ${fieldValues.postalCode}`;
+        setCombinedAddress(combinedAdd);
+      } else {
+        const combinedAdd = `${fieldValues.streetAddress}, ${fieldValues.unitNumber}, Singapore ${fieldValues.postalCode}`;
+        setCombinedAddress(combinedAdd);
+      }
+
+      console.log(fieldValues);
+
+      const profile = { fieldValues: fieldValues };
+      try {
+        const userProfile = await axios.post(
+          `${BACKEND_URL}/users/userprofile/${currUser.id}`,
+          profile,
+          {
+            headers: {
+              Authorization: `Bearer ${currUser.accessToken}`,
+            },
+          }
+        );
+        console.log(userProfile.data);
+        if (userProfile != null) {
+          setAxiosLoading(false);
+          setFieldErrors({});
+          setFieldValues(initialFieldValues);
+        }
+        Swal.fire(
+          SwalMsgs.successPostingAwaitApprovalWButtons(
+            "personal information",
+            "Homepage",
+            "Profile"
+          )
+        ).then((result) => {
+          if (result.isDenied) {
+            navigate(`/`);
+          }
+        });
+      } catch (error) {
+        console.log(error);
+        Swal.fire(SwalMsgs.errorPosting);
+      } finally {
+        setAxiosLoading(false);
+        // setModalOpen(false);
+      }
+    }
+  }; // end handle Submit
+
+  // useEffect(() => {
+  //   if (isAuthenticated && user) {
+  //     if (!currUser.approvedByAdmin) {
+  //       setAxiosLoading(false);
+  //       // setDisableSubmit(true);
+  //       Swal.fire(SwalMsgs.awaitingAccountApproval);
+  //     }
+  //   }
+  // }, []);
 
   return (
     <ThemeProvider theme={theme}>
@@ -235,23 +293,29 @@ function Profile() {
                               flex: 1,
                               m: 1,
                             }}
+                            InputLabelProps={{
+                              shrink: !!fieldValues.firstName, // This will make the label "shrink" when there's a value
+                            }}
                           />
                           <TextField
                             label="Last Name"
                             required
                             {...theme.textbox.common}
                             value={fieldValues.lastName}
-                            onChange={(e) =>
-                              handleChange("lastName", e.target.value)
-                            }
                             sx={{
                               flex: 1,
                               m: 1,
                             }}
+                            onChange={(e) =>
+                              handleChange("lastName", e.target.value)
+                            }
                             error={fieldErrors.lastName || false}
                             helperText={
                               fieldErrors.lastName && "Last Name is required"
                             }
+                            InputLabelProps={{
+                              shrink: !!fieldValues.firstName, // This will make the label "shrink" when there's a value
+                            }}
                           />
                           <TextField
                             label="NRIC"
@@ -339,7 +403,7 @@ function Profile() {
                               }
                             >
                               <FormControlLabel
-                                value="male"
+                                value="Male"
                                 control={<Radio size="small" />}
                                 label={
                                   <Typography sx={{ fontSize: "small" }}>
@@ -348,7 +412,7 @@ function Profile() {
                                 }
                               />
                               <FormControlLabel
-                                value="female"
+                                value="Female"
                                 control={<Radio size="small" />}
                                 label={
                                   <Typography sx={{ fontSize: "small" }}>
@@ -422,18 +486,17 @@ function Profile() {
                             label="Address"
                             required
                             {...theme.textbox.common}
-                            value={fieldValues.displayedAddress}
+                            value={fieldValues.streetAddress}
                             sx={{
                               flex: 2,
                               m: 1,
                             }}
                             onChange={(e) =>
-                              handleChange("displayedAddress", e.target.value)
+                              handleChange("streetAddress", e.target.value)
                             }
-                            error={fieldErrors.displayedAddress || false}
+                            error={fieldErrors.streetAddress || false}
                             helperText={
-                              fieldErrors.displayedAddress &&
-                              "Address is required"
+                              fieldErrors.streetAddress && "Address is required"
                             }
                           />
                         </Stack>
@@ -515,7 +578,7 @@ function Profile() {
                                 }}
                                 options={cancerDiag}
                                 isOptionEqualToValue={(option, value) =>
-                                  option.label === value
+                                  option.label === value.label
                                 }
                                 groupBy={(option) => option.firstLetter}
                                 getOptionLabel={(option) => option.label}
@@ -641,19 +704,18 @@ function Profile() {
                                 width: 150,
                               }}
                             >
-                              <InputLabel>Occupation</InputLabel>
+                              <InputLabel>
+                                {currentlyWorking === ""
+                                  ? "Occupation"
+                                  : currentlyWorking
+                                  ? "Current Occupation"
+                                  : "Previous Occupation"}
+                              </InputLabel>
                               <Select
-                                label={
-                                  fieldValues.currentWorkStatus
-                                    ? "Current Occupation"
-                                    : "Previous Occupation"
-                                }
+                                label=" occupation"
                                 value={fieldValues.occupation}
                                 onChange={(e) => {
-                                  const value = fieldValues.currentWorkStatus
-                                    ? `Current ${e.target.value}`
-                                    : `Last ${e.target.value}`;
-                                  handleChange("occupation", value);
+                                  handleChange("occupation", e.target.value);
                                 }}
                               >
                                 {options.occupationOptions}
@@ -701,9 +763,8 @@ function Profile() {
                           spacing={3}
                         >
                           <FormControl
-                            variant="outlined"
                             size="small"
-                            error={fieldErrors.cancerImpactOnFinances === ""}
+                            error={fieldErrors.cancerImpactOnFinance || false}
                           >
                             <Tooltip
                               title="To what degree has cancer caused financial problems to you
@@ -712,13 +773,13 @@ function Profile() {
                               <InputLabel>Cancer impact on finances</InputLabel>
                               <Select
                                 label="Cancer impact on finances"
-                                value={fieldValues.cancerImpactOnFinances}
+                                value={fieldValues.cancerImpactOnFinance}
                                 sx={{
                                   width: 250,
                                 }}
                                 onChange={(e) =>
                                   handleChange(
-                                    "cancerImpactOnFinances",
+                                    "cancerImpactOnFinance",
                                     e.target.value
                                   )
                                 }
@@ -731,15 +792,55 @@ function Profile() {
                                   )
                                 )}
                               </Select>
-                              {fieldErrors.cancerImpactOnFinances && (
+                              {fieldErrors.cancerImpactOnFinance && (
                                 <FormHelperText>
                                   Cancer Impact on Finances is required
                                 </FormHelperText>
                               )}
                             </Tooltip>
                           </FormControl>
+
+                          <FormControl
+                            {...theme.textbox.common}
+                            error={
+                              !currentlyWorking
+                                ? fieldErrors.readinessToRtw
+                                : false
+                            }
+                          >
+                            <InputLabel>Readiness Scale to RTW</InputLabel>
+                            {/* <InputLabel>
+                              0 (Not coping) to 10 (Coping well)
+                            </InputLabel> */}
+                            <Typography sx={{ fontSize: "small" }}></Typography>
+                            <Select
+                              label="Readiness Scale to RTW"
+                              sx={{ width: 220 }}
+                              value={fieldValues.readinessToRtw}
+                              onChange={(e) =>
+                                handleChange("readinessToRtw", e.target.value)
+                              }
+                            >
+                              {options.scaleOptions}
+                            </Select>
+
+                            {fieldErrors.readinessToRtw && (
+                              <FormHelperText>Input is required</FormHelperText>
+                            )}
+                          </FormControl>
                         </Stack>
                         {/* row  9 current work status, occupation, basic mthly sal, cancer impact on finance*/}
+                        <Typography
+                          variant="p"
+                          sx={{
+                            color: theme.typography.error.color,
+                            fontSize: "small",
+                            fontWeight: theme.typography.p.fontWeightBold,
+                          }}
+                        >
+                          *For the scales below, 0 is unable to/not ready, 10 is
+                          fully able to/fully ready.{" "}
+                        </Typography>
                         <Stack
                           direction={theme.customStyles.stackCollapseRow}
                           sx={{
@@ -748,7 +849,7 @@ function Profile() {
                           }}
                           spacing={3}
                         >
-                          {!currentlyWorking ? (
+                          {!currentlyWorking && (
                             <>
                               <TextField
                                 label="Date of last employment"
@@ -774,102 +875,63 @@ function Profile() {
                                     : ""
                                 }
                               />
-                              <FormControl
-                                {...theme.textbox.common}
-                                error={
-                                  !currentlyWorking
-                                    ? fieldErrors.readinessScaleToRtw
-                                    : false
-                                }
-                              >
-                                <Tooltip title="On a Scale of 1 to 10. 10 means ready to return to workforce. 1 means not so ready">
-                                  <InputLabel>
-                                    Readiness Scale to RTW
-                                  </InputLabel>
-                                  <Select
-                                    label="Readiness Scale to RTW"
-                                    sx={{ width: 220 }}
-                                    value={fieldValues.readinessScaleToRtw}
-                                    onChange={(e) =>
-                                      handleChange(
-                                        "readinessScaleToRtw",
-                                        e.target.value
-                                      )
-                                    }
-                                  >
-                                    {options.scaleOptions}
-                                  </Select>
-                                  {!currentlyWorking &&
-                                  fieldErrors.readinessScaleToRtw ? (
-                                    <FormHelperText>
-                                      Input is required
-                                    </FormHelperText>
-                                  ) : (
-                                    ""
-                                  )}
-                                </Tooltip>
-                              </FormControl>
-                              <FormControl
-                                {...theme.textbox.common}
-                                variant="outlined"
-                                sx={{ width: 200 }}
-                                error={fieldErrors.timeFrameToRtw === ""}
-                              >
-                                <InputLabel>Time frame to RTW </InputLabel>
-                                <Select
-                                  sx={{ flex: 1 }}
-                                  label="Time Frame to RTW"
-                                  value={fieldValues.timeFrameToRtw}
-                                  onChange={(e) =>
-                                    handleChange(
-                                      "timeFrameToRtw",
-                                      e.target.value
-                                    )
-                                  }
-                                >
-                                  {options.timePeriodOptions}
-                                </Select>
-                                {fieldValues.timeFrameToRtw === "" && (
-                                  <FormHelperText>
-                                    Input is required
-                                  </FormHelperText>
-                                )}
-                              </FormControl>
                             </>
-                          ) : (
+                          )}
+                          <Tooltip title="Time frame needed before being able to return to work">
                             <FormControl
                               {...theme.textbox.common}
                               variant="outlined"
-                              sx={{ width: 250 }}
+                              sx={{ width: 200, height: "42px" }}
+                              error={fieldErrors.timeFrameToRtw || false}
+                            >
+                              <InputLabel>Time frame to RTW </InputLabel>
+                              <Select
+                                sx={{ flex: 1 }}
+                                label="Time Frame to RTW"
+                                value={fieldValues.timeFrameToRtw}
+                                onChange={(e) =>
+                                  handleChange("timeFrameToRtw", e.target.value)
+                                }
+                              >
+                                {options.timePeriodOptions}
+                              </Select>
+                              {fieldErrors.timeFrameToRtw && (
+                                <FormHelperText>
+                                  Input is required
+                                </FormHelperText>
+                              )}
+                            </FormControl>
+                          </Tooltip>
+                          <Tooltip title="Time frame needed before being able to return to work">
+                            <FormControl
+                              {...theme.textbox.common}
+                              variant="outlined"
+                              sx={{ width: 200, height: "42px" }}
                               error={
-                                currentlyWorking
-                                  ? fieldErrors.employedReadinessScale
-                                  : false
+                                fieldErrors.employmentReadinessScale || false
                               }
                             >
-                              <InputLabel>Readiness Scale to RTW </InputLabel>
+                              <InputLabel>Readiness for RTW </InputLabel>
                               <Select
-                                label="Readiness Scale to RTW"
-                                value={fieldValues.employedReadinessScale}
+                                sx={{ flex: 1 }}
+                                label="Readiness for RTW"
+                                value={fieldValues.employmentReadinessScale}
                                 onChange={(e) =>
                                   handleChange(
-                                    "employedReadinessScale",
+                                    "employmentReadinessScale",
                                     e.target.value
                                   )
                                 }
                               >
-                                {options.scaleOptions}
+                                {options.employmentReadinessOptions}
                               </Select>
-                              {currentlyWorking &&
-                              fieldErrors.employedReadinessScale ? (
+                              {fieldErrors.employmentReadinessScale && (
                                 <FormHelperText>
                                   Input is required
                                 </FormHelperText>
-                              ) : (
-                                ""
                               )}
                             </FormControl>
-                          )}
+                          </Tooltip>
                         </Stack>
                         {/* row  10 current work status, occupation, basic mthly sal, cancer impact on finance*/}
                         <Typography
@@ -893,7 +955,7 @@ function Profile() {
                             <Select
                               size="small"
                               label="Current Health"
-                              sx={{ width: 200 }}
+                              sx={{ width: 225 }}
                               value={fieldValues.currentHealthStatus}
                               onChange={(e) =>
                                 handleChange(
@@ -912,46 +974,47 @@ function Profile() {
                           </FormControl>
                           <FormControl
                             variant="outlined"
-                            error={fieldErrors.physicalHealthStatus || false}
+                            error={
+                              fieldErrors.currentPhysicalHealthStatus || false
+                            }
                           >
-                            <Tooltip title="Has physical health interfered with normal activities in the past 4 weeks?">
-                              <div>
-                                <InputLabel>
-                                  Physical health interfered with normal
-                                  activities?
-                                </InputLabel>
+                            <div>
+                              <InputLabel>Physical health status</InputLabel>
+                              <Tooltip title="Has physical health interfered with normal activities in the past 4 weeks?">
                                 <Select
-                                  sx={{ width: "100%", height: "42px" }}
-                                  label="Physical health interfered with normal activities?"
-                                  value={fieldValues.physicalHealthStatus}
+                                  size="small"
+                                  sx={{ width: 225 }}
+                                  label="Physical Health Status"
+                                  value={
+                                    fieldValues.currentPhysicalHealthStatus
+                                  }
                                   onChange={(e) =>
                                     handleChange(
-                                      "physicalHealthStatus",
+                                      "currentPhysicalHealthStatus",
                                       e.target.value
                                     )
                                   }
                                 >
                                   {options.distressOptions}
-                                </Select>
-                                {fieldErrors.physicalHealthStatus && (
-                                  <FormHelperText error>
-                                    Please select an option
-                                  </FormHelperText>
-                                )}
-                              </div>
-                            </Tooltip>
-                          </FormControl>
+                                </Select>{" "}
+                              </Tooltip>
+                              {fieldErrors.currentPhysicalHealthStatus && (
+                                <FormHelperText error>
+                                  Please select an option
+                                </FormHelperText>
+                              )}
+                            </div>
+                          </FormControl>{" "}
                           <FormControl
                             variant="outlined"
                             error={fieldErrors.currentMentalHealthStatus === ""}
                           >
-                            <Tooltip title="Mental health interfered with normal activities in the past 4 weeks.">
-                              <InputLabel>
-                                Mental health interfered with normal activities?
-                              </InputLabel>
+                            <Tooltip title="Mental health interfered with normal activities in the past 4 weeks?">
+                              <InputLabel>Mental health status</InputLabel>
                               <Select
-                                sx={{ width: "100%", height: "42px" }}
-                                label="Mental health interfered with normal activities?"
+                                size="small"
+                                sx={{ width: 225 }}
+                                label="Mental Health Status"
                                 value={fieldValues.currentMentalHealthStatus}
                                 onChange={(e) =>
                                   handleChange(
@@ -962,7 +1025,7 @@ function Profile() {
                               >
                                 {options.distressOptions}
                               </Select>
-                              {fieldValues.currentMentalHealthStatus === "" && (
+                              {fieldErrors.currentMentalHealthStatus && (
                                 <FormHelperText error>
                                   Please select an option
                                 </FormHelperText>
@@ -979,7 +1042,7 @@ function Profile() {
                           <TextField
                             label="Physical barriers to RTW"
                             variant="outlined"
-                            fullWidth
+                            sx={{ flex: 1 }}
                             multiline
                             rows={4}
                             value={fieldValues.physicalBarriersToRtw}
@@ -991,15 +1054,14 @@ function Profile() {
                             }
                             error={fieldErrors.physicalBarriersToRtw || false}
                             helperText={
-                              fieldErrors
-                                ? "Input is required, if no input put N/A"
-                                : ""
+                              fieldErrors.physicalBarriersToRtw &&
+                              "Input is required, if no input put N/A"
                             }
                           />
                           <TextField
                             label="Mental barriers to RTW"
                             variant="outlined"
-                            fullWidth
+                            sx={{ flex: 1 }}
                             multiline
                             rows={4}
                             value={fieldValues.psychosocialBarriersToRtw}
@@ -1013,16 +1075,15 @@ function Profile() {
                               fieldErrors.psychosocialBarriersToRtw || false
                             }
                             helperText={
-                              fieldErrors.psychosocialBarriersToRtw
-                                ? "Input is required, if no input put N/A"
-                                : ""
+                              fieldErrors.psychosocialBarriersToRtw &&
+                              "Input is required, if no input put N/A"
                             }
                           />
 
                           <TextField
                             label="Additional Information"
                             variant="outlined"
-                            fullWidth
+                            sx={{ flex: 1 }}
                             multiline
                             rows={4}
                             value={fieldValues.additionalInformation}
@@ -1034,9 +1095,8 @@ function Profile() {
                             }
                             error={fieldErrors.additionalInformation || false}
                             helperText={
-                              fieldValues.additionalInformation
-                                ? "Input is required, if no input put N/A"
-                                : ""
+                              fieldErrors.additionalInformation &&
+                              "Input is required, if no input put N/A"
                             }
                           />
                         </Stack>

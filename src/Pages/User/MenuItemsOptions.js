@@ -180,13 +180,24 @@ export const familyCompositionOptions = [
 ));
 
 export const workStatusOptions = [
-  "Employed - Part Time",
-  "Employed - Full Time",
-  "Employed - Freelance",
-  "Self Employed",
   "Unemployed",
   "Unpaid Leave",
   "Paid Leave",
+  "Self Employed",
+  "Employed - Freelance",
+  "Employed - Part Time",
+  "Employed - Full Time",
+].map((option) => (
+  <MenuItem key={option} value={option}>
+    {option}
+  </MenuItem>
+));
+
+export const employmentReadinessOptions = [
+  "Not ready",
+  "Uncertain",
+  "Ready for part-time work",
+  "Ready for full-time work",
 ].map((option) => (
   <MenuItem key={option} value={option}>
     {option}
@@ -195,6 +206,13 @@ export const workStatusOptions = [
 
 // add radio button current or last
 export const occupationOptions = [
+  "Packer",
+  "Hawker",
+  "Cleaner, Labourer and Related Worker",
+  "Manager",
+  "Executive",
+  "Self-employed",
+  "Technician",
   "Legislator, Senior Officials and Managers",
   "Professional",
   "Associate Professionals and Technicians",
@@ -203,13 +221,6 @@ export const occupationOptions = [
   "Agricultural and Fishery Worker",
   "Craftsmen and Related Trades Worker",
   "Plant and Machine Operator & Assembler",
-  "Packer",
-  "Hawker",
-  "Cleaner, Labourer and Related Worker",
-  "Manager",
-  "Executive",
-  "Self-employed",
-  "Technician",
 ]
   .sort()
   .map((option) => (
@@ -244,6 +255,7 @@ export const impactOnFinancesOptions = [
   "Refused",
 ];
 export const timePeriodOptions = [
+  "N/A",
   "3 months",
   "6 months",
   "9 months",
@@ -265,11 +277,11 @@ export const scaleOptions = Array.from({ length: 11 }, (_, index) => (
 export const nullOption = <MenuItem value="null"></MenuItem>;
 
 export const healthStatusOptions = [
-  "Excellent",
-  "Very Good",
-  "Good",
-  "Fair",
   "Poor",
+  "Fair",
+  "Good",
+  "Very Good",
+  "Excellent",
 ].map((option) => (
   <MenuItem key={option} value={option}>
     {option}
