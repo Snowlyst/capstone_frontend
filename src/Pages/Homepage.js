@@ -50,6 +50,13 @@ function Homepage() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const url = window.location.href;
+    if (url === "http://localhost:3000/#") {
+      navigate("dashboard");
+    }
+  }, []);
+
+  useEffect(() => {
     if (isAuthenticated) {
       const role = JSON.parse(localStorage.getItem("verveRole"));
       const checkLogin = async () => {

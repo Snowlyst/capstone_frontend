@@ -120,19 +120,21 @@ function JobListingOverall() {
                     </Typography>
                   </TableCell>
                   <TableCell align="right">
-                    <Button
-                      variant="contained"
-                      component="span"
-                      style={{
-                        backgroundColor: "#FF6B2C",
-                        color: "white",
-                        width: "5.5vw",
-                        borderRadius: "7px",
-                      }}
-                    >
-                      <EditIcon />
-                      GO
-                    </Button>
+                    <Link href={`/company/jobs/${row.id}`}>
+                      <Button
+                        variant="contained"
+                        component="span"
+                        style={{
+                          backgroundColor: "#FF6B2C",
+                          color: "white",
+                          width: "5.5vw",
+                          borderRadius: "7px",
+                        }}
+                      >
+                        <EditIcon />
+                        GO
+                      </Button>
+                    </Link>
                   </TableCell>
                 </TableRow>
               );
