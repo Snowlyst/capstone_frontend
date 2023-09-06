@@ -390,19 +390,23 @@ function JobPost() {
         console.log(newJobInfo.data.postedJobInfo);
         if (newJobInfo != null) {
           setAxiosLoading(false);
-          Swal.fire(SwalMsgs.successPostingAwaitApprovalWButtons).then(
-            (result) => {
-              if (result.isConfirmed) {
-                setModalOpen(false);
-                resetFields();
-                fieldValues.jobTitle = "";
-                fieldValues.description = "";
-                setEditorState(EditorState.createEmpty());
-              } else if (result.isDenied) {
-                navigate(`/`);
-              }
+          Swal.fire(
+            SwalMsgs.successPostingAwaitApprovalWButtons(
+              "job post",
+              "Return to Home",
+              "Post another job"
+            )
+          ).then((result) => {
+            if (result.isConfirmed) {
+              setModalOpen(false);
+              resetFields();
+              fieldValues.jobTitle = "";
+              fieldValues.description = "";
+              setEditorState(EditorState.createEmpty());
+            } else if (result.isDenied) {
+              navigate(`/`);
             }
-          );
+          });
         }
       } catch (error) {
         console.log(error);
@@ -971,81 +975,7 @@ function JobPost() {
                           </DialogActions>
                         </Grid>
                       </Dialog>
-
-                      {/* row 3 - 2 buttons edit listing and delete listing
-                  {displayAdminButtons ? (
-                    <Box
-                      mt={4}
-                      mb={4}
-                      sx={theme.customStyles.displayFlexRowCenter}
-                    >
-                      <Stack direction="row" spacing={5}>
-                        <Button
-                          classes={{ root: "orange" }}
-                          variant="contained"
-                        >
-                          Check Applicants
-                        </Button>
-                        <Button classes={{ root: "blue" }} variant="contained">
-                          Edit Listing
-                        </Button>
-                        <Button classes={{ root: "red" }} variant="contained">
-                          Delete Listing
-                        </Button>
-                      </Stack>
-                    </Box>
-                  ) : (
-                    ""
-                  )}
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Divider
-                      sx={{
-                        borderBottomWidth: 3,
-
-                        width: "90%",
-                      }}
-                    />
-                  </div>
-                  {/* row 4 - job details */}
-                      {/* <Box m={4} sx={theme.customStyles.displayFlexRowLeft}>
-                    <Stack direction="column" spacing={2}>
-                      <Typography
-                        textAlign="left"
-                        variant="h5"
-                        sx={{
-                          fontWeight: theme.typography.h6.fontWeightBold,
-                        }}
-                      >
-                        Job Details
-                      </Typography>
-                      <div
-                        dangerouslySetInnerHTML={{
-                          __html: description || "",
-                        }}
-                      />
-                    </Stack>
-                  </Box>
-
-                  {/* row 5 - 1 button to check current applicants */}
-                      {/* <Box
-                    m={4}
-                    pb={5}
-                    sx={theme.customStyles.displayFlexRowCenter}
-                  ></Box>
-                </Paper>
-              </Box>
-            </Grid>
-          </Container>
-        </div>
-      </Grid>
-    </ThemeProvider>  */}
-                    </Grid>{" "}
+                    </Grid>
                   </Dialog>
                 </Paper>
               </Box>

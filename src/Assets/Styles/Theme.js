@@ -164,6 +164,21 @@ export const theme = createTheme({
               backgroundColor: "#f79568",
             },
           },
+          "&.purple": {
+            backgroundColor: "#9384D1",
+            color: "#ffffff",
+            "&:hover": {
+              backgroundColor: "#1D267D",
+            },
+          },
+
+          "&.green": {
+            backgroundColor: "#00908B",
+            color: "#ffffff",
+            "&:hover": {
+              backgroundColor: "#3DCCC7",
+            },
+          },
           "&.red": {
             backgroundColor: "#D73030",
             color: "#ffffff",
