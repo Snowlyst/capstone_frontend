@@ -32,7 +32,7 @@ function CreateResume() {
       setUsername(currUser.lastname);
     }
   }, [currUser]);
-  
+
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
   console.log(backendUrl);
 
@@ -64,6 +64,9 @@ function CreateResume() {
   });
   const [savedFieldValues, setSavedFieldValues] = useState([]);
   const [editingIndex, setEditingIndex] = useState(null);
+  const [databaseExperiences, setDatabaseExperiences] = useState([]);
+  const [allExperiences, setAllExperiences] = useState([]);
+  const [databaseExperienceIds, setDatabaseExperienceIds] = useState([]);
   const [databaseExperiences, setDatabaseExperiences] = useState([]);
   const [allExperiences, setAllExperiences] = useState([]);
   const [databaseExperienceIds, setDatabaseExperienceIds] = useState([]);
