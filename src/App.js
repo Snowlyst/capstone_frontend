@@ -23,7 +23,6 @@ import CompanyProfile from "./Pages/Employer/CompanyProfile";
 import CreateResume from "./Pages/User/CreateResume";
 import JobListingOverall from "./Pages/Employer/JobListingOverall";
 import IndividualJobPage from "./Pages/Employer/IndividualJobPage";
-import AdminDashboard from "./Pages/Administrator/AdminDashboard";
 import AdminApproveDenyJob from "./Pages/Administrator/AdminApproveDenyJob";
 import AdminApproveDenyUserCompanies from "./Pages/Administrator/AdminApproveDenyUser";
 import EditProfile from "./Pages/User/EditProfile";
@@ -94,7 +93,6 @@ function App() {
         <Route path="/companyprofile/:companyId" element={<CompanyProfile />} />
         <Route path="createresume" element={<CreateResume />} />
         <Route path="/joblisting" element={<JobListingOverall />} />
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/admin/checkjobs" element={<AdminApproveDenyJob />} />
         <Route
           path="/admin/checkusercompanies"
@@ -104,7 +102,6 @@ function App() {
           path="/admin/manageusercompanies"
           element={<AdminManageExistingUserCompany />}
         />
-
         <Route
           path="/checkapplication/:jobId"
           element={<ReviewApplication />}
@@ -115,14 +112,12 @@ function App() {
         <Route path="/googlecalendar" element={<GoogleCalendar />} />
         <Route path="/firebaseupload" element={<FirebaseUpload />} />
         <Route path="/listing/:listingId" element={<IndividualListing />} />
-
         {/* <Route
           path="*"
           element={
             <RequireAuth> */}
         {/* <Routes> */}
         <Route path="/dashboard" element={<Dashboard />} />
-
         <Route path="/profile" element={<Profile />} />
         <Route path="/editprofile/:userId" element={<EditProfile />} />
         <Route path="/jobpost" element={<JobPost />} />
@@ -130,8 +125,7 @@ function App() {
         <Route path="/updateprofile" element={<UpdateProfile />} />
         <Route path="createresume" element={<CreateResume />} />
         <Route path="/joblisting" element={<JobListingOverall />} />
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path="/admin/checkjobs" element={<AdminApproveDenyJob />} />
+        <Route path="/admin/checkjobs" element={<AdminApproveDenyJob />} />/
         <Route
           path="/admin/checkusercompanies"
           element={<AdminApproveDenyUserCompanies />}
