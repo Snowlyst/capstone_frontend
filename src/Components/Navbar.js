@@ -32,25 +32,34 @@ function Navbar() {
 
   // const navigate = useNavigate();
 
-  const pages = ["Job Search", "Company Profiles", "Programs"];
+  const pages = ["Job Search", "Company Profiles"];
   const [settings, setSettings] = useState([]);
   // to retrieve currUser from local storage and to set it for context
   useEffect(() => {
     console.log(currUser);
+    let settings = [];
+
+    if (currUser === null && !isAuthenticated) {
+      settings = ["User", "Employer", "Admin"];
+
+      setSettings(settings);
+    }
+
     // const checkLogin =  () => {
     if (currUser === null && isAuthenticated) {
       const localAccess = JSON.parse(localStorage.getItem("verveCurrUser"));
       const role = JSON.parse(localStorage.getItem("verveRole"));
-      console.log(localAccess);
+      console.log(role);
       setCurrUser(localAccess);
-      const settings = !isAuthenticated
-        ? ["User", "Employer", "Admin"]
-        : isAuthenticated && role === "user"
-        ? ["Profile", "Resume", "Jobs", "Logout"]
-        : isAuthenticated && ["Dashboard", "Post Job", "Logout"];
+
+      if (role === "user") {
+        settings = ["Profile", "Resume", "Job Categories", "Logout"];
+      } else if (role === "admin" || role === "employer") {
+        settings = ["Dashboard", "Post Job", "Logout"];
+      }
       setSettings(settings);
     }
-  }, []);
+  }, [currUser]);
 
   // checks if user is logged in or not to display user menu
   // const login = currUser !== null ? true : false;
@@ -185,7 +194,7 @@ function Navbar() {
             >
               {pages.map((page) => (
                 <Link
-                  to={page.toLowerCase()}
+                  to={page.toLowerCase().replace(/\s+/g, "-")}
                   key={page}
                   style={{ textDecoration: "none" }}
                 >
@@ -273,7 +282,7 @@ function Navbar() {
               >
                 {settings.map((setting) => (
                   <Link
-                    to={setting.toLowerCase()}
+                    to={setting.toLowerCase().replace(/\s+/g, "-")}
                     key={setting}
                     style={{ textDecoration: "none" }}
                   >

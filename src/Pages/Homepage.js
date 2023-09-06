@@ -165,6 +165,11 @@ function Homepage() {
     navigate(`/search?location=${location}&type=${type}`);
   };
 
+  const handleBrowseAll = (e) => {
+    e.preventDefault();
+    navigate(`/job-categories`);
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <Box
@@ -434,6 +439,7 @@ function Homepage() {
               color: "#FFFFFF",
               fontWeight: theme.typography.h5.fontWeightBold,
             }}
+            onClick={handleBrowseAll}
           >
             Browse All
           </Typography>
