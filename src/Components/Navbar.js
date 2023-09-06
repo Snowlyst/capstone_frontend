@@ -33,18 +33,22 @@ function Navbar() {
   // const navigate = useNavigate();
 
   const pages = ["Job Search", "Company Profiles", "Programs"];
-  const settings = isAuthenticated
-    ? ["Profile", "Chat", "Dashboard", "Logout"]
-    : ["User", "Employer"];
-
+  const [settings, setSettings] = useState([]);
   // to retrieve currUser from local storage and to set it for context
   useEffect(() => {
     console.log(currUser);
     // const checkLogin =  () => {
     if (currUser === null && isAuthenticated) {
       const localAccess = JSON.parse(localStorage.getItem("verveCurrUser"));
+      const role = JSON.parse(localStorage.getItem("verveRole"));
       console.log(localAccess);
       setCurrUser(localAccess);
+      const settings = !isAuthenticated
+        ? ["User", "Employer", "Admin"]
+        : isAuthenticated && role === "user"
+        ? ["Profile", "Resume", "Jobs", "Logout"]
+        : isAuthenticated && ["Dashboard", "Post Job", "Logout"];
+      setSettings(settings);
     }
   }, []);
 
@@ -54,17 +58,16 @@ function Navbar() {
   // handle user menu click
   const handleUserMenu = async (page) => {
     let user = {};
+
     if (page === "Logout") {
-      await logout({
-        logoutParams: {
-          returnTo: window.location.origin,
-        },
-      });
-      setAnchorElUser(null);
-      setCurrUser(null);
       localStorage.removeItem("verveRole");
       localStorage.removeItem("verveToken");
       localStorage.removeItem("verveCurrUser");
+
+      setAnchorElUser(null);
+      setCurrUser(null);
+      await logout();
+      return;
     } else if (page === "User") {
       setAnchorElUser(null);
       user.role = "user";
@@ -84,6 +87,19 @@ function Navbar() {
       localStorage.setItem("verveRole", JSON.stringify(user.role));
       await loginWithRedirect({
         appState: {
+          returnTo: "/dashboard",
+        },
+        authorizationParams: {
+          screen_hint: "Login/Register",
+        },
+      });
+    } else if (page === "Admin") {
+      setAnchorElUser(null);
+      user.role = "admin";
+      setCurrUser(user);
+      localStorage.setItem("verveRole", JSON.stringify(user.role));
+      await loginWithRedirect({
+        appState: {
           returnTo: "/",
         },
         authorizationParams: {
@@ -91,12 +107,8 @@ function Navbar() {
         },
       });
     }
+
     console.log(currUser);
-    // else if (page === "Past Orders") {
-    //   navigate("pastorders");
-    // } else {
-    //   navigate(`${page.toLowerCase()}`);
-    // }
   };
 
   return (
@@ -222,7 +234,7 @@ function Navbar() {
               </Tooltip>
             </Link> */}
 
-              <Link to="search">
+              <Link to="/search">
                 <Tooltip title="Search">
                   <IconButton sx={{ p: 0 }}>
                     <SearchIcon sx={{ color: "#0E0140" }} alt="Search" />

@@ -14,11 +14,13 @@ import { theme } from "../../Assets/Styles/Theme";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
+// import { useAuth0 } from "@auth0/auth0-react";
+
 function AdminDashboard() {
   const { currUser } = useUserContext();
-  const [accessToken, setAccessToken] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
-
+  const [accessToken, setAccessToken] = useState(null);
+  // const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
   const navigate = useNavigate();
 
   //make sure currUser is set or else the navigate gonna boot everyone off the screen
@@ -38,7 +40,7 @@ function AdminDashboard() {
       if (!currUser || currUser.userRoleId !== 1) {
         Swal.fire(
           "Error",
-          "You do not have permissions to act on that page",
+          "You do not have permissions to access this page",
           "error"
         );
         navigate("/");
