@@ -24,12 +24,17 @@ function CreateResume() {
   // All the states
   const { currUser, setCurrUser } = useUserContext();
   const [id, setId] = useState("");
+  const [username, setUsername] = useState("");
   useEffect(() => {
     if (currUser) {
       console.log(currUser.id);
       setId(currUser.id);
+      setUsername(currUser.lastname);
     }
   }, [currUser]);
+  
+  const backendUrl = process.env.REACT_APP_BACKEND_URL;
+  console.log(backendUrl);
 
   // States for the Experience
   const [selectedContent, setSelectedContent] = useState(null);
@@ -59,51 +64,71 @@ function CreateResume() {
   });
   const [savedFieldValues, setSavedFieldValues] = useState([]);
   const [editingIndex, setEditingIndex] = useState(null);
+  const [databaseExperiences, setDatabaseExperiences] = useState([]);
+  const [allExperiences, setAllExperiences] = useState([]);
+  const [databaseExperienceIds, setDatabaseExperienceIds] = useState([]);
   // States for education
+  const [eduFieldErrors, setEduFieldErrors] = useState({});
   const [educationFields, setEducationFields] = useState([]);
   const [eduFieldValues, setEduFieldValues] = useState({
-    university: "",
+    institute: "",
     graduationDate: "",
     qualification: "",
-    universityLocation: "",
+    instituteLocation: "",
     fieldOfStudy: "",
     major: "",
     grade: "",
     awards: "",
   });
-  const [eduFieldErrors, setEduFieldErrors] = useState({});
+
   const [eduEditingIndex, setEduEditingIndex] = useState(null);
   const [eduFieldsVisible, setEduFieldsVisible] = useState(false);
+  const [databaseEducations, setDatabaseEducations] = useState([]);
+  const [allEducations, setAllEducations] = useState([]);
+  const [databaseEducationIds, setDatabaseEducationIds] = useState([]);
+  const [savedEduFieldValues, setSavedEduFieldValues] = useState([]);
   // State for Skills
   const [skillFields, setSkillFields] = useState([]);
   const [skillFieldValues, setSkillFieldValues] = useState({
-    skillName: "",
-    proficiencyLevel: "",
+    skill: "",
+    proficiency: "",
   });
   const [skillFieldErrors, setSkillFieldErrors] = useState({});
   const [skillEditingIndex, setSkillEditingIndex] = useState(null);
   const [skillFormVisible, setSkillFormVisible] = useState(false);
+  const [databaseSkills, setDatabaseSkills] = useState([]);
+  const [databaseSkillIds, setDatabaseSkillIds] = useState([]);
+  const [allSkills, setAllSkills] = useState([]);
   // State for language
 
   const [languageFields, setLanguageFields] = useState([]);
   const [languageFormVisible, setLanguageFormVisible] = useState(false);
   const [languageFieldValues, setLanguageFieldValues] = useState({
-    languageName: "",
-    proficiencySpoken: "",
-    proficiencyWritten: "",
-    isPrimary: false,
+    language: "",
+    spoken: "",
+    written: "",
+    ifPrimary: false,
   });
   const [languageFieldErrors, setLanguageFieldErrors] = useState({});
   const [languageEditingIndex, setLanguageEditingIndex] = useState(null);
+  const [databaseLanguages, setDatabaseLanguages] = useState([]);
+  const [databaseLanguageIds, setDatabaseLanguageIds] = useState([]);
+  const [allLanguages, setAllLanguages] = useState([]);
+
   // State for Additional Information
   const [additionalInfo, setAdditionalInfo] = useState({
     expectedSalary: "",
-    preferredLocation: "",
+    preferredWorkLocation: "",
   });
 
   const [isEditing, setIsEditing] = useState(false);
   const [isAdditionalInfoVisible, setIsAdditionalInfoVisible] = useState(true);
   const [additionalInfoErrors, setAdditionalInfoErrors] = useState({});
+  const [databaseAdditionalInfo, setDatabaseAdditionalInfo] = useState([]);
+  const [databaseAdditionalInfoIds, setDatabaseAdditionalInfoIds] = useState(
+    []
+  );
+  const [allAdditionalInfo, setAllAdditionalInfo] = useState([]);
   // State for about me.
   const [aboutMe, setAboutMe] = useState({
     name: "",
@@ -121,6 +146,10 @@ function CreateResume() {
   const [postalCode, setPostalCode] = useState("");
   const [address, setAddress] = useState("");
   const [displayedAddress, setDisplayedAddress] = useState([]);
+  const [databaseAboutMe, setDatabaseAboutMe] = useState([]);
+  const [databaseAboutMeIds, setDatabaseAboutMeIds] = useState([]);
+  const [allAboutMe, setAllAboutMe] = useState([]);
+
   // State for privacy setting
   const [privacySetting, setPrivacySetting] = useState("searchable");
   const [isEditingPrivacy, setIsEditingPrivacy] = useState(false);
@@ -139,7 +168,7 @@ function CreateResume() {
     "Privacy Setting(?)",
   ];
   const user = {
-    name: "John Doe",
+    name: username,
     avatarUrl: "path-to-avatar-image.jpg",
   };
   const handleOptionChange = (e) => {
@@ -179,11 +208,44 @@ function CreateResume() {
       }));
     }
   };
+  useEffect(() => {
+    if (id) {
+      axios
+        .get(`${backendUrl}/createresume/experience/${id}`)
+        .then((response) => {
+          console.log("GET request successful:", response.data);
+          response.data.output.forEach((entry) => {
+            console.log("Experience Database ID:", entry.id);
+            setDatabaseExperienceIds(entry.id);
+            const experiences = response.data.output;
+            setDatabaseExperiences(experiences, databaseExperienceIds);
+            console.log(databaseExperienceIds);
+          });
+        })
+        .catch((error) => {
+          console.error("Error with GET request:", error);
+        });
+    }
+  }, [id]);
+  useEffect(() => {
+    const combinedExperiences = [...savedFieldValues, ...databaseExperiences];
+    setAllExperiences(combinedExperiences);
+  }, [savedFieldValues, databaseExperiences]);
+
+  useEffect(() => {
+    console.log(allExperiences);
+    console.log(editingIndex);
+    console.log(fieldValues);
+  }, [allExperiences, editingIndex, fieldValues]);
 
   const handleSaveExperience = () => {
     const newFieldErrors = Object.keys(fieldValues).reduce(
       (errors, fieldName) => {
-        if (fieldValues[fieldName].trim() === "") {
+        console.log(fieldValues);
+        console.log(fieldName);
+        if (fieldName === "id" || fieldName === "userId") {
+          console.log(fieldName);
+        } else if (fieldValues[fieldName].trim() === "") {
           errors[fieldName] = true;
         }
         return errors;
@@ -199,16 +261,43 @@ function CreateResume() {
       const updatedSavedFieldValues = [...savedFieldValues];
       if (editingIndex !== null) {
         updatedSavedFieldValues[editingIndex] = fieldValues;
-        setEditingIndex(null);
+        //setEditingIndex(null);
       } else {
         updatedSavedFieldValues.push(fieldValues);
       }
       setSavedFieldValues(updatedSavedFieldValues);
       setExperienceFormFieldVisible(false);
       setShowSavedValues(true);
+      if (!fieldValues.id) {
+        axios
+          .post(`${backendUrl}/createresume/experience/${id}`, {
+            userId: id,
+            ...fieldValues,
+          })
+          .then((response) => {
+            const entryId = response.data.id;
+            console.log("Data successfully saved, ID:", entryId);
+          })
+          .catch((error) => {
+            console.error("Error saving data:", error);
+          });
+      } else {
+        axios
+          .put(
+            `${backendUrl}/createresume/experience/${allExperiences[editingIndex].id}`,
+            {
+              ...fieldValues,
+            }
+          )
+          .then(() => {
+            console.log("Data successfully updated, ID:", fieldValues.id);
+          })
+          .catch((error) => {
+            console.error("Error updating data:", error);
+          });
+      }
     }
   };
-
   const handleCancelExperience = () => {
     setExperienceFormFieldVisible(false);
     setShowSavedValues(true);
@@ -248,11 +337,49 @@ function CreateResume() {
 
   const handleDeleteExperience = (index) => {
     const updatedSavedFieldValues = [...savedFieldValues];
+
     updatedSavedFieldValues.splice(index, 1);
     setSavedFieldValues(updatedSavedFieldValues);
+    if (!fieldValues.id) {
+      axios
+        .delete(
+          `${backendUrl}/createresume/experience/${allExperiences[editingIndex].id}`
+        )
+        .then((response) => {
+          console.log(`Item with ID response deleted successfully.`);
+        })
+        .catch((error) => {
+          console.error(`Error deleting item with ID:`, error);
+        });
+    }
   };
 
   // Logic for education .
+  useEffect(() => {
+    if (id) {
+      axios
+        .get(`${backendUrl}/createresume/education/${id}`)
+        .then((response) => {
+          console.log("GET request successful:", response.data);
+          response.data.output.forEach((entry) => {
+            console.log("Education Database ID:", entry.id);
+            setDatabaseEducationIds(entry.id);
+            const educations = response.data.output;
+            setDatabaseEducations(educations, databaseEducationIds);
+            console.log(databaseEducationIds);
+          });
+        })
+        .catch((error) => {
+          console.error("Error with GET request:", error);
+        });
+    }
+  }, [id]);
+  useEffect(() => {
+    const combinedEducations = [...educationFields, ...databaseEducations];
+    setAllEducations(combinedEducations);
+    console.log(allEducations);
+  }, [educationFields, databaseEducations]);
+
   const handleSaveEducation = () => {
     const newEduFieldErrors = eduValidateFields(eduFieldValues);
 
@@ -263,57 +390,95 @@ function CreateResume() {
         const updatedEducationFields = [...educationFields];
         updatedEducationFields[eduEditingIndex] = eduFieldValues;
         setEducationFields(updatedEducationFields);
-        setEduEditingIndex(null);
+        //setEduEditingIndex(null);
       } else {
         setEducationFields([...educationFields, eduFieldValues]);
       }
 
       // Clear the form fields
       setEduFieldValues({
-        university: "",
+        institute: "",
         graduationDate: "",
         qualification: "",
-        universityLocation: "",
+        instituteLocation: "",
         fieldOfStudy: "",
         major: "",
         grade: "",
         awards: "",
       });
 
-      // Clear field errors
       setEduFieldErrors({});
       setEduFieldsVisible(false);
+      if (!eduFieldValues.id) {
+        axios
+          .post(`${backendUrl}/createresume/education/${id}`, {
+            userId: id,
+            ...eduFieldValues,
+          })
+          .then((response) => {
+            const entryId = response.data.id;
+            console.log("Data successfully saved, ID:", entryId);
+          })
+          .catch((error) => {
+            console.error("Error saving data:", error);
+          });
+      } else {
+        axios
+          .put(
+            `${backendUrl}/createresume/education/${allEducations[eduEditingIndex].id}`,
+            {
+              ...eduFieldValues,
+            }
+          )
+          .then(() => {
+            console.log("Data successfully updated, ID:", eduFieldValues.id);
+          })
+          .catch((error) => {
+            console.error("Error updating data:", error);
+          });
+      }
     }
   };
+  useEffect(() => {
+    console.log(allEducations);
+    console.log(eduFieldValues);
+    console.log(eduEditingIndex);
+  }, [allEducations, eduFieldValues, eduEditingIndex]);
+
   const eduValidateFields = (fields) => {
-  const requiredFields = [
-    "university",
-    "graduationDate",
-    "qualification",
-    "universityLocation",
-    "fieldOfStudy",
-    "major",
-    "grade",
-    "awards",
-  ];
+    const requiredFields = [
+      "institute",
+      "graduationDate",
+      "qualification",
+      "instituteLocation",
+      "fieldOfStudy",
+      "major",
+      "grade",
+      "awards",
+    ];
 
-  const eduErrors = {};
+    const eduErrors = {};
 
-  requiredFields.forEach((fieldName) => {
-    if (fields[fieldName].trim() === "") {
-      eduErrors[fieldName] = `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} is required`;
-    }
-  });
+    requiredFields.forEach((fieldName) => {
+      console.log(fieldName);
+      if (fieldName === "id" || fieldName === "userId") {
+        console.log(fieldName);
+      } else if (fields[fieldName].trim() === "") {
+        eduErrors[fieldName] = `${
+          fieldName.charAt(0).toUpperCase() + fieldName.slice(1)
+        } is required`;
+      }
+    });
 
-  return eduErrors;
-};
+    return eduErrors;
+  };
 
   const resetEduFormFields = () => {
     setFieldValues({
-      university: "",
+      institute: "",
       graduationDate: "",
       qualification: "",
-      universityLocation: "",
+      instituteLocation: "",
       fieldOfStudy: "",
       major: "",
       grade: "",
@@ -323,15 +488,53 @@ function CreateResume() {
     setEduEditingIndex(null);
   };
   console.log("Education info Array", educationFields);
+
   const handleDeleteEducation = (indexToDelete) => {
     const updatedEducationFields = [...educationFields];
 
     updatedEducationFields.splice(indexToDelete, 1);
 
     setEducationFields(updatedEducationFields);
+    if (!eduFieldValues.id) {
+      axios
+        .delete(
+          `${backendUrl}/createresume/education/${allEducations[eduEditingIndex].id}`
+        )
+        .then((response) => {
+          console.log(`Item with ID response deleted successfully.`);
+        })
+        .catch((error) => {
+          console.error(`Error deleting item with ID:`, error);
+        });
+    }
   };
 
   //Logic for Skills
+  useEffect(() => {
+    if (id) {
+      axios
+        .get(`${backendUrl}/createresume/skill/${id}`)
+        .then((response) => {
+          console.log("GET request successful:", response.data);
+          response.data.output.forEach((entry) => {
+            console.log("skill Database ID:", entry.id);
+            setDatabaseSkillIds(entry.id);
+            const skills = response.data.output;
+            setDatabaseSkills(skills, databaseSkillIds);
+            console.log(databaseSkillIds);
+          });
+        })
+        .catch((error) => {
+          console.error("Error with GET request:", error);
+        });
+    }
+  }, [id]);
+  useEffect(() => {
+    const combinedSkills = [...skillFields, ...databaseSkills];
+    setAllSkills(combinedSkills);
+    console.log(allSkills);
+  }, [skillFields, databaseSkills]);
+
   const handleSaveSkill = () => {
     const newSkillFieldErrors = validateSkillFields(skillFieldValues);
 
@@ -351,18 +554,45 @@ function CreateResume() {
       setSkillFieldValues({ skillName: "", proficiencyLevel: "" });
       setSkillFieldErrors({});
       setSkillFormVisible(false);
+      if (!skillFieldValues.id) {
+        axios
+          .post(`${backendUrl}/createresume/skill/${id}`, {
+            userId: id,
+            ...skillFieldValues,
+          })
+          .then((response) => {
+            const entryId = response.data.id;
+            console.log("Data successfully saved, ID:", entryId);
+          })
+          .catch((error) => {
+            console.error("Error saving data:", error);
+          });
+      } else {
+        axios
+          .put(
+            `${backendUrl}/createresume/skill/${allSkills[skillEditingIndex].id}`,
+            {
+              ...skillFieldValues,
+            }
+          )
+          .then(() => {
+            console.log("Data successfully updated, ID:", skillFieldValues.id);
+          })
+          .catch((error) => {
+            console.error("Error updating data:", error);
+          });
+      }
     }
   };
 
   const validateSkillFields = (fields) => {
     const errors = {};
-
-    if (fields.skillName.trim() === "") {
-      errors.skillName = "Skill Name is required";
-    }
-
-    if (fields.proficiencyLevel.trim() === "") {
-      errors.proficiencyLevel = "Proficiency Level is required";
+    if (fields === "id" || fields === "userId") {
+      console.log(fields);
+    } else if (fields.skill.trim() === "") {
+      errors.skill = "Skill Name is required";
+    } else if (fields.proficiency.trim() === "") {
+      errors.proficiency = "Proficiency Level is required";
     }
 
     return errors;
@@ -373,9 +603,45 @@ function CreateResume() {
     updatedSkillFields.splice(index, 1);
 
     setSkillFields(updatedSkillFields);
+    if (!skillFieldValues.id) {
+      axios
+        .delete(
+          `${backendUrl}/createresume/skill/${allSkills[skillEditingIndex].id}`
+        )
+        .then((response) => {
+          console.log(`Item with ID response deleted successfully.`);
+        })
+        .catch((error) => {
+          console.error(`Error deleting item with ID:`, error);
+        });
+    }
   };
 
   // Logic for lanaguage
+  useEffect(() => {
+    if (id) {
+      axios
+        .get(`${backendUrl}/createresume/language/${id}`)
+        .then((response) => {
+          console.log("GET request successful:", response.data);
+          response.data.output.forEach((entry) => {
+            console.log("skill Database ID:", entry.id);
+            setDatabaseLanguageIds(entry.id);
+            const languages = response.data.output;
+            setDatabaseLanguages(languages, databaseLanguageIds);
+            console.log(databaseLanguageIds);
+          });
+        })
+        .catch((error) => {
+          console.error("Error with GET request:", error);
+        });
+    }
+  }, [id]);
+  useEffect(() => {
+    const combinedLanguages = [...languageFields, ...databaseLanguages];
+    setAllLanguages(combinedLanguages);
+    console.log(allLanguages);
+  }, [languageFields, databaseLanguages]);
   const handleSaveLanguage = () => {
     const newLanguageFieldErrors = validateLanguageFields(languageFieldValues);
 
@@ -391,29 +657,57 @@ function CreateResume() {
         setLanguageFields([...languageFields, languageFieldValues]);
       }
       setLanguageFieldValues({
-        languageName: "",
-        proficiencySpoken: "",
-        proficiencyWritten: "",
-        isPrimary: false,
+        language: "",
+        spoken: "",
+        written: "",
+        ifPrimary: false,
       });
       setLanguageFieldErrors({});
       setLanguageFormVisible(false);
+      if (!languageFieldValues.id) {
+        axios
+          .post(`${backendUrl}/createresume/language/${id}`, {
+            userId: id,
+            ...languageFieldValues,
+          })
+          .then((response) => {
+            const entryId = response.data.id;
+            console.log("Data successfully saved, ID:", entryId);
+          })
+          .catch((error) => {
+            console.error("Error saving data:", error);
+          });
+      } else {
+        axios
+          .put(
+            `${backendUrl}/createresume/language/${allLanguages[languageEditingIndex].id}`,
+            {
+              ...languageFieldValues,
+            }
+          )
+          .then(() => {
+            console.log(
+              "Data successfully updated, ID:",
+              languageFieldValues.id
+            );
+          })
+          .catch((error) => {
+            console.error("Error updating data:", error);
+          });
+      }
     }
   };
 
   const validateLanguageFields = (fields) => {
     const errors = {};
-
-    if (fields.languageName.trim() === "") {
-      errors.languageName = "Language Name is required";
-    }
-
-    if (fields.proficiencySpoken.trim() === "") {
+    if (fields === "id" || fields === "userId") {
+      console.log(fields);
+    } else if (fields.language.trim() === "") {
+      errors.language = "Language Name is required";
+    } else if (fields.spoken.trim() === "") {
       errors.proficiencySpoken = "Proficiency (Spoken) is required";
-    }
-
-    if (fields.proficiencyWritten.trim() === "") {
-      errors.proficiencyWritten = "Proficiency (Written) is required";
+    } else if (fields.written.trim() === "") {
+      errors.written = "Proficiency (Written) is required";
     }
 
     return errors;
@@ -424,9 +718,50 @@ function CreateResume() {
     updatedLanguageFields.splice(indexToDelete, 1);
 
     setLanguageFields(updatedLanguageFields);
+
+    if (!languageFieldValues.id) {
+      axios
+        .delete(
+          `${backendUrl}/createresume/language/${allLanguages[languageEditingIndex].id}`
+        )
+        .then((response) => {
+          console.log(`Item with ID response deleted successfully.`);
+        })
+        .catch((error) => {
+          console.error(`Error deleting item with ID:`, error);
+        });
+    }
   };
 
   // Logic for additional Information
+  useEffect(() => {
+    if (id) {
+      axios
+        .get(`${backendUrl}/createresume/additionalinfo/${id}`)
+        .then((response) => {
+          console.log("GET request successful:", response.data);
+          response.data.output.forEach((entry) => {
+            console.log("Additonal Info Database ID:", entry.id);
+            setDatabaseAdditionalInfoIds(entry.id);
+            const additionalInfo = response.data.output;
+            setDatabaseAdditionalInfo(
+              additionalInfo,
+              databaseAdditionalInfoIds
+            );
+            console.log(databaseAdditionalInfoIds);
+          });
+        })
+        .catch((error) => {
+          console.error("Error with GET request:", error);
+        });
+    }
+  }, [id]);
+  useEffect(() => {
+    const combinedInformation = [additionalInfo, ...databaseAdditionalInfo];
+    setAllAdditionalInfo(combinedInformation);
+    console.log(allAdditionalInfo);
+  }, [additionalInfo, databaseAdditionalInfo]);
+
   const handleAdditionalInfoEditClick = () => {
     setIsEditing(false);
   };
@@ -449,6 +784,34 @@ function CreateResume() {
           ...additionalInfo,
           expectedSalary: expectedSalary.toString(),
         });
+        if (!additionalInfo.id) {
+          axios
+            .post(`${backendUrl}/createresume/additionalinfo/${id}`, {
+              userId: id,
+              ...additionalInfo,
+            })
+            .then((response) => {
+              const entryId = response.data.id;
+              console.log("Data successfully saved, ID:", entryId);
+            })
+            .catch((error) => {
+              console.error("Error saving data:", error);
+            });
+        } else {
+          axios
+            .put(
+              `${backendUrl}/createresume/additionalinfo/${additionalInfo.id}`,
+              {
+                ...additionalInfo,
+              }
+            )
+            .then(() => {
+              console.log("Data successfully updated, ID:", fieldValues.id);
+            })
+            .catch((error) => {
+              console.error("Error updating data:", error);
+            });
+        }
       }
     }
 
@@ -462,21 +825,45 @@ function CreateResume() {
   };
   const validateAdditionalInfoFields = (fields) => {
     const errors = {};
-    if (fields.preferredLocation.trim() === "") {
-      errors.preferredLocation = "Preferred Work Location is required";
+    if (fields.preferredWorkLocation.trim() === "") {
+      errors.preferredWorkLocation = "Preferred Work Location is required";
     }
     return errors;
   };
   const handleDeleteAdditionalInfo = () => {
     setAdditionalInfo({
       expectedSalary: "",
-      preferredLocation: "",
+      preferredWorkLocation: "",
     });
 
     setIsAdditionalInfoVisible(true);
   };
 
   // Logic for About me
+  useEffect(() => {
+    if (id) {
+      axios
+        .get(`${backendUrl}/createresume/aboutme/${id}`)
+        .then((response) => {
+          console.log("GET request successful:", response.data);
+          response.data.output.forEach((entry) => {
+            console.log("About me Database ID:", entry.id);
+            setDatabaseAboutMeIds(entry.id);
+            const aboutMe = response.data.output;
+            setDatabaseAboutMe(aboutMe, databaseAboutMeIds);
+            console.log(databaseAboutMeIds);
+          });
+        })
+        .catch((error) => {
+          console.error("Error with GET request:", error);
+        });
+    }
+  }, [id]);
+  useEffect(() => {
+    const combinedAboutMe = [aboutMe, ...databaseAboutMe];
+    setAllAboutMe(combinedAboutMe);
+    console.log(allAboutMe);
+  }, [aboutMe, databaseAboutMe]);
   const handleAboutMeEditClick = () => {
     setIsEditingAboutMe(false);
   };
@@ -494,6 +881,32 @@ function CreateResume() {
     } else {
       setAboutMeErrors(newAboutMeErrors);
       console.log("Validation errors:", newAboutMeErrors);
+      console.log("ABoutME", aboutMe);
+    }
+    if (id) {
+      axios
+        .post(`${backendUrl}/createresume/aboutme/${id}`, {
+          userId: id,
+          ...aboutMe,
+        })
+        .then((response) => {
+          const entryId = response.data.id;
+          console.log("Data successfully saved, ID:", entryId);
+        })
+        .catch((error) => {
+          console.error("Error saving data:", error);
+        });
+    } else {
+      axios
+        .put(`${backendUrl}/createresume/aboutme/${aboutMe.id}`, {
+          ...aboutMe,
+        })
+        .then(() => {
+          console.log("Data successfully updated, ID:", fieldValues.id);
+        })
+        .catch((error) => {
+          console.error("Error updating data:", error);
+        });
     }
   };
 
@@ -828,13 +1241,18 @@ function CreateResume() {
                             <TextField
                               label="Position Title"
                               id="positionTitle"
-                              value={fieldValues.positionTitle}
-                              onChange={(e) =>
+                              value={
+                                //editingIndex !== null && fieldValues.positionTitle ===""
+                                //? allExperiences[editingIndex].positionTitle
+                                //: fieldValues.positionTitle!==""? fieldValues.positionTitle : ""
+                                fieldValues.positionTitle || ""
+                              }
+                              onChange={(e) => {
                                 handleExperienceChange(
                                   "positionTitle",
                                   e.target.value
-                                )
-                              }
+                                );
+                              }}
                               error={fieldErrors.positionTitle || false}
                               helperText={
                                 fieldErrors.positionTitle &&
@@ -847,7 +1265,12 @@ function CreateResume() {
                             <TextField
                               label="Company Name"
                               id="companyName"
-                              value={fieldValues.companyName}
+                              value={
+                                // editingIndex !== null
+                                //   ? allExperiences[editingIndex].companyName ||
+                                //     "" :
+                                fieldValues.companyName || ""
+                              }
                               onChange={(e) =>
                                 handleExperienceChange(
                                   "companyName",
@@ -866,7 +1289,13 @@ function CreateResume() {
                             <TextField
                               label="Start Period"
                               id="startPeriod"
-                              value={fieldValues.startPeriod}
+                              value={
+                                // editingIndex !== null
+                                //   ? allExperiences[editingIndex].startPeriod ||
+                                //     ""
+                                //   : fieldValues.startPeriod || ""
+                                fieldValues.startPeriod || ""
+                              }
                               onChange={(e) =>
                                 handleExperienceChange(
                                   "startPeriod",
@@ -905,7 +1334,12 @@ function CreateResume() {
                             <TextField
                               label="End Period"
                               id="endPeriod"
-                              value={fieldValues.endPeriod}
+                              value={
+                                // editingIndex !== null
+                                //   ? allExperiences[editingIndex].endPeriod || ""
+                                //   : fieldValues.endPeriod || ""
+                                fieldValues.endPeriod || ""
+                              }
                               onChange={(e) =>
                                 handleExperienceChange(
                                   "endPeriod",
@@ -925,7 +1359,13 @@ function CreateResume() {
                             <TextField
                               label="Specialization"
                               id="specialization"
-                              value={fieldValues.specialization}
+                              value={
+                                // editingIndex !== null
+                                //   ? allExperiences[editingIndex]
+                                //       .specialization || ""
+                                //   : fieldValues.specialization || ""
+                                fieldValues.specialization || ""
+                              }
                               onChange={(e) =>
                                 handleExperienceChange(
                                   "specialization",
@@ -944,7 +1384,12 @@ function CreateResume() {
                             <TextField
                               label="Role"
                               id="role"
-                              value={fieldValues.role}
+                              value={
+                                // editingIndex !== null
+                                //   ? allExperiences[editingIndex].role || ""
+                                //   : fieldValues.role || ""
+                                fieldValues.role || ""
+                              }
                               onChange={(e) =>
                                 handleExperienceChange("role", e.target.value)
                               }
@@ -959,7 +1404,12 @@ function CreateResume() {
                             <TextField
                               label="Country"
                               id="country"
-                              value={fieldValues.country}
+                              value={
+                                // editingIndex !== null
+                                //   ? allExperiences[editingIndex].country || ""
+                                //   : fieldValues.country || ""
+                                fieldValues.country || ""
+                              }
                               onChange={(e) =>
                                 handleExperienceChange(
                                   "country",
@@ -977,7 +1427,12 @@ function CreateResume() {
                             <TextField
                               label="Industry"
                               id="industry"
-                              value={fieldValues.industry}
+                              value={
+                                // editingIndex !== null
+                                //   ? allExperiences[editingIndex].industry || ""
+                                //   : fieldValues.industry || """
+                                fieldValues.industry || ""
+                              }
                               onChange={(e) =>
                                 handleExperienceChange(
                                   "industry",
@@ -995,7 +1450,12 @@ function CreateResume() {
                             <TextField
                               label="Position Level"
                               id="positionLevel"
-                              value={fieldValues.positionLevel}
+                              value={
+                                // editingIndex !== null
+                                //   ? allExperiences[editingIndex].positionLevel
+                                //   : fieldValues.positionLevel || ""
+                                fieldValues.positionLevel || ""
+                              }
                               onChange={(e) =>
                                 handleExperienceChange(
                                   "positionLevel",
@@ -1014,7 +1474,13 @@ function CreateResume() {
                             <TextField
                               label="Monthly Salary"
                               id="monthlySalary"
-                              value={fieldValues.monthlySalary}
+                              value={
+                                // editingIndex !== null
+                                //   ? allExperiences[editingIndex]
+                                //       .monthlySalary || ""
+                                //   : fieldValues.monthlySalary || ""
+                                fieldValues.monthly || ""
+                              }
                               onChange={(e) =>
                                 handleExperienceChange(
                                   "monthlySalary",
@@ -1033,7 +1499,13 @@ function CreateResume() {
                             <TextField
                               label="Executive Summary"
                               id="executiveSummary"
-                              value={fieldValues.experienceSummary}
+                              value={
+                                // editingIndex !== null
+                                //   ? allExperiences[editingIndex]
+                                //       .executiveSummary
+                                //   : fieldValues.executiveSummary || ""
+                                fieldValues.executiveSummary || ""
+                              }
                               onChange={(e) =>
                                 handleExperienceChange(
                                   "executiveSummary",
@@ -1051,6 +1523,7 @@ function CreateResume() {
                               multiline
                               rows={5}
                             />
+
                             <Button
                               variant="contained"
                               classes={{ root: "orange" }}
@@ -1059,6 +1532,7 @@ function CreateResume() {
                             >
                               Save
                             </Button>
+
                             <Button
                               classes={{ root: "orange" }}
                               onClick={() => {
@@ -1075,7 +1549,19 @@ function CreateResume() {
                       <div>
                         {/* Your saved values */}
                         <Typography variant="h6">Saved Experience:</Typography>
-                        {savedFieldValues.map((savedValues, index) => (
+                        <Button
+                          variant="contained"
+                          classes={{ root: "orange" }}
+                          onClick={() => {
+                            resetFormFields();
+                            setExperienceFormFieldVisible(true);
+                            setShowSavedValues(true);
+                          }}
+                          style={{ marginRight: "10px" }}
+                        >
+                          Add Experience
+                        </Button>
+                        {allExperiences.map((savedValues, index) => (
                           <div key={index}>
                             <Typography
                               variant="p"
@@ -1114,28 +1600,21 @@ function CreateResume() {
                                 resetFormFields(savedFieldValues[index]);
                                 setEditingIndex(index);
                                 setExperienceFormFieldVisible(true);
-                                setShowSavedValues(false);
+                                setFieldValues(allExperiences[index]);
+                                setShowSavedValues(true);
                               }}
                               style={{ marginRight: "10px" }}
                             >
                               Edit
                             </Button>
+
                             <Button
                               variant="contained"
                               classes={{ root: "orange" }}
                               onClick={() => {
-                                resetFormFields();
-                                setExperienceFormFieldVisible(true);
-                                setShowSavedValues(true);
+                                handleDeleteExperience(index);
+                                setFieldValues(allExperiences[index]);
                               }}
-                              style={{ marginRight: "10px" }}
-                            >
-                              Add Experience
-                            </Button>
-                            <Button
-                              variant="contained"
-                              classes={{ root: "orange" }}
-                              onClick={() => handleDeleteExperience(index)}
                             >
                               Delete
                             </Button>
@@ -1159,7 +1638,7 @@ function CreateResume() {
                   >
                     Add Education
                   </Button>
-                  {educationFields.map((education, index) => (
+                  {allEducations.map((education, index) => (
                     <div key={index}>
                       <Typography
                         variant="p"
@@ -1167,7 +1646,7 @@ function CreateResume() {
                           fontWeight: theme.typography.p,
                         }}
                       >
-                        Institute/University: {education.university}
+                        Institute/University: {education.institute}
                       </Typography>
                       <br />
                       <Typography
@@ -1195,7 +1674,7 @@ function CreateResume() {
                         }}
                       >
                         Institute/University Location:
-                        {education.universityLocation}
+                        {education.instituteLocation}
                       </Typography>
                       <br />
                       <Typography
@@ -1241,6 +1720,9 @@ function CreateResume() {
                           setEduFieldsVisible(true);
                           setEduFieldValues(education);
                           setEduEditingIndex(index);
+                          console.log(eduEditingIndex);
+                          setEduFieldValues(allEducations[index].id);
+                          console.log(eduFieldValues);
                         }}
                         sx={{ marginRight: "8px" }}
                       >
@@ -1249,7 +1731,11 @@ function CreateResume() {
                       <Button
                         variant="contained"
                         classes={{ root: "orange" }}
-                        onClick={() => handleDeleteEducation(index)}
+                        onClick={() => {
+                          handleDeleteEducation(index);
+                          setEduFieldValues(allEducations[index].id);
+                          setEduEditingIndex(index);
+                        }}
                       >
                         Delete
                       </Button>
@@ -1260,22 +1746,22 @@ function CreateResume() {
                     <div>
                       <TextField
                         label="Institute/University"
-                        value={eduFieldValues.university}
+                        value={eduFieldValues.institute || ""}
                         onChange={(e) =>
                           setEduFieldValues({
                             ...eduFieldValues,
-                            university: e.target.value,
+                            institute: e.target.value,
                           })
                         }
                         fullWidth
                         margin="normal"
                         size="small"
-                        error={!!eduFieldErrors.university}
-                        helperText={eduFieldErrors.university}
+                        error={!!eduFieldErrors.institute}
+                        helperText={eduFieldErrors.institute}
                       />
                       <TextField
                         label="Graduation Date"
-                        value={eduFieldValues.graduationDate}
+                        value={eduFieldValues.graduationDate || ""}
                         onChange={(e) =>
                           setEduFieldValues({
                             ...eduFieldValues,
@@ -1289,7 +1775,7 @@ function CreateResume() {
                       />
                       <TextField
                         label="Qualification"
-                        value={eduFieldValues.qualification}
+                        value={eduFieldValues.qualification || ""}
                         onChange={(e) =>
                           setEduFieldValues({
                             ...eduFieldValues,
@@ -1304,22 +1790,22 @@ function CreateResume() {
                       />
                       <TextField
                         label="Institute/University Location"
-                        value={eduFieldValues.universityLocation}
+                        value={eduFieldValues.instituteLocation || ""}
                         onChange={(e) =>
                           setEduFieldValues({
                             ...eduFieldValues,
-                            universityLocation: e.target.value,
+                            instituteLocation: e.target.value,
                           })
                         }
                         fullWidth
                         margin="normal"
                         size="small"
-                        error={!!eduFieldErrors.universityLocation}
-                        helperText={eduFieldErrors.universityLocation}
+                        error={!!eduFieldErrors.instituteLocation}
+                        helperText={eduFieldErrors.instituteLocation}
                       />
                       <TextField
                         label="Field of Study"
-                        value={eduFieldValues.fieldOfStudy}
+                        value={eduFieldValues.fieldOfStudy || ""}
                         onChange={(e) =>
                           setEduFieldValues({
                             ...eduFieldValues,
@@ -1333,7 +1819,7 @@ function CreateResume() {
                       />
                       <TextField
                         label="Major"
-                        value={eduFieldValues.major}
+                        value={eduFieldValues.major || ""}
                         onChange={(e) =>
                           setEduFieldValues({
                             ...eduFieldValues,
@@ -1348,7 +1834,7 @@ function CreateResume() {
                       />
                       <TextField
                         label="Grade"
-                        value={eduFieldValues.grade}
+                        value={eduFieldValues.grade || ""}
                         onChange={(e) =>
                           setEduFieldValues({
                             ...eduFieldValues,
@@ -1363,7 +1849,7 @@ function CreateResume() {
                       />
                       <TextField
                         label="Awards"
-                        value={eduFieldValues.awards}
+                        value={eduFieldValues.awards || ""}
                         onChange={(e) =>
                           setEduFieldValues({
                             ...eduFieldValues,
@@ -1426,7 +1912,7 @@ function CreateResume() {
                         marginBottom: "2px",
                       }}
                     >
-                      {skillFields.length > 0 && (
+                      {skillFields.length >= 0 && (
                         <div>
                           <Typography variant="p" style={{ width: "40%" }}>
                             Skills
@@ -1447,7 +1933,7 @@ function CreateResume() {
                       </Typography>
                     </div>
 
-                    {skillFields.map((skill, index) => (
+                    {allSkills.map((skill, index) => (
                       <div
                         key={index}
                         style={{
@@ -1458,11 +1944,11 @@ function CreateResume() {
                         }}
                       >
                         <div style={{ width: "40%" }}>
-                          <Typography variant="p">{skill.skillName}</Typography>
+                          <Typography variant="p">{skill.skill}</Typography>
                         </div>
                         <div style={{ width: "40%" }}>
                           <Typography variant="p">
-                            {skill.proficiencyLevel}
+                            {skill.proficiency}
                           </Typography>
                         </div>
                         <div
@@ -1479,6 +1965,7 @@ function CreateResume() {
                               setSkillFormVisible(true);
                               setSkillFieldValues(skill);
                               setSkillEditingIndex(index);
+                              setSkillFieldValues(allSkills[index].id);
                             }}
                             sx={{ marginRight: "8px" }}
                           >
@@ -1499,33 +1986,33 @@ function CreateResume() {
                       <div>
                         <TextField
                           label="Skill Name"
-                          value={skillFieldValues.skillName}
+                          value={skillFieldValues.skill || ""}
                           onChange={(e) =>
                             setSkillFieldValues({
                               ...skillFieldValues,
-                              skillName: e.target.value,
+                              skill: e.target.value,
                             })
                           }
                           fullWidth
                           margin="normal"
                           size="small"
-                          error={!!skillFieldErrors.skillName}
-                          helperText={skillFieldErrors.skillName}
+                          error={!!skillFieldErrors.skill}
+                          helperText={skillFieldErrors.skill}
                         />
                         <TextField
                           label="Proficiency Level"
-                          value={skillFieldValues.proficiencyLevel}
+                          value={skillFieldValues.proficiency || ""}
                           onChange={(e) =>
                             setSkillFieldValues({
                               ...skillFieldValues,
-                              proficiencyLevel: e.target.value,
+                              proficiency: e.target.value,
                             })
                           }
                           fullWidth
                           margin="normal"
                           size="small"
-                          error={!!skillFieldErrors.proficiencyLevel}
-                          helperText={skillFieldErrors.proficiencyLevel}
+                          error={!!skillFieldErrors.proficiency}
+                          helperText={skillFieldErrors.proficiency}
                         />
                         <Button
                           variant="contained"
@@ -1565,9 +2052,9 @@ function CreateResume() {
                     onClick={() => {
                       setLanguageFormVisible(true);
                       setLanguageFieldValues({
-                        languageName: "",
-                        proficiencySpoken: "",
-                        proficiencyWritten: "",
+                        language: "",
+                        spoken: "",
+                        written: "",
                         isPrimary: false,
                       });
                       setLanguageEditingIndex(null);
@@ -1577,7 +2064,7 @@ function CreateResume() {
                   </Button>
                   <Divider sx={{ margin: "24px 0" }} />
                   <div>
-                    {languageFields.length > 0 && (
+                    {languageFields.length >= 0 && (
                       <div
                         style={{
                           display: "flex",
@@ -1635,7 +2122,7 @@ function CreateResume() {
                       </div>
                     )}
 
-                    {languageFields.map((language, index) => (
+                    {allLanguages.map((language, index) => (
                       <div
                         key={index}
                         style={{
@@ -1652,7 +2139,7 @@ function CreateResume() {
                               fontWeight: theme.typography.p,
                             }}
                           >
-                            {language.languageName}
+                            {language.language}
                           </Typography>
                         </div>
                         <div style={{ width: "20%" }}>
@@ -1662,7 +2149,7 @@ function CreateResume() {
                               fontWeight: theme.typography.p,
                             }}
                           >
-                            {language.proficiencySpoken}
+                            {language.spoken}
                           </Typography>
                         </div>
                         <div style={{ width: "20%" }}>
@@ -1672,7 +2159,7 @@ function CreateResume() {
                               fontWeight: theme.typography.p,
                             }}
                           >
-                            {language.proficiencyWritten}
+                            {language.written}
                           </Typography>
                         </div>
                         <div style={{ width: "20%" }}>
@@ -1699,6 +2186,7 @@ function CreateResume() {
                               setLanguageFormVisible(true);
                               setLanguageFieldValues(language);
                               setLanguageEditingIndex(index);
+                              setLanguageFieldValues(allLanguages[index].id);
                             }}
                           >
                             Edit
@@ -1718,63 +2206,60 @@ function CreateResume() {
                       <div>
                         <TextField
                           label="Language Name"
-                          value={languageFieldValues.languageName}
+                          value={languageFieldValues.language || ""}
                           onChange={(e) =>
                             setLanguageFieldValues({
                               ...languageFieldValues,
-                              languageName: e.target.value,
+                              language: e.target.value,
                             })
                           }
                           fullWidth
                           margin="normal"
                           size="small"
-                          error={!!languageFieldErrors.languageName}
-                          helperText={languageFieldErrors.languageName || " "}
+                          error={!!languageFieldErrors.language}
+                          helperText={languageFieldErrors.language || " "}
                         />
                         <TextField
                           label="Proficiency (Spoken)"
-                          value={languageFieldValues.proficiencySpoken}
+                          value={languageFieldValues.spoken || ""}
                           onChange={(e) =>
                             setLanguageFieldValues({
                               ...languageFieldValues,
-                              proficiencySpoken: e.target.value,
+                              spoken: e.target.value,
                             })
                           }
                           fullWidth
                           margin="normal"
                           size="small"
-                          error={!!languageFieldErrors.proficiencySpoken}
-                          helperText={
-                            languageFieldErrors.proficiencySpoken || " "
-                          }
+                          error={!!languageFieldErrors.spoken}
+                          helperText={languageFieldErrors.spoken || " "}
                         />
                         <TextField
                           label="Proficiency (Written)"
-                          value={languageFieldValues.proficiencyWritten}
+                          value={languageFieldValues.written}
                           onChange={(e) =>
                             setLanguageFieldValues({
                               ...languageFieldValues,
-                              proficiencyWritten: e.target.value,
+                              written: e.target.value,
                             })
                           }
                           fullWidth
                           margin="normal"
                           size="small"
-                          error={!!languageFieldErrors.proficiencyWritten}
-                          helperText={
-                            languageFieldErrors.proficiencyWritten || " "
-                          }
+                          error={!!languageFieldErrors.written}
+                          helperText={languageFieldErrors.written || " "}
                         />
                         <div>
                           <label>
                             Primary Language:
                             <input
                               type="radio"
-                              checked={languageFieldValues.isPrimary === true}
+                              //value={languageFieldValues.ifPrimary || ""}
+                              checked={languageFieldValues.ifPrimary === true}
                               onChange={() =>
                                 setLanguageFieldValues({
                                   ...languageFieldValues,
-                                  isPrimary: true,
+                                  ifPrimary: true,
                                 })
                               }
                             />
@@ -1783,11 +2268,12 @@ function CreateResume() {
                           <label>
                             <input
                               type="radio"
-                              checked={languageFieldValues.isPrimary === false}
+                              //value={languageFieldValues.ifPrimary || ""}
+                              checked={languageFieldValues.ifPrimary === false}
                               onChange={() =>
                                 setLanguageFieldValues({
                                   ...languageFieldValues,
-                                  isPrimary: false,
+                                  ifPrimary: false,
                                 })
                               }
                             />
@@ -1836,18 +2322,18 @@ function CreateResume() {
                       />
                       <TextField
                         label="Preferred Work Location"
-                        value={additionalInfo.preferredLocation}
+                        value={additionalInfo.preferredWorkLocation}
                         onChange={(e) =>
                           setAdditionalInfo({
                             ...additionalInfo,
-                            preferredLocation: e.target.value,
+                            preferredWorkLocation: e.target.value,
                           })
                         }
                         fullWidth
                         margin="normal"
                         size="small"
-                        error={!!additionalInfoErrors.preferredLocation}
-                        helperText={additionalInfoErrors.preferredLocation}
+                        error={!!additionalInfoErrors.preferredWorkLocation}
+                        helperText={additionalInfoErrors.preferredWorkLocation}
                       />
                       <Button
                         variant="contained"
@@ -1874,23 +2360,23 @@ function CreateResume() {
                           handleDeleteAdditionalInfo();
                           setAdditionalInfo({
                             expectedSalary: "",
-                            preferredLocation: "",
+                            preferredWorkLocation: "",
                           });
                           setIsEditing(false);
                         }}
                         disabled={
                           !additionalInfo.expectedSalary &&
-                          !additionalInfo.preferredLocation
+                          !additionalInfo.preferredWorkLocation
                         }
                       >
                         Delete
                       </Button>
-                      <Typography variant="subtitle1">
+                      <Typography variant="p">
                         Expected Monthly Salary: {additionalInfo.expectedSalary}
                       </Typography>
-                      <Typography variant="subtitle1">
+                      <Typography variant="p">
                         Preferred Work Location:{" "}
-                        {additionalInfo.preferredLocation}
+                        {additionalInfo.preferredWorkLocation}
                       </Typography>
                     </div>
                   )}
@@ -2001,7 +2487,7 @@ function CreateResume() {
                         onChange={(e) =>
                           setAboutMe({
                             ...aboutMe,
-                            address: e.target.value,
+                            address: e.target.value || address,
                           })
                         }
                         fullWidth
