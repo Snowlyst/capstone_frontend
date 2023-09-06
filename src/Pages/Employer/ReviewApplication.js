@@ -327,41 +327,6 @@ function ReviewApplication() {
       });
   }
 
-  async function createCalendarEvent() {
-    console.log("creating calendar event");
-    const event = {
-      summary: eventName,
-      description: eventDescription,
-      start: {
-        dateTime: startTD.toISOString(),
-        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      },
-      end: {
-        dateTime: endTD.toISOString(),
-        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      },
-    };
-    axios({
-      url: `https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events`,
-      method: "post",
-      headers: {
-        Authorization: "Bearer " + session.provider_token,
-      },
-      data: JSON.stringify(event),
-    })
-      .then((data) => {
-        console.log(data);
-        Swal.fire(
-          "Success",
-          "The event has been created on your google calendar!",
-          "success"
-        );
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }
-
   const scheduleMeeting = async () => {
     if (!eventName || !eventDescription) {
       return Swal.fire(SwalMsgs.missingFormInfoGentle);
@@ -428,74 +393,6 @@ function ReviewApplication() {
       console.error(error);
     }
   };
-  // const scheduleMeeting = () => {
-  //   if (!eventName || !eventDescription) {
-  //     return Swal.fire(SwalMsgs.missingFormInfoGentle);
-  //   }
-  //   const startTime = new Date(startTD).toISOString();
-  //   const idToEdit = usersData[currentEntitySelection].id;
-  //   const dataToSend = {
-  //     idToEdit: idToEdit,
-  //     startTime: startTime,
-  //   };
-  //   console.log(dataToSend);
-  //   axios
-  //     .put(`${BACKEND_URL}/application/scheduleinterview`, dataToSend, {
-  //       headers: {
-  //         Authorization: `Bearer ${accessToken}`,
-  //       },
-  //     })
-  //     .then(() => {
-  //       console.log("creating calendar event");
-  //       const event = {
-  //         summary: eventName,
-  //         description: eventDescription,
-  //         start: {
-  //           dateTime: startTD.toISOString(),
-  //           timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-  //         },
-  //         end: {
-  //           dateTime: endTD.toISOString(),
-  //           timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-  //         },
-  //       };
-  //       return event;
-  //     })
-  //     .then((event) => {
-  //       axios({
-  //         url: `https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events`,
-  //         method: "post",
-  //         headers: {
-  //           Authorization: "Bearer " + session.provider_token,
-  //         },
-  //         data: JSON.stringify(event),
-  //       })
-  //         .then((data) => {
-  //           console.log(data);
-  //           return Swal.fire(
-  //             "Success",
-  //             "The event has been created on your google calendar!",
-  //             "success"
-  //           );
-  //         })
-  //         .then(() => {
-  //           setStartTD(new Date());
-  //           setEndTD(new Date());
-  //           setEventName("");
-  //           setEventDescription("");
-  //           return;
-  //         })
-  //         .catch((error) => {
-  //           console.log(error);
-  //         })
-  //         .finally(() => {
-  //           window.location.reload();
-  //         });
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //     });
-  // };
 
   // this must be at bottom layer right before return if not useeffect kills itself
   if (isLoading) {
