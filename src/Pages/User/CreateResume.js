@@ -64,11 +64,8 @@ function CreateResume() {
   });
   const [savedFieldValues, setSavedFieldValues] = useState([]);
   const [editingIndex, setEditingIndex] = useState(null);
-  const [databaseExperiences, setDatabaseExperiences] = useState([]);
   const [allExperiences, setAllExperiences] = useState([]);
-  const [databaseExperienceIds, setDatabaseExperienceIds] = useState([]);
   const [databaseExperiences, setDatabaseExperiences] = useState([]);
-  const [allExperiences, setAllExperiences] = useState([]);
   const [databaseExperienceIds, setDatabaseExperienceIds] = useState([]);
   // States for education
   const [eduFieldErrors, setEduFieldErrors] = useState({});

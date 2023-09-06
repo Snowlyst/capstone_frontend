@@ -6,6 +6,8 @@ import axios from "axios";
 
 const UserProfile = () => {
   const { currUser, setCurrUser, categories, location } = useUserContext();
+  const [isLoaded, setIsLoaded] = useState(false);
+
   const param = useParams();
   console.log(param);
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -13,13 +15,14 @@ const UserProfile = () => {
   const [user, setUser] = useState("");
   const [accessToken, setAccessToken] = useState("");
 
+  //make sure currUser is set or else the navigate gonna boot everyone off the screen
   useEffect(() => {
     console.log(currUser);
-    if (!currUser) {
-      const localAccess = JSON.parse(localStorage.getItem("verveCurrUser"));
-      console.log("User retrieved");
-      // setAccessToken(localAccess.accessToken);
-      setCurrUser(localAccess);
+    if (!accessToken) {
+      const localAccess = JSON.parse(localStorage.getItem("verveToken"));
+      console.log("access token ready");
+      setAccessToken(localAccess);
+      setIsLoaded(true);
     }
   }, []);
 
@@ -29,7 +32,6 @@ const UserProfile = () => {
 
   useEffect(() => {
     console.log(currUser);
-    console.log(currUser.accessToken);
   }, [currUser]);
 
   useEffect(() => {
@@ -53,52 +55,55 @@ const UserProfile = () => {
       elevation={3}
       style={{ padding: "20px", maxWidth: "400px", margin: "auto" }}
     >
-      <Grid container spacing={2} justifyContent="center" alignItems="center">
-        <Grid item xs={12} style={{ textAlign: "center" }}>
-          {profileData.avatarUrl ? (
-            <Avatar
-              alt="User Avatar"
-              src={profileData.avatarUrl}
-              sx={{ width: 100, height: 100 }}
-            />
-          ) : (
-            ""
-          )}
+      {profileData ? (
+        <Grid container spacing={2} justifyContent="center" alignItems="center">
+          <Grid item xs={12} style={{ textAlign: "center" }}>
+            {profileData.avatarUrl ? (
+              <Avatar
+                alt="User Avatar"
+                src={profileData.avatarUrl}
+                sx={{ width: 100, height: 100 }}
+              />
+            ) : (
+              ""
+            )}
+          </Grid>
+          <Grid item xs={12} style={{ textAlign: "center" }}>
+            <Typography variant="h5">
+              {profileData.firstName} {profileData.lastName}
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="subtitle1">
+              Date of Birth:{" "}
+              {profileData.user_personal_detail.dateOfBirth || ""}
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="subtitle1">
+              Mobile Number:{" "}
+              {profileData.user_personal_detail.mobileNumber || ""}
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="subtitle1">
+              Address: {profileData.user_personal_detail.address || ""}
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="subtitle1">
+              Active Treatment:{" "}
+              {profileData.user_personal_detail.activeTreatment || ""}
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="subtitle1">
+              Cancer Type:{" "}
+              {profileData.user_personal_detail.cancerDiagnosis || ""}
+            </Typography>
+          </Grid>
         </Grid>
-        {profileData && "Data loaded"}
-        {/* <Grid item xs={12} style={{ textAlign: "center" }}>
-          <Typography variant="h5">
-            {profileData.firstName} {profileData.lastName}
-          </Typography>
-        </Grid>
-        <Grid item xs={12}>
-          <Typography variant="subtitle1">
-            Date of Birth: {profileData.user_personal_detail.dateOfBirth || ""}
-          </Typography>
-        </Grid>
-        <Grid item xs={12}>
-          <Typography variant="subtitle1">
-            Mobile Number: {profileData.user_personal_detail.mobileNumber || ""}
-          </Typography>
-        </Grid>
-        <Grid item xs={12}>
-          <Typography variant="subtitle1">
-            Address: {profileData.user_personal_detail.address || ""}
-          </Typography>
-        </Grid>
-        <Grid item xs={12}>
-          <Typography variant="subtitle1">
-            Active Treatment:{" "}
-            {profileData.user_personal_detail.activeTreatment || ""}
-          </Typography>
-        </Grid>
-        <Grid item xs={12}>
-          <Typography variant="subtitle1">
-            Cancer Type:{" "}
-            {profileData.user_personal_detail.cancerDiagnosis || ""}
-          </Typography>
-        </Grid> */}
-      </Grid>
+      ) : null}
     </Paper>
   );
 };
