@@ -221,7 +221,7 @@ function AdminDashboard() {
                 </Grid>
                 <Grid item sx={{ mt: 3, mb: 7 }}>
                   <Stack direction={"row"}>
-                    <Link href="#">
+                    <Link href="/admin/manageusercompanies">
                       <Button
                         variant="contained"
                         component="span"
@@ -232,8 +232,8 @@ function AdminDashboard() {
                           borderRadius: "7px",
                         }}
                       >
-                        <Typography sx={{ fontSize: 14 }}>
-                          Manage Existing Users
+                        <Typography sx={{ fontSize: "1.4vh" }}>
+                          Manage Existing Users/Companies
                         </Typography>
                       </Button>
                     </Link>

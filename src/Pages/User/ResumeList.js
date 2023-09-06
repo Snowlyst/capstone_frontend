@@ -363,7 +363,7 @@ function ResumeList() {
             }}
           >
             Please upload your resume. If you do not have one currently, click{" "}
-            <Link href="#">here</Link> to start making one!
+            <Link href="/createresume">here</Link> to start making one!
           </Typography>
           <Typography
             variant="p"
