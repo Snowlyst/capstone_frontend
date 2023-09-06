@@ -11,22 +11,11 @@ import {
 } from "@mui/material";
 import { theme } from "../Assets/Styles/Theme";
 import { useNavigate } from "react-router-dom";
-
+import { useUserContext } from "../Components/UserContext";
 function Categories() {
   const navigate = useNavigate();
-  const [categories, setCategories] = useState([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState("");
-
-  useEffect(() => {
-    axios
-      .get(`${process.env.REACT_APP_BACKEND_URL}/listings/categories`)
-      .then((response) => {
-        setCategories(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching categories:", error);
-      });
-  }, []);
+const { categories, setCategories } = useUserContext();
 
   const handleCardClick = (category) => {
     setSelectedCategoryId(category.id);
