@@ -18,14 +18,26 @@ export const successPostingAwaitApproval = {
   icon: "success",
 };
 
-export const successPostingAwaitApprovalWButtons = {
-  title: "Success!",
-  text: "Your post has been successfully submitted, but it needs approval before it can be listed. ",
-  icon: "success",
-  showDenyButton: true,
-  confirmButtonColor: "LightSeaGreen",
-  denyButtonText: "Return to Home",
-  confirmButtonText: "Add New Post",
+export const errorRetrievingInfo = {
+  title: "Error",
+  text: "We are sorry but the record could not be retrieved. Please try again ",
+  icon: "error",
+};
+
+export const successPostingAwaitApprovalWButtons = (
+  infoName,
+  denyText,
+  confirmText
+) => {
+  return {
+    title: "Success!",
+    text: `Your ${infoName} has been successfully submitted, but it needs approval before it can be listed. `,
+    icon: "success",
+    showDenyButton: true,
+    confirmButtonColor: "LightSeaGreen",
+    denyButtonText: `Return to ${denyText}`,
+    confirmButtonText: `Return to ${confirmText}`,
+  };
 };
 
 // form checks
