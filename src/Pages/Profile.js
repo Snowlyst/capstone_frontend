@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   Grid,
@@ -12,682 +12,1053 @@ import {
   FormControl,
   InputLabel,
   IconButton,
+  Tooltip,
+  Button,
+  FormHelperText,
+  ThemeProvider,
+  Autocomplete,
+  Container,
+  Paper,
+  Stack,
+  InputAdornment,
 } from "@mui/material";
-import { ThemeProvider } from "@mui/material/styles";
-import { theme } from "../Assets/Styles/Theme";
+import { useAuth0 } from "@auth0/auth0-react";
+import { theme } from "../../Assets/Styles/Theme";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
-import "../Assets/Styles/MemberProfile.css";
+import "../../Assets/Styles/MemberProfile.css";
+import "../../Assets/Styles/Homepage.css";
+import axios from "axios";
+import * as options from "./MenuItemsOptions";
+import Swal from "sweetalert2";
+import "sweetalert2/dist/sweetalert2.min.css";
+import * as SwalMsgs from "../../Utils/SwalMsgs";
+import { useUserContext } from "../../Components/UserContext";
+import AxiosLoader from "../../Components/AxiosLoader";
 
 function Profile() {
   // Set States
-  const [cancerDiagnosis, setCancerDiagnosis] = useState("");
-  const [housingType, setHousingType] = useState("");
-  const [livingArrangement, setLivingArrangment] = useState("");
-  const [currentWorkStatus, setCurrentWorkStatus] = useState("");
-  const [occupation, setOccupation] = useState("");
-  const [monthlySalary, setMonthlySalary] = useState("");
-  const [cancerImpactOnFinances, setCancerImpactOnFinances] = useState("");
-  const [employedReadinessScaleToRtw, setEmployedReadinessScaleToRtw] =
-    useState("");
-  const [unemployedReadinessScaleToRtw, setUnemployedReadinessScaleToRtw] =
-    useState("");
-  const [unemployedTimeFrameToRtw, setUnemployedTimeFrameToRtw] = useState("");
-  const [currentHealthStatus, setCurrentHealthStatus] = useState("");
+  const { isAuthenticated } = useAuth0();
+  const [axiosLoading, setAxiosLoading] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
+  const { currUser, categories, location } = useUserContext();
+  const [currentlyWorking, setCurrentlyWorking] = useState(false);
+  const cancerDiag = options.cancerDiag.sort(
+    (a, b) => -b.firstLetter.localeCompare(a.firstLetter)
+  );
+  // combinedAddress: "", // To display combined Add
+  const [fieldValues, setFieldValues] = useState({
+    userId: "",
+    firstName: "", // users 1
+    lastName: "", // users 2
+    identificationNumber: "", // UPD 3
+    mobileNumber: "", // UPD 4
+    dateOfBirth: "", // UPD 5
+    cancerDiagnosis: "", // UPD 6
+    activeTreatment: "", // UPD 7
+    gender: "", // UPD 8
+    postalCode: "", // UPD 9
+    housingType: "", // UPD 10
+    displayedAddress: "", // STREET ADDRESS AFTER POSTAL CODE UPD 11
+    unitNumber: "", // UPD 12
+    livingArrangement: "", // UPD 13
+    currentWorkStatus: "", // UPD 14
+    occupation: "", // UPD 15
+    monthlySalary: "", // where is this ??? UPD 27
+    cancerImpactOnFinances: "", // UPD 16
+    dateOfLastEmployment: "", // UPD 17
+    readinessScaleToRtw: "", // readiness_to_rtw UPD 18
+    timeFrameToRtw: "", // time_frame_to_rtw UPD 19
+    employedReadinessScale: "", // employed_readiness_scale UPD 20
+    currentHealthStatus: "", // UPD 21
+    physicalHealthStatus: "", //current physical health status UPD 22
+    currentMentalHealthStatus: "", // current mental health status UPD 23
+    physicalBarriersToRtw: "", // UPD 24
+    psychosocialBarriersToRtw: "", // psychosocial barriers to rtw UPD 25
+    additionalInformation: "", // UPD 26
+  });
 
-  // Functions to handle input
-  const handleCancerDiagnosisChange = (e) => {
-    setCancerDiagnosis(e.target.value);
+  useEffect(() => {
+    console.log(currUser);
+    if (isAuthenticated && currUser) {
+      handleChange("userId", currUser.id);
+      handleChange("firstName", currUser.firstName);
+      handleChange("lastName", currUser.lastName);
+    }
+  }, [currUser]);
+
+  const handleChange = (fieldName, value) => {
+    setFieldValues((prevValues) => ({
+      ...prevValues,
+      [fieldName]: value,
+    }));
+    if (fieldName === "currentWorkStatus") {
+      if (value === "Unemployed") {
+        setCurrentlyWorking(false);
+      } else {
+        setCurrentlyWorking(true);
+      }
+    }
   };
 
-  const handleHousingTypeChange = (e) => {
-    setHousingType(e.target.value);
+  const handleSearchPostal = (e) => {
+    e.preventDefault();
+    handleChange("postalCode", "");
+    const searchQuery = fieldValues.postalCode;
+    axios
+      .get(
+        `https://developers.onemap.sg/commonapi/search?searchVal=${searchQuery}&returnGeom=Y&getAddrDetails=Y`
+      )
+      .then((info) => {
+        const spreadData = info.data.results.map((info, index) => {
+          console.log(info);
+          console.log(info.ADDRESS);
+          // handleChange("address", info.ADDRESS);
+          return <div key={index}>Address: {info.ADDRESS}</div>;
+        });
+        handleChange("displayedAddress", spreadData);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
-  const handleLivingArrangmentChange = (e) => {
-    setLivingArrangment(e.target.value);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const newFieldErrors = {};
+    Object.keys(fieldValues).forEach((fieldName) => {
+      if (fieldValues[fieldName].trim() === "") {
+        newFieldErrors[fieldName] = true;
+      }
+    });
+    setFieldErrors(newFieldErrors);
+    if (newFieldErrors && newFieldErrors.length > 0) {
+      Swal.fire(SwalMsgs.missingFormInfoGentle);
+    } else {
+      console.log(fieldValues);
+      // do form checks b4 axios call to submit
+      // if (fieldValues && fieldValues.housingType === "Private Landed") {
+      //   const combinedAdd = `${fieldValues.unitNumber} ${fieldValues.displayedAddress}, Singapore ${fieldValues.postalCode}`;
+      //   handleChange("combinedAddress", combinedAdd);
+      // } else {
+      //   const combinedAdd = `${fieldValues.displayedAddress}, ${fieldValues.unitNumber}, Singapore ${fieldValues.postalCode}`;
+      //   handleChange("combinedAddress", combinedAdd);
+      // }
+      // const objToSend = {}
+    }
   };
-  const handleCurrentWorkStatus = (e) => {
-    setCurrentWorkStatus(e.target.value);
-  };
-  const handleOccupation = (e) => {
-    setOccupation(e.target.value);
-  };
-  const handleMonthlySalary = (e) => {
-    setMonthlySalary(e.target.value);
-  };
-  const handleCancerImpactOnFinances = (e) => {
-    setCancerImpactOnFinances(e.target.value);
-  };
-  const handleEmployedReadinessScaleToRtw = (e) => {
-    setEmployedReadinessScaleToRtw(e.target.value);
-  };
-  const handleUnemployedReadinessScaleToRtw = (e) => {
-    setUnemployedReadinessScaleToRtw(e.target.value);
-  };
-  const handleUnemployedTimeFrameToRtw = (e) => {
-    setUnemployedTimeFrameToRtw(e.target.value);
-  };
-  const handleCurrentHealthStatus = (e) => {
-    setCurrentHealthStatus(e.target.value);
-  };
+
+  useEffect(() => {
+    // Fetch user data from the API
+    axios
+      .get("http://localhost:8080/users/personalinfo/3")
+      .then((response) => {
+        const fetchedData = response.data;
+        setFieldValues(fetchedData);
+        console.log(fetchedData);
+        handleChange("firstName", fetchedData.firstName);
+        handleChange("lastName", fetchedData.lastName);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, []);
 
   return (
     <ThemeProvider theme={theme}>
-      <Box>
-        <Grid container justifyContent="center">
-          <Grid item xs={12}>
-            {/* Header */}
-            <Box textAlign="center" mt={2}>
-              <Typography theme={theme} sx={theme.typography.h4}>
-                Profile
-              </Typography>
-              <Typography theme={theme} sx={theme.typography.p}>
-                Please fill up your particulars. All fields must be filled in
-                before you can join the programs.
-              </Typography>
-            </Box>
-          </Grid>
-          <Grid item xs={12} md={8}>
-            {/* Personal Information */}
-            <Box mt={4} ml={2}>
-              <Typography theme={theme} sx={theme.typography.h6}>
-                Personal Information
-              </Typography>
-              <Grid container spacing={2}>
-                <Grid item xs={12} md={4}>
-                  <TextField
-                    label="First Name"
-                    fullWidth
-                    margin="normal"
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <TextField
-                    label="Last Name"
-                    fullWidth
-                    margin="normal"
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item xs={12} md={3}>
-                  <TextField
-                    label="NRIC"
-                    fullWidth
-                    margin="normal"
-                    variant="outlined"
-                  />
-                </Grid>
-              </Grid>
-            </Box>
-          </Grid>
-          <Grid item xs={12} md={8}>
-            <Box mt={1} ml={2}>
-              <Grid container spacing={2}>
-                <Grid item xs={4} md={2}>
-                  <TextField
-                    label="Mobile"
-                    fullWidth
-                    margin="normal"
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item xs={4} md={2}>
-                  <TextField
-                    label="Date of Birth"
-                    fullWidth
-                    margin="normal"
-                    variant="outlined"
-                    placeholder="DD/MM/YYYY"
-                  />
-                </Grid>
-                <Grid item xs={4} md={3}>
-                  <Box className="myBox">
-                    <FormControl fullWidth variant="outlined">
-                      <InputLabel>Cancer Diagnosis</InputLabel>
-                      <Select
-                        label="Cancer Diagnosis"
-                        value={cancerDiagnosis}
-                        onChange={handleCancerDiagnosisChange}
-                      >
-                        <MenuItem value="Breast">Breast</MenuItem>
-                        <MenuItem value="Brain">Brain</MenuItem>
-                        <MenuItem value="Lung">Lung</MenuItem>
-                        <MenuItem value="Colon & Rectum">
-                          Colon & Rectum
-                        </MenuItem>
-                        <MenuItem value="Prostate">Prostate</MenuItem>
-                        <MenuItem value="Head & Neck">Head & Neck</MenuItem>
-                        <MenuItem value="Others">Others</MenuItem>
-                        <MenuItem value="null"></MenuItem>
-                      </Select>
-                    </FormControl>
-                    {cancerDiagnosis === "Others" && (
-                      <TextField
-                        label="Other Cancer Diagnosis"
-                        fullWidth
-                        margin="normal"
-                        variant="outlined"
-                      />
-                    )}
-                  </Box>
-                </Grid>
-                <Grid item xs={6} md={2}>
-                  <Box className="myBox2">
-                    <Typography sx={{ fontSize: "small" }}>
-                      Active Treatment
-                    </Typography>
-                    <RadioGroup row>
-                      <FormControlLabel
-                        value="yes"
-                        control={<Radio size="small" />}
-                        label={
-                          <Typography sx={{ fontSize: "small" }}>
-                            Yes
-                          </Typography>
-                        }
-                      />
-                      <FormControlLabel
-                        value="no"
-                        control={<Radio size="small" />}
-                        label={
-                          <Typography sx={{ fontSize: "small" }}>No</Typography>
-                        }
-                      />
-                    </RadioGroup>
-                  </Box>
-                </Grid>
-                <Grid item xs={6} md={2}>
-                  <Box className="myBox">
-                    <Typography sx={{ fontSize: "small" }}>Gender</Typography>
-                    <RadioGroup row>
-                      <FormControlLabel
-                        value="male"
-                        control={<Radio size="small" />}
-                        label={
-                          <Typography sx={{ fontSize: "small" }}>
-                            Male
-                          </Typography>
-                        }
-                      />
-                      <FormControlLabel
-                        value="female"
-                        control={<Radio size="small" />}
-                        label={
-                          <Typography sx={{ fontSize: "small" }}>
-                            Female
-                          </Typography>
-                        }
-                      />
-                    </RadioGroup>
-                  </Box>
-                </Grid>
-              </Grid>
-            </Box>
-            <Box mt={1} ml={2}>
-              <Grid container spacing={2}>
-                {/* Postal Code */}
-                <Grid item xs={3} md={1.5}>
-                  <TextField
-                    label="Postal Code"
-                    fullWidth
-                    margin="normal"
-                    variant="outlined"
-                  />
-                </Grid>
-                <Grid item xs={1} md={0.5}>
-                  <Box className="myBox3">
-                    <IconButton
-                      style={{ color: "#FF6B2C" }}
-                      aria-label="search"
-                    >
-                      <SearchOutlinedIcon />
-                    </IconButton>
-                  </Box>
-                </Grid>
-                {/* Unit No */}
-                <Grid item xs={4} md={1.5}>
-                  <Box className="myBox4">
-                    <TextField
-                      label="Unit No"
-                      fullWidth
-                      margin="normal"
-                      variant="outlined"
-                      placeholder="#"
-                    />
-                  </Box>
-                </Grid>
+      <Grid container sx={theme.customStyles.centered.container}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <Container
+            sx={{
+              maxWidth: "880px",
+            }}
+          >
+            <Grid item>
+              {/* row 1 - banner */}
+              {axiosLoading && <AxiosLoader />}
+              <Box sx={{ maxWidth: "838px", flexWrap: "wrap" }} p={1} mb={3}>
+                <Paper elevation={2} color="FFF" className="boxpaper">
+                  <Box m={3} p={3} sx={theme.customStyles.displayFlexRowLeft}>
+                    <Stack direction="row">
+                      <Stack direction="column" spacing={3}>
+                        {/* row 1 profile title */}
+                        <Typography
+                          textAlign="left"
+                          variant="h4"
+                          sx={{
+                            fontWeight: theme.typography.h5.fontWeightBold,
+                          }}
+                        >
+                          Profile
+                        </Typography>
+                        <Typography
+                          variant="p"
+                          sx={{
+                            fontWeight: theme.typography.p.fontWeightBold,
+                          }}
+                        >
+                          Please fill up your particulars. All fields must be
+                          filled in before you can join the programs.
+                        </Typography>
+                        {/* row 2 personal information */}
+                        <Typography
+                          textAlign="left"
+                          variant="h6"
+                          sx={{
+                            fontWeight: theme.typography.h6.fontWeightBold,
+                          }}
+                        >
+                          Personal Information
+                        </Typography>
+                        {/* row 3 first name, last name, nric */}
+                        <Stack
+                          direction={theme.customStyles.stackCollapseRow}
+                          sx={theme.customStyles.stackFlexWrapLeft}
+                          spacing={2}
+                        >
+                          <TextField
+                            label="First Name"
+                            {...theme.textbox.common}
+                            value={fieldValues.firstName}
+                            onChange={(e) =>
+                              handleChange("firstName", e.target.value)
+                            }
+                            error={fieldErrors.firstName || false}
+                            helperText={
+                              fieldErrors.firstName && "First Name is required"
+                            }
+                            sx={{
+                              flex: 1,
+                              m: 1,
+                            }}
+                          />
+                          <TextField
+                            label="Last Name"
+                            required
+                            {...theme.textbox.common}
+                            value={fieldValues.lastName}
+                            onChange={(e) =>
+                              handleChange("lastName", e.target.value)
+                            }
+                            sx={{
+                              flex: 1,
+                              m: 1,
+                            }}
+                            error={fieldErrors.lastName || false}
+                            helperText={
+                              fieldErrors.lastName && "Last Name is required"
+                            }
+                          />
+                          <TextField
+                            label="NRIC"
+                            required
+                            {...theme.textbox.common}
+                            value={fieldValues.identificationNumber}
+                            sx={{
+                              flex: 1,
+                              m: 1,
+                            }}
+                            onChange={(e) =>
+                              handleChange(
+                                "identificationNumber",
+                                e.target.value
+                              )
+                            }
+                            error={fieldErrors.identificationNumber || false}
+                            helperText={
+                              fieldErrors.identificationNumber &&
+                              "Identification Number is required"
+                            }
+                          />
+                        </Stack>
+                        {/* row 4 mobile, dob,  gender */}
+                        <Stack
+                          direction={theme.customStyles.stackCollapseRow}
+                          spacing={2}
+                          sx={{
+                            justifyContent: "flex-start",
+                            alignItems: { xs: "flex-start", sm: "center" },
+                          }}
+                        >
+                          <TextField
+                            label="Mobile"
+                            required
+                            {...theme.textbox.common}
+                            value={fieldValues.mobileNumber}
+                            onChange={(e) =>
+                              handleChange("mobileNumber", e.target.value)
+                            }
+                            sx={{
+                              flex: 1,
+                              m: 1,
+                            }}
+                            error={fieldErrors.mobileNumber || false}
+                            helperText={
+                              fieldErrors.mobileNumber &&
+                              "Mobile Number is required"
+                            }
+                          />
+                          <TextField
+                            label="Date of Birth"
+                            required
+                            {...theme.textbox.common}
+                            placeholder="DD/MM/YYYY"
+                            value={fieldValues.dateOfBirth}
+                            onChange={(e) =>
+                              handleChange("dateOfBirth", e.target.value)
+                            }
+                            sx={{
+                              flex: 1,
+                              m: 1,
+                            }}
+                            error={fieldErrors.dateOfBirth || false}
+                            helperText={
+                              fieldErrors.dateOfBirth &&
+                              "Date of Birth is required"
+                            }
+                          />
+                          <Stack
+                            direction="column"
+                            sx={{
+                              ...theme.customStyles.stackWrapLeftCenter,
+                              alignItems: "flex-start",
+                            }}
+                          >
+                            <Typography sx={{ fontSize: "small" }}>
+                              Gender *
+                            </Typography>
+                            <RadioGroup
+                              row
+                              value={fieldValues.gender}
+                              onChange={(e) =>
+                                handleChange("gender", e.target.value)
+                              }
+                            >
+                              <FormControlLabel
+                                value="male"
+                                control={<Radio size="small" />}
+                                label={
+                                  <Typography sx={{ fontSize: "small" }}>
+                                    Male
+                                  </Typography>
+                                }
+                              />
+                              <FormControlLabel
+                                value="female"
+                                control={<Radio size="small" />}
+                                label={
+                                  <Typography sx={{ fontSize: "small" }}>
+                                    Female
+                                  </Typography>
+                                }
+                              />
+                            </RadioGroup>
+                            {fieldErrors.genderError && (
+                              <FormHelperText error>
+                                Please select an option
+                              </FormHelperText>
+                            )}
+                          </Stack>
+                        </Stack>
+                        {/* row 5 postal code, unit no, address,*/}
+                        <Stack
+                          direction={theme.customStyles.stackCollapseRow}
+                          sx={theme.customStyles.stackWrapLeft}
+                          spacing={3}
+                        >
+                          <TextField
+                            label="Postal Code"
+                            required
+                            {...theme.textbox.common}
+                            type="number"
+                            value={fieldValues.postalCode}
+                            onChange={(e) =>
+                              handleChange("postalCode", e.target.value)
+                            }
+                            sx={{
+                              flex: 1,
+                              m: 1,
+                            }}
+                            error={fieldErrors.postalCode || false}
+                            helperText={
+                              fieldErrors.postalCode &&
+                              "Postal Code is required"
+                            }
+                          />
+                          <Tooltip title="Key in postal code and click the search button to get the address">
+                            <IconButton
+                              style={{ color: "#FF6B2C" }}
+                              aria-label="search"
+                              onClick={handleSearchPostal}
+                            >
+                              <SearchOutlinedIcon />
+                            </IconButton>
+                          </Tooltip>
 
-                {/* Address */}
-                <Grid item xs={12} md={3}>
-                  <TextField
-                    label="Address"
-                    fullWidth
-                    margin="normal"
-                    variant="outlined"
-                  />
-                </Grid>
-                {/* Housing Type */}
-                <Grid item xs={6} md={2.5}>
-                  <Box className="myBox">
-                    <FormControl fullWidth variant="outlined">
-                      <InputLabel>Housing Type</InputLabel>
-                      <Select
-                        label="Housing Type"
-                        value={housingType}
-                        onChange={handleHousingTypeChange}
-                      >
-                        <MenuItem value="HDB 1 Room">HDB 1 Room</MenuItem>
-                        <MenuItem value="HDB 2 Room">HDB 2 Room</MenuItem>
-                        <MenuItem value="HDB 3 Room">HDB 3 Room</MenuItem>
-                        <MenuItem value="HDB 4 Room">HDB 4 Room</MenuItem>
-                        <MenuItem value="HDB 5 Room">HDB 5 Room</MenuItem>
-                        <MenuItem value="HDB Executive & Above">
-                          HDB Executive & Above
-                        </MenuItem>
-                        <MenuItem value="Private Condo">Private Condo</MenuItem>
-                        <MenuItem value="Private Landed">
-                          Private Landed
-                        </MenuItem>
-                        <MenuItem value="Others">Others</MenuItem>
-                        <MenuItem value="null"></MenuItem>
-                      </Select>
-                    </FormControl>
-                    {housingType === "Others" && (
-                      <TextField
-                        label="Others"
-                        fullWidth
-                        margin="normal"
-                        variant="outlined"
-                      />
-                    )}
+                          <TextField
+                            label="Unit/Hse No"
+                            required
+                            {...theme.textbox.common}
+                            placeholder="Unit/Hse No"
+                            value={fieldValues.unitNumber}
+                            sx={{
+                              flex: 1,
+                              m: 1,
+                            }}
+                            onChange={(e) =>
+                              handleChange("unitNumber", e.target.value)
+                            }
+                            error={fieldErrors.unitNumber || false}
+                            helperText={
+                              fieldErrors.unitNumber &&
+                              "Unit Number is required"
+                            }
+                          />
+                          <TextField
+                            label="Address"
+                            required
+                            {...theme.textbox.common}
+                            value={fieldValues.displayedAddress}
+                            sx={{
+                              flex: 2,
+                              m: 1,
+                            }}
+                            onChange={(e) =>
+                              handleChange("displayedAddress", e.target.value)
+                            }
+                            error={fieldErrors.displayedAddress || false}
+                            helperText={
+                              fieldErrors.displayedAddress &&
+                              "Address is required"
+                            }
+                          />
+                        </Stack>
+
+                        {/* row 6 housing type, living arrangement, cancer diagnosis, active treatment*/}
+                        <Stack
+                          direction={theme.customStyles.stackCollapseRow}
+                          spacing={3}
+                          sx={{
+                            justifyContent: "flex-start",
+                            alignItems: { xs: "flex-start", sm: "center" },
+                          }}
+                        >
+                          <FormControl
+                            size="small"
+                            sx={{
+                              width: 140,
+                            }}
+                            error={fieldErrors.housingType === ""}
+                          >
+                            <InputLabel>Housing Type</InputLabel>
+                            <Select
+                              label="Housing Type"
+                              value={fieldValues.housingType}
+                              onChange={(e) =>
+                                handleChange("housingType", e.target.value)
+                              }
+                            >
+                              {options.housingOptions}
+                            </Select>
+                            {fieldErrors.housingType && (
+                              <FormHelperText>
+                                Housing Type is required
+                              </FormHelperText>
+                            )}
+                          </FormControl>
+                          <FormControl
+                            size="small"
+                            error={fieldErrors.livingArrangement || false}
+                          >
+                            <InputLabel>Living Arrangement</InputLabel>
+                            <Select
+                              label="Living Arrangment"
+                              value={fieldValues.livingArrangement}
+                              sx={{
+                                width: 180,
+                              }}
+                              onChange={(e) =>
+                                handleChange(
+                                  "livingArrangement",
+                                  e.target.value
+                                )
+                              }
+                            >
+                              {options.familyCompositionOptions}
+                            </Select>
+                            {fieldErrors.livingArrangement && (
+                              <FormHelperText>
+                                Living Arrangement is required
+                              </FormHelperText>
+                            )}
+                          </FormControl>
+
+                          <FormControl
+                            error={fieldErrors.cancerDiagnosis || false}
+                          >
+                            <Tooltip title="Please type in your diagnosis to find it easily in the list.">
+                              <Autocomplete
+                                id="cancerDiagnosis"
+                                // value={fieldValues.cancerDiagnosis.label}
+                                onChange={(e, selectedOption) => {
+                                  if (selectedOption) {
+                                    console.log(selectedOption);
+                                    handleChange(
+                                      "cancerDiagnosis",
+                                      selectedOption.label
+                                    );
+                                  }
+                                }}
+                                options={cancerDiag}
+                                isOptionEqualToValue={(option, value) =>
+                                  option.label === value
+                                }
+                                groupBy={(option) => option.firstLetter}
+                                getOptionLabel={(option) => option.label}
+                                sx={{ minWidth: 200, maxWidth: 350 }}
+                                renderInput={(params) => (
+                                  <TextField
+                                    {...params}
+                                    variant="outlined"
+                                    required
+                                    size="small"
+                                    label="Primary Cancer Diagnosis"
+                                  />
+                                )}
+                              />
+                            </Tooltip>
+                            {fieldErrors.cancerDiagnosis && (
+                              <FormHelperText>
+                                Cancer Diagnosis is required
+                              </FormHelperText>
+                            )}
+                          </FormControl>
+                          <Stack
+                            direction="column"
+                            sx={{
+                              ...theme.customStyles.stackWrapLeftCenter,
+                              alignItems: "flex-start",
+                            }}
+                            spacing={0}
+                          >
+                            <Typography sx={{ fontSize: "small" }}>
+                              Active Treatment
+                            </Typography>
+                            <RadioGroup
+                              row
+                              value={fieldValues.activeTreatment}
+                              onChange={(e) =>
+                                handleChange("activeTreatment", e.target.value)
+                              }
+                            >
+                              <FormControlLabel
+                                value="yes"
+                                control={<Radio size="small" />}
+                                label={
+                                  <Typography sx={{ fontSize: "small" }}>
+                                    Yes
+                                  </Typography>
+                                }
+                              />
+                              <FormControlLabel
+                                value="no"
+                                control={<Radio size="small" />}
+                                label={
+                                  <Typography sx={{ fontSize: "small" }}>
+                                    No
+                                  </Typography>
+                                }
+                              />
+                            </RadioGroup>
+                            {fieldErrors.activeTreatment && (
+                              <FormHelperText error>
+                                Please select an option
+                              </FormHelperText>
+                            )}
+                          </Stack>
+                        </Stack>
+                        {/* row 7 work information*/}
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: theme.typography.h6.fontWeightBold,
+                          }}
+                        >
+                          Work information
+                        </Typography>
+                        {/* row  8 current work status, occupation, basic mthly sal, cancer impact on finance*/}
+                        <Stack
+                          direction={theme.customStyles.stackCollapseRow}
+                          sx={{
+                            justifyContent: "flex-start",
+                            alignItems: { xs: "flex-start", sm: "center" },
+                          }}
+                          spacing={3}
+                        >
+                          <Stack
+                            direction={theme.customStyles.stackCollapseRow}
+                            sx={theme.customStyles.stackWrapLeft}
+                            spacing={3}
+                          >
+                            <FormControl
+                              required
+                              size="small"
+                              variant="outlined"
+                              error={fieldErrors.currentWorkStatus || false}
+                              sx={{
+                                width: 195,
+                              }}
+                            >
+                              <InputLabel>Current Work Status</InputLabel>
+                              <Select
+                                label="Current Work Status"
+                                value={fieldValues.currentWorkStatus}
+                                onChange={(e) =>
+                                  handleChange(
+                                    "currentWorkStatus",
+                                    e.target.value
+                                  )
+                                }
+                              >
+                                {options.workStatusOptions}
+                              </Select>
+                              {fieldErrors.currentWorkStatus && (
+                                <FormHelperText>
+                                  Work Status is required
+                                </FormHelperText>
+                              )}
+                            </FormControl>
+
+                            <FormControl
+                              variant="outlined"
+                              size="small"
+                              error={fieldErrors.occupation || false}
+                              sx={{
+                                width: 150,
+                              }}
+                            >
+                              <InputLabel>Occupation</InputLabel>
+                              <Select
+                                label={
+                                  fieldValues.currentWorkStatus
+                                    ? "Current Occupation"
+                                    : "Previous Occupation"
+                                }
+                                value={fieldValues.occupation}
+                                onChange={(e) => {
+                                  const value = fieldValues.currentWorkStatus
+                                    ? `Current ${e.target.value}`
+                                    : `Last ${e.target.value}`;
+                                  handleChange("occupation", value);
+                                }}
+                              >
+                                {options.occupationOptions}
+                              </Select>
+                              {fieldErrors.occupation && (
+                                <FormHelperText>
+                                  Occupation is required
+                                </FormHelperText>
+                              )}
+                            </FormControl>
+                            <FormControl
+                              variant="outlined"
+                              error={fieldErrors.monthlySalary || false}
+                            >
+                              <Tooltip title="excludes bonuses, employer cpf, 13th month bonus etc">
+                                <InputLabel>Basic Monthly Salary</InputLabel>
+                                <Select
+                                  label="Basic Monthly Salary"
+                                  size="small"
+                                  value={fieldValues.monthlySalary}
+                                  sx={{
+                                    width: 200,
+                                  }}
+                                  onChange={(e) =>
+                                    handleChange(
+                                      "monthlySalary",
+                                      e.target.value
+                                    )
+                                  }
+                                >
+                                  {options.incomeOptions}
+                                </Select>
+                                {fieldErrors.monthlySalary && (
+                                  <FormHelperText>
+                                    Monthly Salary is required
+                                  </FormHelperText>
+                                )}
+                              </Tooltip>
+                            </FormControl>
+                          </Stack>
+                        </Stack>
+                        <Stack
+                          direction={theme.customStyles.stackCollapseRow}
+                          sx={theme.customStyles.stackWrapLeft}
+                          spacing={3}
+                        >
+                          <FormControl
+                            variant="outlined"
+                            size="small"
+                            error={fieldErrors.cancerImpactOnFinances === ""}
+                          >
+                            <Tooltip
+                              title="To what degree has cancer caused financial problems to you
+                    and your family?"
+                            >
+                              <InputLabel>Cancer impact on finances</InputLabel>
+                              <Select
+                                label="Cancer impact on finances"
+                                value={fieldValues.cancerImpactOnFinances}
+                                sx={{
+                                  width: 250,
+                                }}
+                                onChange={(e) =>
+                                  handleChange(
+                                    "cancerImpactOnFinances",
+                                    e.target.value
+                                  )
+                                }
+                              >
+                                {options.impactOnFinancesOptions.map(
+                                  (option) => (
+                                    <MenuItem key={option} value={option}>
+                                      {option}
+                                    </MenuItem>
+                                  )
+                                )}
+                              </Select>
+                              {fieldErrors.cancerImpactOnFinances && (
+                                <FormHelperText>
+                                  Cancer Impact on Finances is required
+                                </FormHelperText>
+                              )}
+                            </Tooltip>
+                          </FormControl>
+                        </Stack>
+                        {/* row  9 current work status, occupation, basic mthly sal, cancer impact on finance*/}
+                        <Stack
+                          direction={theme.customStyles.stackCollapseRow}
+                          sx={{
+                            ...theme.customStyles.stackWrapLeft,
+                            alignContent: "flex-start",
+                          }}
+                          spacing={3}
+                        >
+                          {!currentlyWorking ? (
+                            <>
+                              <TextField
+                                label="Date of last employment"
+                                sx={{ width: 250 }}
+                                {...theme.textbox.common}
+                                placeholder="MM/YYYY"
+                                value={fieldValues.dateOfLastEmployment}
+                                onChange={(e) =>
+                                  handleChange(
+                                    "dateOfLastEmployment",
+                                    e.target.value
+                                  )
+                                }
+                                error={
+                                  !currentlyWorking
+                                    ? fieldErrors.dateOfLastEmployment
+                                    : false
+                                }
+                                helperText={
+                                  !currentlyWorking &&
+                                  fieldErrors.dateOfLastEmployment
+                                    ? "Date of last Employment is required"
+                                    : ""
+                                }
+                              />
+                              <FormControl
+                                {...theme.textbox.common}
+                                error={
+                                  !currentlyWorking
+                                    ? fieldErrors.readinessScaleToRtw
+                                    : false
+                                }
+                              >
+                                <Tooltip title="On a Scale of 1 to 10. 10 means ready to return to workforce. 1 means not so ready">
+                                  <InputLabel>
+                                    Readiness Scale to RTW
+                                  </InputLabel>
+                                  <Select
+                                    label="Readiness Scale to RTW"
+                                    sx={{ width: 220 }}
+                                    value={fieldValues.readinessScaleToRtw}
+                                    onChange={(e) =>
+                                      handleChange(
+                                        "readinessScaleToRtw",
+                                        e.target.value
+                                      )
+                                    }
+                                  >
+                                    {options.scaleOptions}
+                                  </Select>
+                                  {!currentlyWorking &&
+                                  fieldErrors.readinessScaleToRtw ? (
+                                    <FormHelperText>
+                                      Input is required
+                                    </FormHelperText>
+                                  ) : (
+                                    ""
+                                  )}
+                                </Tooltip>
+                              </FormControl>
+                              <FormControl
+                                {...theme.textbox.common}
+                                variant="outlined"
+                                sx={{ width: 200 }}
+                                error={fieldErrors.timeFrameToRtw === ""}
+                              >
+                                <InputLabel>Time frame to RTW </InputLabel>
+                                <Select
+                                  sx={{ flex: 1 }}
+                                  label="Time Frame to RTW"
+                                  value={fieldValues.timeFrameToRtw}
+                                  onChange={(e) =>
+                                    handleChange(
+                                      "timeFrameToRtw",
+                                      e.target.value
+                                    )
+                                  }
+                                >
+                                  {options.timePeriodOptions}
+                                </Select>
+                                {fieldValues.timeFrameToRtw === "" && (
+                                  <FormHelperText>
+                                    Input is required
+                                  </FormHelperText>
+                                )}
+                              </FormControl>
+                            </>
+                          ) : (
+                            <FormControl
+                              {...theme.textbox.common}
+                              variant="outlined"
+                              sx={{ width: 250 }}
+                              error={
+                                currentlyWorking
+                                  ? fieldErrors.employedReadinessScale
+                                  : false
+                              }
+                            >
+                              <InputLabel>Readiness Scale to RTW </InputLabel>
+                              <Select
+                                label="Readiness Scale to RTW"
+                                value={fieldValues.employedReadinessScale}
+                                onChange={(e) =>
+                                  handleChange(
+                                    "employedReadinessScale",
+                                    e.target.value
+                                  )
+                                }
+                              >
+                                {options.scaleOptions}
+                              </Select>
+                              {currentlyWorking &&
+                              fieldErrors.employedReadinessScale ? (
+                                <FormHelperText>
+                                  Input is required
+                                </FormHelperText>
+                              ) : (
+                                ""
+                              )}
+                            </FormControl>
+                          )}
+                        </Stack>
+                        {/* row  10 current work status, occupation, basic mthly sal, cancer impact on finance*/}
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: theme.typography.h6.fontWeightBold,
+                          }}
+                        >
+                          Self Assessment
+                        </Typography>
+                        <Stack
+                          direction={theme.customStyles.stackCollapseRow}
+                          sx={theme.customStyles.stackWrapLeft}
+                          spacing={3}
+                        >
+                          <FormControl
+                            variant="outlined"
+                            error={fieldErrors.currentHealthStatus || false}
+                          >
+                            <InputLabel>Current Health</InputLabel>
+                            <Select
+                              size="small"
+                              label="Current Health"
+                              sx={{ width: 200 }}
+                              value={fieldValues.currentHealthStatus}
+                              onChange={(e) =>
+                                handleChange(
+                                  "currentHealthStatus",
+                                  e.target.value
+                                )
+                              }
+                            >
+                              {options.healthStatusOptions}
+                            </Select>
+                            {fieldErrors.currentHealthStatus && (
+                              <FormHelperText error>
+                                Please select an option
+                              </FormHelperText>
+                            )}
+                          </FormControl>
+                          <FormControl
+                            variant="outlined"
+                            error={fieldErrors.physicalHealthStatus || false}
+                          >
+                            <Tooltip title="Has physical health interfered with normal activities in the past 4 weeks?">
+                              <div>
+                                <InputLabel>
+                                  Physical health interfered with normal
+                                  activities?
+                                </InputLabel>
+                                <Select
+                                  sx={{ width: "100%", height: "42px" }}
+                                  label="Physical health interfered with normal activities?"
+                                  value={fieldValues.physicalHealthStatus}
+                                  onChange={(e) =>
+                                    handleChange(
+                                      "physicalHealthStatus",
+                                      e.target.value
+                                    )
+                                  }
+                                >
+                                  {options.distressOptions}
+                                </Select>
+                                {fieldErrors.physicalHealthStatus && (
+                                  <FormHelperText error>
+                                    Please select an option
+                                  </FormHelperText>
+                                )}
+                              </div>
+                            </Tooltip>
+                          </FormControl>
+                          <FormControl
+                            variant="outlined"
+                            error={fieldErrors.currentMentalHealthStatus === ""}
+                          >
+                            <Tooltip title="Mental health interfered with normal activities in the past 4 weeks.">
+                              <InputLabel>
+                                Mental health interfered with normal activities?
+                              </InputLabel>
+                              <Select
+                                sx={{ width: "100%", height: "42px" }}
+                                label="Mental health interfered with normal activities?"
+                                value={fieldValues.currentMentalHealthStatus}
+                                onChange={(e) =>
+                                  handleChange(
+                                    "currentMentalHealthStatus",
+                                    e.target.value
+                                  )
+                                }
+                              >
+                                {options.distressOptions}
+                              </Select>
+                              {fieldValues.currentMentalHealthStatus === "" && (
+                                <FormHelperText error>
+                                  Please select an option
+                                </FormHelperText>
+                              )}
+                            </Tooltip>
+                          </FormControl>
+                        </Stack>
+                        {/* row  11 current work status, occupation, basic mthly sal, cancer impact on finance*/}
+                        <Stack
+                          direction={theme.customStyles.stackCollapseRow}
+                          sx={theme.customStyles.stackWrapLeft}
+                          spacing={3}
+                        >
+                          <TextField
+                            label="Physical barriers to RTW"
+                            variant="outlined"
+                            fullWidth
+                            multiline
+                            rows={4}
+                            value={fieldValues.physicalBarriersToRtw}
+                            onChange={(e) =>
+                              handleChange(
+                                "physicalBarriersToRtw",
+                                e.target.value
+                              )
+                            }
+                            error={fieldErrors.physicalBarriersToRtw || false}
+                            helperText={
+                              fieldErrors
+                                ? "Input is required, if no input put N/A"
+                                : ""
+                            }
+                          />
+                          <TextField
+                            label="Mental barriers to RTW"
+                            variant="outlined"
+                            fullWidth
+                            multiline
+                            rows={4}
+                            value={fieldValues.psychosocialBarriersToRtw}
+                            onChange={(e) =>
+                              handleChange(
+                                "psychosocialBarriersToRtw",
+                                e.target.value
+                              )
+                            }
+                            error={
+                              fieldErrors.psychosocialBarriersToRtw || false
+                            }
+                            helperText={
+                              fieldErrors.psychosocialBarriersToRtw
+                                ? "Input is required, if no input put N/A"
+                                : ""
+                            }
+                          />
+
+                          <TextField
+                            label="Additional Information"
+                            variant="outlined"
+                            fullWidth
+                            multiline
+                            rows={4}
+                            value={fieldValues.additionalInformation}
+                            onChange={(e) =>
+                              handleChange(
+                                "additionalInformation",
+                                e.target.value
+                              )
+                            }
+                            error={fieldErrors.additionalInformation || false}
+                            helperText={
+                              fieldValues.additionalInformation
+                                ? "Input is required, if no input put N/A"
+                                : ""
+                            }
+                          />
+                        </Stack>
+                        {/* row  12 current work status, occupation, basic mthly sal, cancer impact on finance*/}
+                        <Box display="flex" justifyContent="flex-end">
+                          <Button
+                            className="orange"
+                            variant="contained"
+                            onClick={handleSubmit}
+                          >
+                            Submit
+                          </Button>
+                        </Box>
+                      </Stack>
+                    </Stack>
                   </Box>
-                </Grid>
-                {/* Living Arrangement */}
-                <Grid item xs={6} md={3}>
-                  <Box className="myBox">
-                    <FormControl fullWidth variant="outlined">
-                      <InputLabel>Living Arrangement</InputLabel>
-                      <Select
-                        label="Living Arrangment"
-                        value={livingArrangement}
-                        onChange={handleLivingArrangmentChange}
-                      >
-                        <MenuItem value="Alone">Alone</MenuItem>
-                        <MenuItem value="w/spouse only">w/spouse only</MenuItem>
-                        <MenuItem value="w/children only">
-                          w/children only
-                        </MenuItem>
-                        <MenuItem value="w/ spouse & children">
-                          w/ spouse & children
-                        </MenuItem>
-                        <MenuItem value="Others">Others</MenuItem>
-                        <MenuItem value="null"></MenuItem>
-                      </Select>
-                    </FormControl>
-                    {livingArrangement === "Others" && (
-                      <TextField
-                        label="Others"
-                        fullWidth
-                        margin="normal"
-                        variant="outlined"
-                      />
-                    )}
-                  </Box>
-                </Grid>
-              </Grid>
-            </Box>
-          </Grid>
-          <Grid item xs={12} md={8}>
-            {/* Work Information */}
-            <Box mt={4} ml={2}>
-              <Typography theme={theme} sx={theme.typography.h6}>
-                Work Information
-              </Typography>
-              <Grid container spacing={2}>
-                <Grid item xs={12} md={3}>
-                  <Box className="myBox">
-                    <FormControl fullWidth variant="outlined">
-                      <InputLabel>Current Work Status</InputLabel>
-                      <Select
-                        label="Current Work Status"
-                        value={currentWorkStatus}
-                        onChange={handleCurrentWorkStatus}
-                      >
-                        <MenuItem value="Employed">Employed</MenuItem>
-                        <MenuItem value="Unemployed">Unemployed</MenuItem>
-                        <MenuItem value="Unpaid Leave">UNpaid Leave</MenuItem>
-                        <MenuItem value="Paid Leave">Paid Leave</MenuItem>
-                        <MenuItem value="Others">Other work status</MenuItem>
-                        <MenuItem value="null"></MenuItem>
-                      </Select>
-                    </FormControl>
-                    {currentWorkStatus === "Others" && (
-                      <TextField
-                        label="Other work status"
-                        fullWidth
-                        margin="normal"
-                        variant="outlined"
-                      />
-                    )}
-                  </Box>
-                </Grid>
-                <Grid item xs={12} md={3}>
-                  <Box className="myBox">
-                    <FormControl fullWidth variant="outlined">
-                      <InputLabel>Occupation</InputLabel>
-                      <Select
-                        label="Occupation"
-                        value={occupation}
-                        onChange={handleOccupation}
-                      >
-                        <MenuItem value="Current General Worker Cleaner">
-                          Current General Worker Cleaner
-                        </MenuItem>
-                        <MenuItem value="Current General Worker Packer">
-                          Current General Worker Packer
-                        </MenuItem>
-                        <MenuItem value="Current General Worker Hawker">
-                          Current General Worker Hawker
-                        </MenuItem>
-                        <MenuItem value="Current Services & Sales">
-                          Current Services & Sales
-                        </MenuItem>
-                        <MenuItem value="Current Admin & Clerical">
-                          Current Admin & Clerical
-                        </MenuItem>
-                        <MenuItem value="Current PMET">Current PMET</MenuItem>
-                        <MenuItem value="Last General Worker Cleaner">
-                          Last General Worker Cleaner
-                        </MenuItem>
-                        <MenuItem value="Last General Worker Packer">
-                          Last General Worker Packer
-                        </MenuItem>
-                        <MenuItem value="Last General Worker Hawker">
-                          Last General Worker Hawker
-                        </MenuItem>
-                        <MenuItem value="Last Services & Sales">
-                          Last Services & Sales
-                        </MenuItem>
-                        <MenuItem value="Last Admin & Clerical">
-                          Last Admin & Clerical
-                        </MenuItem>
-                        <MenuItem value="Current PMET">Last PMET</MenuItem>
-                        <MenuItem value="Others">Others</MenuItem>
-                        <MenuItem value="null"></MenuItem>
-                      </Select>
-                    </FormControl>
-                    {occupation === "Others" && (
-                      <TextField
-                        label="Others"
-                        fullWidth
-                        margin="normal"
-                        variant="outlined"
-                      />
-                    )}
-                    <Typography
-                      theme={theme}
-                      sx={{ ...theme.typography.p, fontSize: 10 }}
-                    >
-                      *PMET stands for Professionals, Managers, Executives and
-                      Technicians. *Current means currently employed. *Last
-                      means previously employed.
-                    </Typography>
-                  </Box>
-                </Grid>
-                <Grid item xs={12} md={3}>
-                  <Box className="myBox">
-                    <FormControl fullWidth variant="outlined">
-                      <InputLabel>Basic Monthly Salary</InputLabel>
-                      <Select
-                        label="Basic Monthly Salary"
-                        value={monthlySalary}
-                        onChange={handleMonthlySalary}
-                      >
-                        <MenuItem value="Less than $1,000">
-                          Less than $1,000
-                        </MenuItem>
-                        <MenuItem value="$1,000 to $2,000">
-                          $1,000 to $2,000
-                        </MenuItem>
-                        <MenuItem value="$2,001 to $3,000">
-                          $2,001 to $3,000
-                        </MenuItem>
-                        <MenuItem value="$3,001 to $4,000">
-                          $3,001 to $4,000
-                        </MenuItem>
-                        <MenuItem value="$4,001 to $5,000">
-                          $4,001 to $5,000
-                        </MenuItem>
-                        <MenuItem value="$5,001 to $6,000">
-                          $5,001 to $6,000
-                        </MenuItem>
-                        <MenuItem value="$6,001 to $7,000">
-                          $6,001 to $7,000
-                        </MenuItem>
-                        <MenuItem value="$7,001 to $8,000">
-                          $7,001 to $8,000
-                        </MenuItem>
-                        <MenuItem value="$8,001 to $9,000">
-                          $8,001 to $9,000
-                        </MenuItem>
-                        <MenuItem value="$9,001 to $10,000">
-                          $9,001 to $10,000
-                        </MenuItem>
-                        <MenuItem value="Above $10,000">Above $10,000</MenuItem>
-                        <MenuItem value="null"></MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-                  <Typography
-                    theme={theme}
-                    sx={{ ...theme.typography.p, fontSize: 10 }}
-                  >
-                    (*exclude bonuses, employer cpf, 13th month bonus etc. *
-                    Currency: SGD)
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} md={3}>
-                  <Box className="myBox">
-                    <FormControl fullWidth variant="outlined">
-                      <InputLabel>Cancer impact on finances </InputLabel>
-                      <Select
-                        label="Cancer imapct on finances"
-                        value={cancerImpactOnFinances}
-                        onChange={handleCancerImpactOnFinances}
-                      >
-                        <MenuItem value="Not at all">Not at all</MenuItem>
-                        <MenuItem value="A little">A Little</MenuItem>
-                        <MenuItem value="Some">Some</MenuItem>
-                        <MenuItem value="A lot">A lot</MenuItem>
-                        <MenuItem value="Don't Know">Don't Know</MenuItem>
-                        <MenuItem value="Refused">Refused</MenuItem>
-                        <MenuItem value="null"></MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-                  <Typography
-                    theme={theme}
-                    sx={{ ...theme.typography.p, fontSize: 10 }}
-                  >
-                    (To what degree has cancer caused financial problems to you
-                    and your family?)
-                  </Typography>
-                </Grid>
-              </Grid>
-            </Box>
-          </Grid>
-          <Grid item xs={12} md={8}>
-            <Box mt={4} ml={2}>
-              <Grid container spacing={2}>
-                <Grid item xs={12} md={3}>
-                  <Typography theme={theme} sx={theme.typography.h6}>
-                    If Unemployed
-                  </Typography>
-                  <TextField
-                    label="Date of last employment"
-                    fullWidth
-                    margin="normal"
-                    variant="outlined"
-                    placeholder="MM/YYYY"
-                  />
-                </Grid>
-                <Grid item xs={12} md={3}>
-                  <Box className="myBox5">
-                    <FormControl fullWidth variant="outlined">
-                      <InputLabel>Readiness Scale to RTW </InputLabel>
-                      <Select
-                        label="Readiness Scale to RTW"
-                        value={unemployedReadinessScaleToRtw}
-                        onChange={handleUnemployedReadinessScaleToRtw}
-                      >
-                        <MenuItem value="1">1</MenuItem>
-                        <MenuItem value="2">2</MenuItem>
-                        <MenuItem value="3">3</MenuItem>
-                        <MenuItem value="4">4</MenuItem>
-                        <MenuItem value="5">5</MenuItem>
-                        <MenuItem value="6">6</MenuItem>
-                        <MenuItem value="7">7</MenuItem>
-                        <MenuItem value="8">8</MenuItem>
-                        <MenuItem value="9">9</MenuItem>
-                        <MenuItem value="10">10</MenuItem>
-                        <MenuItem value="null"></MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-                  <Typography
-                    theme={theme}
-                    sx={{ ...theme.typography.p, fontSize: 10 }}
-                  >
-                    (On a Scale of 1 to 10. 10 means ready to return to
-                    workforce. 1 means not so ready)
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} md={3}>
-                  <Box className="myBox5">
-                    <FormControl fullWidth variant="outlined">
-                      <InputLabel>Time frame to RTW </InputLabel>
-                      <Select
-                        label="Time Frame to RTW"
-                        value={unemployedTimeFrameToRtw}
-                        onChange={handleUnemployedTimeFrameToRtw}
-                      >
-                        <MenuItem value="3 months">3 months</MenuItem>
-                        <MenuItem value="6 months">6 months</MenuItem>
-                        <MenuItem value="9 months">9 months</MenuItem>
-                        <MenuItem value="12 months">12 months</MenuItem>
-                        <MenuItem value="Not Applicable">
-                          Not Applicable
-                        </MenuItem>
-                        <MenuItem value="Others">Others</MenuItem>
-                        <MenuItem value="null"></MenuItem>
-                      </Select>
-                    </FormControl>
-                    {unemployedTimeFrameToRtw === "Others" && (
-                      <TextField
-                        label="Others"
-                        fullWidth
-                        margin="normal"
-                        variant="outlined"
-                        placeholder="MM/YYYY"
-                      />
-                    )}
-                  </Box>
-                  <Typography
-                    theme={theme}
-                    sx={{ ...theme.typography.p, fontSize: 10 }}
-                  >
-                    (*select others if time frame more than 12 months.)
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} md={3}>
-                  {/* If Employed */}
-                  <Typography theme={theme} sx={theme.typography.h6}>
-                    If Employed
-                  </Typography>
-                  <Box className="myBox">
-                    <FormControl fullWidth variant="outlined">
-                      <InputLabel>Readiness Scale to RTW </InputLabel>
-                      <Select
-                        label="Readiness Scale to RTW"
-                        value={employedReadinessScaleToRtw}
-                        onChange={handleEmployedReadinessScaleToRtw}
-                      >
-                        <MenuItem value="1">1</MenuItem>
-                        <MenuItem value="2">2</MenuItem>
-                        <MenuItem value="3">3</MenuItem>
-                        <MenuItem value="4">4</MenuItem>
-                        <MenuItem value="5">5</MenuItem>
-                        <MenuItem value="6">6</MenuItem>
-                        <MenuItem value="7">7</MenuItem>
-                        <MenuItem value="8">8</MenuItem>
-                        <MenuItem value="9">9</MenuItem>
-                        <MenuItem value="10">10</MenuItem>
-                        <MenuItem value="null"></MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-                  <Typography
-                    theme={theme}
-                    sx={{ ...theme.typography.p, fontSize: 10 }}
-                  >
-                    (On a Scale of 1 to 10. 10 means ready to return to
-                    workforce. 1 means not so ready)
-                  </Typography>
-                </Grid>
-              </Grid>
-            </Box>
-          </Grid>
-          <Grid item xs={12} md={8}>
-            <Box mt={4} ml={2}>
-              <Grid container spacing={2}>
-                <Grid item xs={12} md={3}>
-                  <Typography theme={theme} sx={theme.typography.h6}>
-                    Self Assessment
-                  </Typography>
-                  <Box className="myBox">
-                    <FormControl fullWidth variant="outlined">
-                      <InputLabel>Current Health</InputLabel>
-                      <Select
-                        label="Current Health"
-                        value={currentHealthStatus}
-                        onChange={handleCurrentHealthStatus}
-                      >
-                        <MenuItem value="Excellent">Excellent</MenuItem>
-                        <MenuItem value="Very Good">Very Good</MenuItem>
-                        <MenuItem value="Good">Good</MenuItem>
-                        <MenuItem value="Fair">Fair</MenuItem>
-                        <MenuItem value="Poor">Poor</MenuItem>
-                        <MenuItem value="null"></MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-                </Grid>
-                <Grid item xs={12} md={3}>
-                  <Box className="myBox6">
-                    <TextField
-                      label="Physical health interfered with normal activities?"
-                      fullWidth
-                      margin="normal"
-                      variant="outlined"
-                    />
-                  </Box>
-                </Grid>
-                <Grid item xs={12} md={3}>
-                  <Box className="myBox6">
-                    <TextField
-                      label="Mental health interfered with normal activities?"
-                      fullWidth
-                      margin="normal"
-                      variant="outlined"
-                    />
-                  </Box>
-                </Grid>
-              </Grid>
-            </Box>
-          </Grid>
-        </Grid>
-      </Box>
+                </Paper>
+              </Box>
+            </Grid>
+          </Container>
+        </div>
+      </Grid>
     </ThemeProvider>
   );
 }
