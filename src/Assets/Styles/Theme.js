@@ -94,12 +94,34 @@ export const theme = createTheme({
       display: "flex",
       flexDirection: "row",
       justifyContent: "left",
+      flexWrap: "wrap",
     },
     displayFlexColumnCenter: {
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
     },
+    stackFlexWrapLeft: {
+      flexWrap: "wrap",
+      justifyContent: "flex-start",
+      alignItems: "flex-start",
+    },
+    stackFlexWrapRight: {
+      flexWrap: "wrap",
+      justifyContent: "flex-end",
+      alignItems: "flex-start",
+    },
+    stackFlexWrapLeftCenter: {
+      flexWrap: "wrap",
+      justifyContent: "flex-start",
+      alignItems: "flex-start",
+    },
+    stackFlexWrapCenter: {
+      flexWrap: "wrap",
+      justifyContent: "center",
+      alignItems: "flex-start",
+    },
+    stackCollapseRow: { xs: "column", sm: "row" },
     centered: {
       container: {
         backgroundColor: "#F3F1FF",
@@ -112,6 +134,13 @@ export const theme = createTheme({
     categoryBox: {
       display: "block",
       margin: "0 auto",
+    },
+  },
+  textbox: {
+    common: {
+      margin: "normal",
+      variant: "outlined",
+      size: "small",
     },
   },
   components: {
@@ -133,6 +162,21 @@ export const theme = createTheme({
             color: "#ffffff",
             "&:hover": {
               backgroundColor: "#f79568",
+            },
+          },
+          "&.purple": {
+            backgroundColor: "#9384D1",
+            color: "#ffffff",
+            "&:hover": {
+              backgroundColor: "#1D267D",
+            },
+          },
+
+          "&.green": {
+            backgroundColor: "#00908B",
+            color: "#ffffff",
+            "&:hover": {
+              backgroundColor: "#3DCCC7",
             },
           },
           "&.red": {
