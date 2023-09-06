@@ -17,14 +17,16 @@ import { theme } from "../../Assets/Styles/Theme";
 import { useNavigate } from "react-router-dom";
 //for auth
 import { useUserContext } from "../../Components/UserContext";
+import IndividualJobPage from "../Employer/IndividualJobPage";
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
 function AdminApproveDenyJob() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [jobsData, setJobsData] = useState("");
+  const [jobsInfo, setJobsInfo] = useState("");
   const { currUser } = useUserContext();
   const [accessToken, setAccessToken] = useState("");
-  const [currentJobSelection, setCurrentJobSelection] = useState(0);
+  const [currentJobSelection, setCurrentJobSelection] = useState("");
   const [openModal, setOpenModal] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
   const navigate = useNavigate();
@@ -79,7 +81,8 @@ function AdminApproveDenyJob() {
             },
           })
           .then((info) => {
-            console.log(info);
+            console.log(info.data);
+            setJobsInfo(info.data);
             setJobsData(
               info.data.map((info, index) => {
                 return (
@@ -119,7 +122,7 @@ function AdminApproveDenyJob() {
                           >
                             <Box
                               component="div"
-                              onClick={() => setCurrentJobSelection(info.id)}
+                              onClick={() => setCurrentJobSelection(index)}
                               sx={{
                                 width: "14vw",
                                 height: "5vh",
@@ -192,12 +195,12 @@ function AdminApproveDenyJob() {
   const onAccept = (e) => {
     e.preventDefault();
     console.log(currentJobSelection);
-    if (currentJobSelection === 0) {
+    if (currentJobSelection === "") {
       Swal.fire("Error", "You have not selected Any Job to Accept!", "error");
       return;
     }
     const dataToSend = {
-      jobId: currentJobSelection,
+      jobId: jobsInfo[currentJobSelection].id,
     };
     axios
       .put(`${BACKEND_URL}/listings/admin/acceptunverifiedjob/`, dataToSend, {
@@ -219,7 +222,7 @@ function AdminApproveDenyJob() {
   const onRequestChange = (e) => {
     e.preventDefault();
     console.log(currentJobSelection);
-    if (currentJobSelection === 0) {
+    if (currentJobSelection === "") {
       Swal.fire("Error", "You have not selected Any Job to Accept!", "error");
       return;
     }
@@ -239,7 +242,7 @@ function AdminApproveDenyJob() {
 
   const handleReject = () => {
     const dataToSend = {
-      jobId: currentJobSelection,
+      jobId: jobsInfo[currentJobSelection].id,
       rejectReason: rejectReason,
     };
     console.log(dataToSend);
@@ -336,14 +339,23 @@ function AdminApproveDenyJob() {
               <Grid
                 container
                 sx={{
-                  display: "flex",
                   backgroundColor: "white",
                   width: "45vw",
                   height: "74vh",
                   borderRadius: "40px",
                   flexDirection: "column",
+                  overflow: "auto",
+                  textOverflow: "ellipsis",
+                  WebkitBoxOrient: "vertical",
+                  display: "-webkit-box",
                 }}
-              ></Grid>
+              >
+                {currentJobSelection !== "" ? (
+                  <IndividualJobPage
+                    jobsId={jobsInfo[currentJobSelection].id}
+                  />
+                ) : null}
+              </Grid>
               <Box sx={{ mt: "7vh" }}>
                 <Stack direction="row" spacing={7}>
                   <Button
@@ -359,7 +371,7 @@ function AdminApproveDenyJob() {
                   </Button>
 
                   <Button
-                    classes={{ root: "orange" }}
+                    classes={{ root: "red" }}
                     variant="contained"
                     onClick={onRequestChange}
                     style={{
