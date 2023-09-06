@@ -48,6 +48,8 @@ function IndividualJobPage(props) {
   const [description, setDescription] = useState("");
   const [displayAdminButtons, setDisplayAdminButtons] = useState(false);
 
+  const navigate = useNavigate();
+
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
   useEffect(() => {
     if (props) {
@@ -234,6 +236,9 @@ function IndividualJobPage(props) {
                         <Button
                           classes={{ root: "orange" }}
                           variant="contained"
+                          onClick={() =>
+                            navigate(`/checkapplication/${[params.jobId]}`)
+                          }
                         >
                           Check Applicants
                         </Button>
