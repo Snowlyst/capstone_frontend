@@ -113,3 +113,32 @@ Swal.fire(SwalMsgs.numberRequired("Minimum Salary"));
 
 for those that don't accept props
 Swal.fire(SwalMsgs.overwriteCurrentInfo)
+
+###### textboxes
+
+to standardize textboxes from mui
+standard textbox use {...theme.textbox.common}
+For e.g.
+<TextField
+label="Mobile"
+{...theme.textbox.common}
+value={fieldValues.mobileNumber}
+onChange={(e) =>
+handleChange("mobileNumber", e.target.value)
+}
+error={fieldErrors.mobileNumber || false}
+helperText={
+fieldValues.mobileNumber === ""
+? "Mobile Number is required"
+: ""
+}
+/>
+
+###### for stack in mui to wrap them when screensize small
+
+put it in stack. there are more styles ie left, right, center, refer to theme.js under assets styles
+
+<Stack
+                        direction={theme.customStyles.stackCollapseRow}
+                        sx={theme.customStyles.stackWrapLeft}
+                      >
