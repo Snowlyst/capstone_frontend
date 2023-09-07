@@ -25,7 +25,6 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 
-
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
 function ReviewApplication() {
@@ -284,7 +283,7 @@ function ReviewApplication() {
         console.log(error);
       });
   };
-
+  // google calendar fns
   async function signOut() {
     await supabase.auth.signOut();
   }
@@ -328,43 +327,153 @@ function ReviewApplication() {
       });
   }
 
-  async function createCalendarEvent() {
-    console.log("creating calendar event");
-    const event = {
-      summary: eventName,
-      description: eventDescription,
-      start: {
-        dateTime: startTD.toISOString(),
-        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      },
-      end: {
-        dateTime: endTD.toISOString(),
-        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      },
-    };
-    axios({
-      url: `https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events`,
-      method: "post",
-      headers: {
-        Authorization: "Bearer " + session.provider_token,
-      },
-      data: JSON.stringify(event),
-    })
-      .then((data) => {
-        console.log(data);
-        alert("Event made, check Calendar");
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }
-
-  const scheduleMeeting = () => {
+  const scheduleMeeting = async () => {
     if (!eventName || !eventDescription) {
       return Swal.fire(SwalMsgs.missingFormInfoGentle);
     }
+
     const startTime = new Date(startTD).toISOString();
     const idToEdit = usersData[currentEntitySelection].id;
+    const dataToSend = {
+      idToEdit: idToEdit,
+      startTime: startTime,
+    };
+
+    try {
+      console.log(dataToSend);
+      await axios.put(
+        `${BACKEND_URL}/application/scheduleinterview`,
+        dataToSend,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      console.log("creating calendar event");
+      const event = {
+        summary: eventName,
+        description: eventDescription,
+        start: {
+          dateTime: startTD.toISOString(),
+          timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        },
+        end: {
+          dateTime: endTD.toISOString(),
+          timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        },
+      };
+
+      const response = await axios({
+        url: `https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events`,
+        method: "post",
+        headers: {
+          Authorization: "Bearer " + session.provider_token,
+        },
+        data: JSON.stringify(event),
+      });
+
+      console.log(response);
+
+      Swal.fire(
+        "Success",
+        "The event has been created on your Google calendar!",
+        "success"
+      );
+
+      setStartTD(new Date());
+      setEndTD(new Date());
+      setEventName("");
+      setEventDescription("");
+
+      // Now you can refresh the page after everything is complete
+      window.location.reload();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // const hireApplicant = () => {
+  //   const idToEdit = usersData[currentEntitySelection].id;
+  //   const dataToSend = {
+  //     idToEdit: idToEdit,
+  //   };
+  //   axios
+  //     .put(`${BACKEND_URL}/application/hireapplicant`, dataToSend, {
+  //       headers: {
+  //         Authorization: `Bearer ${accessToken}`,
+  //       },
+  //     })
+  //     .then((info) => {
+  //       console.log(info);
+  //       return Swal.fire(
+  //         "Success",
+  //         "The event has been created on your Google calendar!",
+  //         "success"
+  //       );
+  //     })
+  //     .catch((error) => {
+  //       console.log(error);
+  //     });
+  // };
+
+  const hireApplicant = async () => {
+    try {
+      const idToEdit = usersData[currentEntitySelection].id;
+      const dataToSend = {
+        idToEdit: idToEdit,
+      };
+
+      const response = await axios.put(
+        `${BACKEND_URL}/application/hireapplicant`,
+        dataToSend,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      console.log(response);
+
+      Swal.fire("Success", "The applicant has been hired!", "success").then(
+        () => {
+          window.location.reload();
+        }
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const rejectApplicant = async () => {
+    try {
+      const idToEdit = usersData[currentEntitySelection].id;
+      const dataToSend = {
+        idToEdit: idToEdit,
+      };
+
+      const response = await axios.put(
+        `${BACKEND_URL}/application/rejectapplicant`,
+        dataToSend,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      console.log(response);
+
+      Swal.fire("Success", "The applicant has been rejected!", "success").then(
+        () => {
+          window.location.reload();
+        }
+      );
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   // this must be at bottom layer right before return if not useeffect kills itself
@@ -428,7 +537,15 @@ function ReviewApplication() {
                   Applications
                 </Typography>
                 <Stack direction="column" sx={{ pl: 1.5 }}>
-                  {sideDisplay ? sideDisplay : null}
+                  {sideDisplay ? (
+                    sideDisplay
+                  ) : (
+                    <Box sx={{ mt: "15vh", pl: "2vw" }}>
+                      <Typography variant="darkP">
+                        No current applicants for this listing yet!
+                      </Typography>
+                    </Box>
+                  )}
                 </Stack>
               </Grid>
             </Grid>
@@ -444,7 +561,7 @@ function ReviewApplication() {
                 ml: "5vw",
               }}
             >
-              {usersData && currentEntitySelection !== "" ? (
+              {usersData.length !== 0 && currentEntitySelection !== "" ? (
                 <Box sx={{ ml: "1vw" }}>
                   <Stack direction="row" sx={{ width: "44vw", mt: "2vh" }}>
                     <Typography
@@ -656,8 +773,7 @@ function ReviewApplication() {
                             </Stack>
                             <Stack
                               direction="row"
-                              sx={{ mt: "0.5vh", ml: "4.3vw" }}
-                              spacing={1}
+                              sx={{ width: "44vw", mt: "2vh", ml: "3vw" }}
                             >
                               <Button
                                 classes={{ root: "orange" }}
@@ -665,21 +781,130 @@ function ReviewApplication() {
                                 onClick={scheduleMeeting}
                                 style={{
                                   width: "18vw",
-                                  marginTop: "1vh",
+                                  borderTopRightRadius: 0,
+                                  borderBottomRightRadius: 0,
                                 }}
                               >
                                 Schedule Meeting
                               </Button>
                               <Button
-                                classes={{ root: "orange" }}
+                                classes={{ root: "red" }}
                                 variant="contained"
-                                onClick={scheduleMeeting}
                                 style={{
                                   width: "18vw",
-                                  marginTop: "1vh",
+                                  borderTopLeftRadius: 0,
+                                  borderBottomLeftRadius: 0,
                                 }}
                               >
-                                Schedule Meeting
+                                Reject Applicant
+                              </Button>
+                            </Stack>
+                          </Box>
+                        ) : (
+                          <Box sx={{ ml: "11vw", mt: "16vh" }}>
+                            <Button
+                              classes={{ root: "orange" }}
+                              variant="contained"
+                              onClick={googleSignIn}
+                              style={{
+                                height: "10vh",
+                                width: "20vw",
+                              }}
+                            >
+                              Sign in to Google Calendar!
+                            </Button>
+                          </Box>
+                        )}
+                      </Box>
+                    ) : null}
+                    {usersData[currentEntitySelection].status === 2 ? (
+                      <Box>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: theme.typography.h6.fontWeightBold,
+                            mt: "3vh",
+                          }}
+                        >
+                          Interview Scheduler (Google Calendar Integration)
+                        </Typography>
+                        {session ? (
+                          <Box
+                            sx={{
+                              display: "flex",
+                              backgroundColor: "white",
+                              width: "42vw",
+                              height: "45.5vh",
+                              borderRadius: "40px",
+                              flexDirection: "column",
+                              mt: "1vh",
+                            }}
+                          >
+                            <Stack
+                              direction="row"
+                              sx={{ width: "44vw", mt: "9vh", ml: "3vw" }}
+                            >
+                              <Button
+                                classes={{ root: "green" }}
+                                variant="contained"
+                                onClick={getEvents}
+                                style={{
+                                  width: "18vw",
+                                  height: "12vh",
+                                  borderTopRightRadius: 0,
+                                  borderBottomRightRadius: 0,
+                                  borderBottomLeftRadius: 0,
+                                }}
+                              >
+                                Check Calendar Events!
+                              </Button>
+                              <Button
+                                classes={{ root: "purple" }}
+                                variant="contained"
+                                onClick={signOut}
+                                style={{
+                                  width: "18vw",
+                                  height: "12vh",
+                                  borderTopLeftRadius: 0,
+                                  borderBottomLeftRadius: 0,
+                                  borderBottomRightRadius: 0,
+                                }}
+                              >
+                                Signout of Google Calendar!
+                              </Button>
+                            </Stack>
+
+                            <Stack
+                              direction="row"
+                              sx={{ width: "44vw", ml: "3vw" }}
+                            >
+                              <Button
+                                classes={{ root: "orange" }}
+                                variant="contained"
+                                onClick={hireApplicant}
+                                style={{
+                                  width: "18vw",
+                                  height: "12vh",
+                                  borderTopRightRadius: 0,
+                                  borderBottomRightRadius: 0,
+                                  borderTopLeftRadius: 0,
+                                }}
+                              >
+                                Applicant Hired
+                              </Button>
+                              <Button
+                                classes={{ root: "red" }}
+                                variant="contained"
+                                onClick={rejectApplicant}
+                                style={{
+                                  width: "18vw",
+                                  height: "12vh",
+                                  borderTopLeftRadius: 0,
+                                  borderBottomLeftRadius: 0,
+                                  borderTopRightRadius: 0,
+                                }}
+                              >
+                                Reject Applicant
                               </Button>
                             </Stack>
                           </Box>
@@ -701,6 +926,20 @@ function ReviewApplication() {
                       </Box>
                     ) : null}
                   </Grid>
+                </Box>
+              ) : null}
+              {usersData.length !== 0 && currentEntitySelection === "" ? (
+                <Box sx={{ mt: "15vh", pl: "2vw" }}>
+                  <Typography variant="darkP">
+                    Select an applicant to get started!
+                  </Typography>
+                </Box>
+              ) : null}
+              {usersData.length === 0 && currentEntitySelection === "" ? (
+                <Box sx={{ mt: "15vh", pl: "2vw" }}>
+                  <Typography variant="darkP">
+                    No current applicants available!
+                  </Typography>
                 </Box>
               ) : null}
             </Grid>

@@ -32,21 +32,34 @@ function Navbar() {
 
   // const navigate = useNavigate();
 
-  const pages = ["Job Search", "Company Profiles", "Programs"];
-  const settings = isAuthenticated
-    ? ["Profile", "Chat", "Dashboard", "Logout"]
-    : ["User", "Employer"];
-
+  const pages = ["Job Search", "Company Profiles"];
+  const [settings, setSettings] = useState([]);
   // to retrieve currUser from local storage and to set it for context
   useEffect(() => {
     console.log(currUser);
+    let settings = [];
+
+    if (currUser === null && !isAuthenticated) {
+      settings = ["User", "Employer", "Admin"];
+
+      setSettings(settings);
+    }
+
     // const checkLogin =  () => {
     if (currUser === null && isAuthenticated) {
       const localAccess = JSON.parse(localStorage.getItem("verveCurrUser"));
-      console.log(localAccess);
+      const role = JSON.parse(localStorage.getItem("verveRole"));
+      console.log(role);
       setCurrUser(localAccess);
+
+      if (role === "user") {
+        settings = ["Profile", "Resume", "Job Categories", "Logout"];
+      } else if (role === "admin" || role === "employer") {
+        settings = ["Dashboard", "Post Job", "Logout"];
+      }
+      setSettings(settings);
     }
-  }, []);
+  }, [currUser]);
 
   // checks if user is logged in or not to display user menu
   // const login = currUser !== null ? true : false;
@@ -54,17 +67,16 @@ function Navbar() {
   // handle user menu click
   const handleUserMenu = async (page) => {
     let user = {};
+
     if (page === "Logout") {
-      await logout({
-        logoutParams: {
-          returnTo: window.location.origin,
-        },
-      });
-      setAnchorElUser(null);
-      setCurrUser(null);
       localStorage.removeItem("verveRole");
       localStorage.removeItem("verveToken");
       localStorage.removeItem("verveCurrUser");
+
+      setAnchorElUser(null);
+      setCurrUser(null);
+      await logout();
+      return;
     } else if (page === "User") {
       setAnchorElUser(null);
       user.role = "user";
@@ -84,6 +96,19 @@ function Navbar() {
       localStorage.setItem("verveRole", JSON.stringify(user.role));
       await loginWithRedirect({
         appState: {
+          returnTo: "/dashboard",
+        },
+        authorizationParams: {
+          screen_hint: "Login/Register",
+        },
+      });
+    } else if (page === "Admin") {
+      setAnchorElUser(null);
+      user.role = "admin";
+      setCurrUser(user);
+      localStorage.setItem("verveRole", JSON.stringify(user.role));
+      await loginWithRedirect({
+        appState: {
           returnTo: "/",
         },
         authorizationParams: {
@@ -91,12 +116,8 @@ function Navbar() {
         },
       });
     }
+
     console.log(currUser);
-    // else if (page === "Past Orders") {
-    //   navigate("pastorders");
-    // } else {
-    //   navigate(`${page.toLowerCase()}`);
-    // }
   };
 
   return (
@@ -173,7 +194,7 @@ function Navbar() {
             >
               {pages.map((page) => (
                 <Link
-                  to={page.toLowerCase()}
+                  to={page.toLowerCase().replace(/\s+/g, "-")}
                   key={page}
                   style={{ textDecoration: "none" }}
                 >
@@ -222,7 +243,7 @@ function Navbar() {
               </Tooltip>
             </Link> */}
 
-              <Link to="search">
+              <Link to="/search">
                 <Tooltip title="Search">
                   <IconButton sx={{ p: 0 }}>
                     <SearchIcon sx={{ color: "#0E0140" }} alt="Search" />
@@ -261,7 +282,7 @@ function Navbar() {
               >
                 {settings.map((setting) => (
                   <Link
-                    to={setting.toLowerCase()}
+                    to={setting.toLowerCase().replace(/\s+/g, "-")}
                     key={setting}
                     style={{ textDecoration: "none" }}
                   >
