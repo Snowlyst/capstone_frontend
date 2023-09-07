@@ -524,7 +524,7 @@ function AdminDashboard() {
                   </Grid>
                   <Grid item sx={{ mt: 3, mb: 7 }}>
                     <Stack direction={"row"}>
-                      <Link href="/jobpost">
+                      <Link href="/post-job">
                         <Button
                           variant="contained"
                           component="span"

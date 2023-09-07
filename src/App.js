@@ -116,9 +116,7 @@ function App() {
             <AuthenticationGuard component={AdminManageExistingUserCompany} />
           }
         />
-        <Route
-          path="/checkapplication/:jobId"
-          element={<AuthenticationGuard component={ReviewApplication} />}
+        
         /> */}
         {/* These 4 Pages are Test pages, to be deleted near the end */}
         <Route path="/onemap" element={<OnemapApiTest />} />
@@ -147,6 +145,10 @@ function App() {
         <Route
           path="/admin/manageusercompanies"
           element={<AdminManageExistingUserCompany />}
+        />
+        <Route
+          path="/checkapplication/:jobId"
+          element={<ReviewApplication />}
         />
         {/* </Routes>
             </RequireAuth>
