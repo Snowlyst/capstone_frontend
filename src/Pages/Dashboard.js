@@ -87,7 +87,7 @@ function AdminDashboard() {
                       pl: 2,
                     }}
                   >
-                    These are the jobs that you have listed so far.
+                    Here are the options you may find useful..
                   </Typography>
                   <Typography
                     variant="darkP"
@@ -98,8 +98,8 @@ function AdminDashboard() {
                       pl: 2,
                     }}
                   >
-                    You can check each of the job listings for any incoming
-                    applications, or edit the listings as you wish.
+                    Each of the buttons link to specific main functions that you
+                    will require. Check them out!
                   </Typography>
                 </Stack>
               </Grid>
@@ -373,7 +373,7 @@ function AdminDashboard() {
                   </Grid>
                   <Grid item sx={{ mt: 3, mb: 7 }}>
                     <Stack direction={"row"}>
-                      <Link href="/search">
+                      <Link href="/job-search">
                         <Button
                           variant="contained"
                           component="span"
