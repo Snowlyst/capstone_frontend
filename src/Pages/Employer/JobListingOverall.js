@@ -210,7 +210,7 @@ function JobListingOverall() {
               </Stack>
             </Grid>
             <Grid item sx={{ mt: "3vh" }}>
-              <Link href="/jobpost">
+              <Link href="/post-job">
                 <Button
                   variant="contained"
                   component="span"

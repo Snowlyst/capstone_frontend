@@ -339,7 +339,6 @@ function AdminApproveDenyJob() {
               <Grid
                 container
                 sx={{
-                  backgroundColor: "white",
                   width: "45vw",
                   height: "74vh",
                   borderRadius: "40px",

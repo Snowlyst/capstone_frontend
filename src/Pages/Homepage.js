@@ -162,7 +162,7 @@ function Homepage() {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    navigate(`/search?location=${location}&type=${type}`);
+    navigate(`/job-search?location=${location}&type=${type}`);
   };
 
   const handleBrowseAll = (e) => {

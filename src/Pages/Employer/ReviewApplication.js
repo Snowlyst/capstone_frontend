@@ -670,7 +670,7 @@ function ReviewApplication() {
                               <Button
                                 classes={{ root: "green" }}
                                 variant="contained"
-                                onClick={getEvents}
+                                href="https://calendar.google.com"
                                 style={{
                                   width: "18vw",
                                   borderTopRightRadius: 0,
@@ -697,13 +697,13 @@ function ReviewApplication() {
                               sx={{
                                 fontWeight: theme.typography.h6.fontWeightBold,
                                 mt: "0.5vh",
-                                ml: "0.5vw",
+                                ml: "14.5vw",
                               }}
                             >
                               Set Start Date and Time
                             </Typography>
                             <Box
-                              sx={{ width: "30vw", ml: "11vw", mt: "0.5vh" }}
+                              sx={{ width: "30vw", ml: "14vw", mt: "0.5vh" }}
                             >
                               <LocalizationProvider
                                 dateAdapter={AdapterDateFns}
@@ -719,13 +719,13 @@ function ReviewApplication() {
                               sx={{
                                 fontWeight: theme.typography.h6.fontWeightBold,
                                 mt: "0.5vh",
-                                ml: "0.5vw",
+                                ml: "14.5vw",
                               }}
                             >
                               Set End Date and Time
                             </Typography>
                             <Box
-                              sx={{ width: "30vw", ml: "11vw", mt: "0.5vh" }}
+                              sx={{ width: "30vw", ml: "14vw", mt: "0.5vh" }}
                             >
                               <LocalizationProvider
                                 dateAdapter={AdapterDateFns}
@@ -741,19 +741,19 @@ function ReviewApplication() {
                                   fontWeight:
                                     theme.typography.h6.fontWeightBold,
                                   mt: "0.5vh",
-                                  ml: "0.5vw",
+                                  ml: "2.5vw",
                                 }}
                               >
                                 Event Information
                               </Typography>
 
                               <Box
-                                sx={{ width: "15vw", ml: "2vw", mt: "0.5vh" }}
+                                sx={{ width: "15vw", ml: "5vw", mt: "0.5vh" }}
                               ></Box>
                             </Box>
                             <Stack
                               direction="row"
-                              sx={{ mt: "0.5vh", ml: "4.3vw" }}
+                              sx={{ mt: "0.5vh", ml: "10.6vw" }}
                               spacing={1}
                             >
                               <TextField
@@ -847,7 +847,7 @@ function ReviewApplication() {
                               <Button
                                 classes={{ root: "green" }}
                                 variant="contained"
-                                onClick={getEvents}
+                                href="https://calendar.google.com"
                                 style={{
                                   width: "18vw",
                                   height: "12vh",
@@ -929,8 +929,8 @@ function ReviewApplication() {
                 </Box>
               ) : null}
               {usersData.length !== 0 && currentEntitySelection === "" ? (
-                <Box sx={{ mt: "15vh", pl: "2vw" }}>
-                  <Typography variant="darkP">
+                <Box sx={{ mt: "15vh", pl: "12vw" }}>
+                  <Typography variant="darkP" sx={{ fontSize: "1.3vw" }}>
                     Select an applicant to get started!
                   </Typography>
                 </Box>
