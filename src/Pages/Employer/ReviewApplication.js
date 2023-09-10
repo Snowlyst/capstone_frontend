@@ -537,10 +537,10 @@ function ReviewApplication() {
                   Applications
                 </Typography>
                 <Stack direction="column" sx={{ pl: 1.5 }}>
-                  {sideDisplay ? (
+                  {usersData.length !== 0 ? (
                     sideDisplay
                   ) : (
-                    <Box sx={{ mt: "15vh", pl: "2vw" }}>
+                    <Box sx={{ mt: "15vh", pl: "1vw" }}>
                       <Typography variant="darkP">
                         No current applicants for this listing yet!
                       </Typography>
@@ -936,7 +936,7 @@ function ReviewApplication() {
                 </Box>
               ) : null}
               {usersData.length === 0 && currentEntitySelection === "" ? (
-                <Box sx={{ mt: "15vh", pl: "2vw" }}>
+                <Box sx={{ mt: "12.5vh", pl: "12.5vw" }}>
                   <Typography variant="darkP">
                     No current applicants available!
                   </Typography>
