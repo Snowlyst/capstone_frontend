@@ -115,17 +115,17 @@ function Homepage() {
     console.log(currUser);
   }, [currUser]);
 
-  useEffect(() => {
-    if (accessToken !== null) {
-      localStorage.setItem("verveToken", JSON.stringify(accessToken));
-    }
-  }, [accessToken]);
+  // useEffect(() => {
+  //   if (accessToken !== null) {
+  //     localStorage.setItem("verveToken", JSON.stringify(accessToken));
+  //   }
+  // }, [accessToken]);
 
-  useEffect(() => {
-    if (currUser !== null || currUser !== "") {
-      localStorage.setItem("verveCurrUser", JSON.stringify(currUser));
-    }
-  }, [currUser]);
+  // useEffect(() => {
+  //   if (currUser !== null || currUser !== "") {
+  //     localStorage.setItem("verveCurrUser", JSON.stringify(currUser));
+  //   }
+  // }, [currUser]);
 
   useEffect(() => {
     console.log(setCurrUser);
