@@ -32,7 +32,7 @@ function Navbar() {
   const [role, setRole] = useState("");
   // const navigate = useNavigate();
 
-  const pages = ["Job Search", "Company Profiles", "Programs"];
+  const pages = ["Job Search", "Company Profiles"];
 
   const settings = {
     nonuser: ["User", "Employer", "Admin"],

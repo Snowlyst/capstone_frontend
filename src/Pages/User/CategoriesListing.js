@@ -5,11 +5,16 @@ import { Box, Typography, ThemeProvider, Avatar, Button } from "@mui/material";
 import { theme } from "../../Assets/Styles/Theme";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import IndividualJobPage from "../Employer/IndividualJobPage";
+
 function CategoriesListing() {
   const navigate = useNavigate();
   const [selectedListing, setSelectedListing] = useState(null);
   const [listings, setListings] = useState([]);
   const { categoryId } = useParams();
+  const params = useParams();
+const [jobId, setJobId] = useState(params.jobId);
+const [jobInfo, setJobInfo] = useState(null);
 
   useEffect(() => {
     axios
@@ -30,7 +35,7 @@ function CategoriesListing() {
   const handleBackClick = () => {
     navigate("/categories");
   };
-
+console.log(selectedListing)
   return (
     <ThemeProvider theme={theme}>
       <Box
@@ -40,6 +45,7 @@ function CategoriesListing() {
           alignItems: "flex-start",
           minHeight: "100vh",
           padding: "80px 0",
+          backgroundColor:"#F3F1FF"
         }}
       >
         <Box
@@ -93,70 +99,11 @@ function CategoriesListing() {
             alignItems: "flex-start",
           }}
         >
-          {selectedListing ? (
-            <>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  marginBottom: "10px",
-                }}
-              >
-                <Avatar
-                  src={selectedListing.company_profile_info.companyLogo}
-                  alt={selectedListing.company_profile_info.companyName}
-                  sx={{
-                    width: 450,
-                    height: 220,
-                    marginRight: "25px",
-                  }}
-                />
-                <div>
-                  <Typography
-                    variant="h4"
-                    sx={{ fontWeight: theme.typography.h4.fontWeightBold }}
-                  >
-                    {selectedListing.company_profile_info.companyName}
-                  </Typography>
-                  <Typography
-                    variant="p"
-                    sx={{ fontWeight: theme.typography.p.fontWeightBold }}
-                  >
-                    {selectedListing.company_profile_info.description}
-                  </Typography>
-                </div>
-              </Box>
-              <Typography
-                variant="h5"
-                sx={{ fontWeight: theme.typography.h5.fontWeightBold }}
-                mb={2}
-              >
-                {selectedListing.title}
-              </Typography>
-              <Typography variant="h6" sx={{ fontWeight: theme.typography.h6 }}>
-                Job Description:
-              </Typography>
-              <Typography variant="p" sx={{ fontWeight: theme.typography.p }}>
-                {selectedListing.description}
-              </Typography>
-              <Box display="flex" justifyContent="left" py={2}>
-                <Button
-                  className="orange"
-                  variant="contained"
-                  onClick={() => {
-                    Swal.fire({
-                      icon: "success",
-                      title: "Resume Sent",
-                      text: "Your resume has been sent to the recruiter.",
-                      confirmButtonColor: "#FF6B2C",
-                    });
-                  }}
-                >
-                  Apply Job
-                </Button>
-              </Box>
-            </>
-          ) : (
+          {selectedListing ?  (
+                  <IndividualJobPage
+                    jobsId={selectedListing.id}
+                  />
+                ) : (
             <Typography
               variant="h6"
               sx={{ fontWeight: theme.typography.h6.fontWeightBold }}
