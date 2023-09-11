@@ -66,3 +66,21 @@ html {
 .boxpaper.MuiPaper-root {
   border-radius: 20px !important ;
 }
+
+.hero {
+  background-image: url("../Images/homeBackground/desktop2.png");
+  height: 70%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  position: relative;
+}
+
+.hero-text {
+  text-align: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+}
