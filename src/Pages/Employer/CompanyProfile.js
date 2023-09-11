@@ -5,12 +5,13 @@ import {
   Grid,
   Stack,
   Typography,
+  Link,
   Divider,
 } from "@mui/material";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { theme } from "../../Assets/Styles/Theme";
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 //for auth
 import { useUserContext } from "../../Components/UserContext";
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -85,7 +86,7 @@ function CompanyProfile() {
                         <Grid item xs={8}>
                           <Box>
                             <Link
-                              to={`/company/jobs/${info.id}`}
+                              href={`/company/jobs/${info.id}`}
                               underline="none"
                               sx={{ color: theme.typography.darkP.color }}
                               target="_blank"
@@ -204,22 +205,22 @@ function CompanyProfile() {
                 ml: "5vw",
               }}
             >
-              {companyData.bannerUrl ? (
-                <Grid item xs={3}>
-                  <img
-                    src={companyData.bannerUrl}
-                    alt="Alt"
-                    style={{
-                      height: "22.4vh",
-                      width: "44vw",
-                      objectFit: "fill",
-                      borderTopLeftRadius: "40px",
-                      borderTopRightRadius: "40px",
-                    }}
-                  />
-                </Grid>
-              ) : null}
-
+              <Grid item xs={3}>
+                <img
+                  src={
+                    companyData.bannerUrl ||
+                    "https://firebasestorage.googleapis.com/v0/b/verve-55239.appspot.com/o/images%2FImage_not_available.png?alt=media&token=0a5a0495-5de3-4fea-93a2-3b4b95b22f64"
+                  }
+                  alt="Alt"
+                  style={{
+                    height: "22.4vh",
+                    width: "44vw",
+                    objectFit: "fill",
+                    borderTopLeftRadius: "40px",
+                    borderTopRightRadius: "40px",
+                  }}
+                />
+              </Grid>
               <Grid item xs={2}>
                 <Grid
                   container
@@ -273,7 +274,7 @@ function CompanyProfile() {
                       <Typography
                         variant="p"
                         sx={{
-                          fontSize: "1.3vh",
+                          fontSize: 13,
                           overflow: "hidden",
                           whiteSpace: "nowrap",
                           textOverflow: "ellipsis",
@@ -288,18 +289,17 @@ function CompanyProfile() {
                       component="div"
                       sx={{
                         overflow: "hidden",
+                        whiteSpace: "nowrap",
                         textOverflow: "ellipsis",
-                        WebkitLineClamp: "3",
-                        WebkitBoxOrient: "vertical",
-                        display: "-webkit-box",
                         mr: 0.23,
                         mt: 0.3,
                       }}
                     >
-                      <Typography variant="darkp" sx={{ fontSize: "1.4vh" }}>
+                      <Typography variant="darkp" sx={{ fontSize: 13 }}>
                         Address:{" "}
                         <Typography variant="p">
-                          {companyData.address || "Address here"}
+                          {companyData.address ||
+                            "KEK ROAD VOLUME 1 HIGH ROAD HAHAHAHAHAHA"}
                         </Typography>
                       </Typography>
                     </Box>
