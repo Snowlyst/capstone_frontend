@@ -6,12 +6,11 @@ import {
   Typography,
   ThemeProvider,
   Stack,
-  Link,
   Button,
   Divider,
 } from "@mui/material";
 import { theme } from "../Assets/Styles/Theme";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import Swal from "sweetalert2";
 
 function AdminDashboard() {
@@ -132,7 +131,7 @@ function AdminDashboard() {
                   </Grid>
                   <Grid item sx={{ mt: 3, mb: 7 }}>
                     <Stack direction={"row"}>
-                      <Link href="/joblisting">
+                      <Link to="/joblisting">
                         <Button
                           variant="contained"
                           component="span"
@@ -149,7 +148,7 @@ function AdminDashboard() {
                         </Button>
                       </Link>
                       <Divider sx={{ ml: "5vw", mr: "5vw" }} />
-                      <Link href="/admin/checkjobs">
+                      <Link to="/admin/checkjobs">
                         <Button
                           variant="contained"
                           component="span"
@@ -177,7 +176,7 @@ function AdminDashboard() {
                   </Grid>
                   <Grid item sx={{ mt: 3, mb: 7 }}>
                     <Stack direction={"row"}>
-                      <Link href="/profile">
+                      <Link to="/post-job">
                         <Button
                           variant="contained"
                           component="span"
@@ -189,12 +188,12 @@ function AdminDashboard() {
                           }}
                         >
                           <Typography sx={{ fontSize: 14 }}>
-                            Add New User
+                            Post a Job
                           </Typography>
                         </Button>
                       </Link>
                       <Divider sx={{ ml: "5vw", mr: "5vw" }} />
-                      <Link href="/admin/checkusercompanies">
+                      <Link to="/admin/checkusercompanies">
                         <Button
                           variant="contained"
                           component="span"
@@ -214,7 +213,7 @@ function AdminDashboard() {
                   </Grid>
                   <Grid item sx={{ mt: 3, mb: 7 }}>
                     <Stack direction={"row"}>
-                      <Link href="/admin/manageusercompanies">
+                      <Link to="/admin/manageusercompanies">
                         <Button
                           variant="contained"
                           component="span"
@@ -328,7 +327,7 @@ function AdminDashboard() {
                   </Grid>
                   <Grid item sx={{ mt: 3, mb: 7 }}>
                     <Stack direction={"row"}>
-                      <Link href="/resume">
+                      <Link to="/resume">
                         <Button
                           variant="contained"
                           component="span"
@@ -345,7 +344,7 @@ function AdminDashboard() {
                         </Button>
                       </Link>
                       <Divider sx={{ ml: "5vw", mr: "5vw" }} />
-                      <Link href="/createresume">
+                      <Link to="/createresume">
                         <Button
                           variant="contained"
                           component="span"
@@ -373,7 +372,7 @@ function AdminDashboard() {
                   </Grid>
                   <Grid item sx={{ mt: 3, mb: 7 }}>
                     <Stack direction={"row"}>
-                      <Link href="/job-search">
+                      <Link to="/job-search">
                         <Button
                           variant="contained"
                           component="span"
@@ -390,7 +389,7 @@ function AdminDashboard() {
                         </Button>
                       </Link>
                       <Divider sx={{ ml: "5vw", mr: "5vw" }} />
-                      <Link href="/categories">
+                      <Link to="/job-categories">
                         <Button
                           variant="contained"
                           component="span"
@@ -410,7 +409,7 @@ function AdminDashboard() {
                   </Grid>
                   <Grid item sx={{ mt: 3, mb: 7 }}>
                     <Stack direction={"row"}>
-                      <Link href="#">
+                      <Link to="/usercheckapplication">
                         <Button
                           variant="contained"
                           component="span"
@@ -524,7 +523,7 @@ function AdminDashboard() {
                   </Grid>
                   <Grid item sx={{ mt: 3, mb: 7 }}>
                     <Stack direction={"row"}>
-                      <Link href="/post-job">
+                      <Link to="/post-job">
                         <Button
                           variant="contained"
                           component="span"
@@ -542,7 +541,7 @@ function AdminDashboard() {
                         </Button>
                       </Link>
                       <Divider sx={{ ml: "5vw", mr: "5vw" }} />
-                      <Link href="/joblisting">
+                      <Link to="/joblisting">
                         <Button
                           variant="contained"
                           component="span"

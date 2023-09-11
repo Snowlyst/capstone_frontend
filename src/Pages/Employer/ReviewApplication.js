@@ -9,13 +9,12 @@ import {
   ThemeProvider,
   Divider,
   Typography,
-  Link,
   Button,
   TextField,
 } from "@mui/material";
 import { theme } from "../../Assets/Styles/Theme";
 import { useUserContext } from "../../Components/UserContext";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import {
   useSession,
   useSupabaseClient,
@@ -41,6 +40,7 @@ function ReviewApplication() {
   const [eventName, setEventName] = useState("");
   const [eventDescription, setEventDescription] = useState("");
   const [calendarId, setCalendarId] = useState("");
+  const [renderState, setRenderState] = useState(0);
 
   const { isLoading } = useSessionContext();
 
@@ -53,13 +53,13 @@ function ReviewApplication() {
   //make sure currUser is set or else the navigate gonna boot everyone off the screen
   useEffect(() => {
     console.log(currUser);
-    if (!accessToken) {
-      const localAccess = JSON.parse(localStorage.getItem("verveToken"));
+    if (currUser) {
+      const localAccess = currUser.accessToken;
       console.log("access token ready");
       setAccessToken(localAccess);
       setIsLoaded(true);
     }
-  }, []);
+  }, [currUser]);
 
   //disable jobseekers and non loggedin people from accessing this page
   useEffect(() => {
@@ -158,7 +158,7 @@ function ReviewApplication() {
                     <Grid item xs={8}>
                       <Box>
                         <Link
-                          href="#"
+                          to="#"
                           onClick={() => setCurrentEntitySelection(index)}
                           underline="none"
                           sx={{ color: theme.typography.darkP.color }}
@@ -226,7 +226,7 @@ function ReviewApplication() {
           console.log(error);
         });
     }
-  }, [isLoaded]);
+  }, [isLoaded, renderState]);
 
   useEffect(() => {
     if (session) {
@@ -404,8 +404,8 @@ function ReviewApplication() {
       setEventName("");
       setEventDescription("");
 
-      // Now you can refresh the page after everything is complete
-      window.location.reload();
+      setRenderState((prev) => prev + 1);
+      setCurrentEntitySelection("");
     } catch (error) {
       console.error(error);
     }
@@ -432,7 +432,8 @@ function ReviewApplication() {
 
       Swal.fire("Success", "The applicant has been hired!", "success").then(
         () => {
-          window.location.reload();
+          setRenderState((prev) => prev + 1);
+          setCurrentEntitySelection("");
         }
       );
     } catch (error) {
@@ -461,7 +462,8 @@ function ReviewApplication() {
 
       Swal.fire("Success", "The applicant has been rejected!", "success").then(
         () => {
-          window.location.reload();
+          setRenderState((prev) => prev + 1);
+          setCurrentEntitySelection("");
         }
       );
     } catch (error) {
@@ -497,7 +499,7 @@ function ReviewApplication() {
             >
               Checking Applications for{" "}
               <Link
-                href={`/company/jobs/${jobData.id}`}
+                to={`/company/jobs/${jobData.id}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
