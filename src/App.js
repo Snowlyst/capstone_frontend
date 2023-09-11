@@ -30,6 +30,7 @@ import EditProfile from "./Pages/User/EditProfile";
 
 import AdminManageExistingUserCompany from "./Pages/Administrator/AdminManageExistingUserCompany";
 import ReviewApplication from "./Pages/Employer/ReviewApplication";
+import CheckApplication from "./Pages/User/CheckApplication";
 function App() {
   const { isAuthenticated, isLoading } = useAuth0();
   const [authLoading, setAuthLoading] = useState(false);
@@ -150,6 +151,7 @@ function App() {
           path="/checkapplication/:jobId"
           element={<ReviewApplication />}
         />
+        <Route path="/usercheckapplication" element={<CheckApplication />} />
         {/* </Routes>
             </RequireAuth>
           }
