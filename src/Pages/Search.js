@@ -56,10 +56,13 @@ function Search() {
   const portedTypeQuery = new URLSearchParams(useLocation().search).get("type");
 
   //useEffects for access cookies n stuff
+  useEffect(() => {
+    console.log(currUser);
+  }, []);
 
   useEffect(() => {
     if (!accessToken) {
-      const localAccess = currUser.accessToken;
+      const localAccess = JSON.parse(localStorage.getItem("verveToken"));
       setAccessToken(localAccess);
     }
   }, [accessToken]);
@@ -358,16 +361,14 @@ function Search() {
                   </Stack>
                 </Grid>
                 <Grid item xs={2} sx={{ mt: 4.1 }}>
-                  <Link href={`/company/jobs/${info.id}`}>
-                    <Button
-                      variant="contained"
-                      component="span"
-                      style={{ backgroundColor: "#0E0140", color: "white" }}
-                    >
-                      <VisibilityIcon />
-                      View
-                    </Button>
-                  </Link>
+                  <Button
+                    variant="contained"
+                    component="span"
+                    style={{ backgroundColor: "#0E0140", color: "white" }}
+                  >
+                    <VisibilityIcon />
+                    View
+                  </Button>
                 </Grid>
               </Grid>
             );

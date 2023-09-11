@@ -9,12 +9,13 @@ import {
   ThemeProvider,
   Divider,
   Typography,
+  Link,
   Button,
   TextField,
 } from "@mui/material";
 import { theme } from "../../Assets/Styles/Theme";
 import { useUserContext } from "../../Components/UserContext";
-import { useNavigate, useParams, Link } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   useSession,
   useSupabaseClient,
@@ -40,7 +41,6 @@ function ReviewApplication() {
   const [eventName, setEventName] = useState("");
   const [eventDescription, setEventDescription] = useState("");
   const [calendarId, setCalendarId] = useState("");
-  const [renderState, setRenderState] = useState(0);
 
   const { isLoading } = useSessionContext();
 
@@ -53,13 +53,13 @@ function ReviewApplication() {
   //make sure currUser is set or else the navigate gonna boot everyone off the screen
   useEffect(() => {
     console.log(currUser);
-    if (currUser) {
-      const localAccess = currUser.accessToken;
+    if (!accessToken) {
+      const localAccess = JSON.parse(localStorage.getItem("verveToken"));
       console.log("access token ready");
       setAccessToken(localAccess);
       setIsLoaded(true);
     }
-  }, [currUser]);
+  }, []);
 
   //disable jobseekers and non loggedin people from accessing this page
   useEffect(() => {
@@ -110,23 +110,6 @@ function ReviewApplication() {
           setUsersData(info.data);
           setSideDisplay(
             info.data.map((info, index) => {
-              let formattedDate;
-              if (info.interviewDate) {
-                const date = new Date(info.interviewDate);
-                formattedDate = `${date
-                  .getDate()
-                  .toString()
-                  .padStart(2, "0")}/${(date.getMonth() + 1)
-                  .toString()
-                  .padStart(2, "0")}/${date.getFullYear()} ${date
-                  .getHours()
-                  .toString()
-                  .padStart(2, "0")}:${date
-                  .getMinutes()
-                  .toString()
-                  .padStart(2, "0")}`;
-              }
-
               return (
                 <Box key={index}>
                   <Grid
@@ -158,7 +141,7 @@ function ReviewApplication() {
                     <Grid item xs={8}>
                       <Box>
                         <Link
-                          to="#"
+                          href="#"
                           onClick={() => setCurrentEntitySelection(index)}
                           underline="none"
                           sx={{ color: theme.typography.darkP.color }}
@@ -210,7 +193,7 @@ function ReviewApplication() {
                               display: "-webkit-box",
                             }}
                           >
-                            {info.application_stage.stage || "No interview set"}
+                            {info.application_stages[0].stage}
                           </Typography>
                         </Box>
                       </Box>
@@ -226,7 +209,7 @@ function ReviewApplication() {
           console.log(error);
         });
     }
-  }, [isLoaded, renderState]);
+  }, [isLoaded]);
 
   useEffect(() => {
     if (session) {
@@ -404,12 +387,36 @@ function ReviewApplication() {
       setEventName("");
       setEventDescription("");
 
-      setRenderState((prev) => prev + 1);
-      setCurrentEntitySelection("");
+      // Now you can refresh the page after everything is complete
+      window.location.reload();
     } catch (error) {
       console.error(error);
     }
   };
+
+  // const hireApplicant = () => {
+  //   const idToEdit = usersData[currentEntitySelection].id;
+  //   const dataToSend = {
+  //     idToEdit: idToEdit,
+  //   };
+  //   axios
+  //     .put(`${BACKEND_URL}/application/hireapplicant`, dataToSend, {
+  //       headers: {
+  //         Authorization: `Bearer ${accessToken}`,
+  //       },
+  //     })
+  //     .then((info) => {
+  //       console.log(info);
+  //       return Swal.fire(
+  //         "Success",
+  //         "The event has been created on your Google calendar!",
+  //         "success"
+  //       );
+  //     })
+  //     .catch((error) => {
+  //       console.log(error);
+  //     });
+  // };
 
   const hireApplicant = async () => {
     try {
@@ -432,8 +439,7 @@ function ReviewApplication() {
 
       Swal.fire("Success", "The applicant has been hired!", "success").then(
         () => {
-          setRenderState((prev) => prev + 1);
-          setCurrentEntitySelection("");
+          window.location.reload();
         }
       );
     } catch (error) {
@@ -462,8 +468,7 @@ function ReviewApplication() {
 
       Swal.fire("Success", "The applicant has been rejected!", "success").then(
         () => {
-          setRenderState((prev) => prev + 1);
-          setCurrentEntitySelection("");
+          window.location.reload();
         }
       );
     } catch (error) {
@@ -499,7 +504,7 @@ function ReviewApplication() {
             >
               Checking Applications for{" "}
               <Link
-                to={`/company/jobs/${jobData.id}`}
+                href={`/company/jobs/${jobData.id}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -598,23 +603,15 @@ function ReviewApplication() {
                         width: "44vw",
                       }}
                     >
-                      Interview Time:{" "}
+                      Application Status:{" "}
                       <Typography
                         variant="darkP"
                         sx={{ fontSize: "1.3vw ", width: "44vw" }}
                       >
-                        {usersData[currentEntitySelection].interviewDate
-                          ? "Interview set on " +
-                            new Date(
-                              usersData[currentEntitySelection].interviewDate
-                            ).toLocaleString("en-GB", {
-                              day: "2-digit",
-                              month: "2-digit",
-                              year: "numeric",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })
-                          : "No interview set."}
+                        {
+                          usersData[currentEntitySelection]
+                            .application_stages[0].stage
+                        }
                       </Typography>
                     </Typography>
                   </Stack>
@@ -643,8 +640,7 @@ function ReviewApplication() {
                       mt: "2vh",
                     }}
                   >
-                    {usersData[currentEntitySelection].applicationStageId ===
-                    1 ? (
+                    {usersData[currentEntitySelection].status === 1 ? (
                       <Box>
                         <Typography
                           variant="h6"
@@ -674,7 +670,7 @@ function ReviewApplication() {
                               <Button
                                 classes={{ root: "green" }}
                                 variant="contained"
-                                href="https://calendar.google.com"
+                                onClick={getEvents}
                                 style={{
                                   width: "18vw",
                                   borderTopRightRadius: 0,
@@ -701,13 +697,13 @@ function ReviewApplication() {
                               sx={{
                                 fontWeight: theme.typography.h6.fontWeightBold,
                                 mt: "0.5vh",
-                                ml: "14.5vw",
+                                ml: "0.5vw",
                               }}
                             >
                               Set Start Date and Time
                             </Typography>
                             <Box
-                              sx={{ width: "30vw", ml: "14vw", mt: "0.5vh" }}
+                              sx={{ width: "30vw", ml: "11vw", mt: "0.5vh" }}
                             >
                               <LocalizationProvider
                                 dateAdapter={AdapterDateFns}
@@ -723,13 +719,13 @@ function ReviewApplication() {
                               sx={{
                                 fontWeight: theme.typography.h6.fontWeightBold,
                                 mt: "0.5vh",
-                                ml: "14.5vw",
+                                ml: "0.5vw",
                               }}
                             >
                               Set End Date and Time
                             </Typography>
                             <Box
-                              sx={{ width: "30vw", ml: "14vw", mt: "0.5vh" }}
+                              sx={{ width: "30vw", ml: "11vw", mt: "0.5vh" }}
                             >
                               <LocalizationProvider
                                 dateAdapter={AdapterDateFns}
@@ -745,19 +741,19 @@ function ReviewApplication() {
                                   fontWeight:
                                     theme.typography.h6.fontWeightBold,
                                   mt: "0.5vh",
-                                  ml: "2.5vw",
+                                  ml: "0.5vw",
                                 }}
                               >
                                 Event Information
                               </Typography>
 
                               <Box
-                                sx={{ width: "15vw", ml: "5vw", mt: "0.5vh" }}
+                                sx={{ width: "15vw", ml: "2vw", mt: "0.5vh" }}
                               ></Box>
                             </Box>
                             <Stack
                               direction="row"
-                              sx={{ mt: "0.5vh", ml: "10.6vw" }}
+                              sx={{ mt: "0.5vh", ml: "4.3vw" }}
                               spacing={1}
                             >
                               <TextField
@@ -821,8 +817,7 @@ function ReviewApplication() {
                         )}
                       </Box>
                     ) : null}
-                    {usersData[currentEntitySelection].applicationStageId ===
-                    2 ? (
+                    {usersData[currentEntitySelection].status === 2 ? (
                       <Box>
                         <Typography
                           variant="h6"
@@ -852,7 +847,7 @@ function ReviewApplication() {
                               <Button
                                 classes={{ root: "green" }}
                                 variant="contained"
-                                href="https://calendar.google.com"
+                                onClick={getEvents}
                                 style={{
                                   width: "18vw",
                                   height: "12vh",
@@ -934,8 +929,8 @@ function ReviewApplication() {
                 </Box>
               ) : null}
               {usersData.length !== 0 && currentEntitySelection === "" ? (
-                <Box sx={{ mt: "15vh", pl: "12vw" }}>
-                  <Typography variant="darkP" sx={{ fontSize: "1.3vw" }}>
+                <Box sx={{ mt: "15vh", pl: "2vw" }}>
+                  <Typography variant="darkP">
                     Select an applicant to get started!
                   </Typography>
                 </Box>
