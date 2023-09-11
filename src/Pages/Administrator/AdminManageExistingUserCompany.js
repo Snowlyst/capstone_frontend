@@ -7,14 +7,13 @@ import {
   Typography,
   Divider,
   Button,
-  Link,
   Modal,
   TextField,
 } from "@mui/material";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { theme } from "../../Assets/Styles/Theme";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 //for auth
 import { useUserContext } from "../../Components/UserContext";
 import AxiosLoader from "../../Components/AxiosLoader";
@@ -31,19 +30,20 @@ function AdminManageExistingUserCompany() {
   const [currentEntitySelection, setCurrentEntitySelection] = useState("");
   const [userMode, setUserMode] = useState(true);
   const [axiosLoading, setAxiosLoading] = useState(false);
+  const [renderState, setRenderState] = useState(0);
 
   const navigate = useNavigate();
 
   //make sure currUser is set or else the navigate gonna boot everyone off the screen
   useEffect(() => {
     console.log(currUser);
-    if (!accessToken) {
-      const localAccess = JSON.parse(localStorage.getItem("verveToken"));
+    if (currUser) {
+      const localAccess = currUser.accessToken;
       console.log("access token ready");
       setAccessToken(localAccess);
       setIsLoaded(true);
     }
-  }, []);
+  }, [currUser]);
 
   //disable jobseekers and non loggedin people from accessing this page
   useEffect(() => {
@@ -92,7 +92,7 @@ function AdminManageExistingUserCompany() {
                         <img
                           alt="Logo"
                           src={
-                            null ||
+                            info.avatarUrl ||
                             "https://firebasestorage.googleapis.com/v0/b/verve-55239.appspot.com/o/images%2FImage_not_available.png?alt=media&token=0a5a0495-5de3-4fea-93a2-3b4b95b22f64"
                           }
                           style={{
@@ -106,7 +106,7 @@ function AdminManageExistingUserCompany() {
                       </Grid>
                       <Grid item xs={8}>
                         <Box>
-                          <Link href="#" underline="hover">
+                          <Link to="#" underline="hover">
                             <Box
                               component="div"
                               onClick={() => setCurrentEntitySelection(index)}
@@ -188,7 +188,7 @@ function AdminManageExistingUserCompany() {
                       }}
                     >
                       <Grid item xs={4}>
-                        <Link href={`/companyprofile/${info.id}`}>
+                        <Link to={`/companyprofile/${info.id}`}>
                           <img
                             alt="Logo"
                             src={
@@ -207,7 +207,7 @@ function AdminManageExistingUserCompany() {
                       </Grid>
                       <Grid item xs={8}>
                         <Box>
-                          <Link href={"#"} underline="hover">
+                          <Link to={"#"} underline="hover">
                             <Box
                               component="div"
                               onClick={() => setCurrentEntitySelection(index)}
@@ -282,7 +282,7 @@ function AdminManageExistingUserCompany() {
           });
       }
     }
-  }, [isLoaded, currUser]);
+  }, [isLoaded, currUser, renderState]);
 
   //unverifying a user (removing verify perms)
   const unverifyUser = () => {
@@ -305,7 +305,8 @@ function AdminManageExistingUserCompany() {
         console.log(error);
       })
       .finally(() => {
-        window.location.reload();
+        setRenderState((prev) => prev + 1);
+        setCurrentEntitySelection("");
       });
   };
 
@@ -330,7 +331,8 @@ function AdminManageExistingUserCompany() {
         console.log(error);
       })
       .finally(() => {
-        window.location.reload();
+        setRenderState((prev) => prev + 1);
+        setCurrentEntitySelection("");
       });
   };
 
@@ -467,22 +469,25 @@ function AdminManageExistingUserCompany() {
               >
                 {currentEntitySelection !== "" && !userMode ? (
                   <>
-                    <Grid item xs={3}>
-                      <img
-                        src={
-                          companyData[currentEntitySelection].bannerUrl ||
-                          "https://firebasestorage.googleapis.com/v0/b/verve-55239.appspot.com/o/images%2FImage_not_available.png?alt=media&token=0a5a0495-5de3-4fea-93a2-3b4b95b22f64"
-                        }
-                        alt="Alt"
-                        style={{
-                          height: "22.4vh",
-                          width: "44vw",
-                          objectFit: "fill",
-                          borderTopLeftRadius: "40px",
-                          borderTopRightRadius: "40px",
-                        }}
-                      />
-                    </Grid>
+                    {companyData[currentEntitySelection].bannerUrl ? (
+                      <Grid item xs={3}>
+                        <img
+                          src={
+                            companyData[currentEntitySelection].bannerUrl ||
+                            "https://firebasestorage.googleapis.com/v0/b/verve-55239.appspot.com/o/images%2FImage_not_available.png?alt=media&token=0a5a0495-5de3-4fea-93a2-3b4b95b22f64"
+                          }
+                          alt="Alt"
+                          style={{
+                            height: "22.4vh",
+                            width: "44vw",
+                            objectFit: "fill",
+                            borderTopLeftRadius: "40px",
+                            borderTopRightRadius: "40px",
+                          }}
+                        />
+                      </Grid>
+                    ) : null}
+
                     <Grid item xs={2}>
                       <Grid
                         container
@@ -586,7 +591,7 @@ function AdminManageExistingUserCompany() {
                             fontSize: theme.typography.h6.fontSize,
                             overflow: "auto",
                             textOverflow: "ellipsis",
-                            WebkitLineClamp: "8",
+                            WebkitLineClamp: "15",
                             WebkitBoxOrient: "vertical",
                             display: "-webkit-box",
                           }}
@@ -913,7 +918,9 @@ function AdminManageExistingUserCompany() {
                       width: "20vw",
                     }}
                   >
-                    Remove Verification from User
+                    <Typography sx={{ fontSize: "1.4vh" }}>
+                      Remove Verification from User
+                    </Typography>
                   </Button>
                 ) : (
                   <Button
@@ -925,7 +932,9 @@ function AdminManageExistingUserCompany() {
                       width: "20vw",
                     }}
                   >
-                    Remove Verification from Company
+                    <Typography sx={{ fontSize: "1.4vh" }}>
+                      Remove Verification from Company
+                    </Typography>
                   </Button>
                 )}
               </Box>
