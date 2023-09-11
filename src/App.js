@@ -33,6 +33,7 @@ import AdminDashboard from "./Pages/Dashboard";
 
 import AdminManageExistingUserCompany from "./Pages/Administrator/AdminManageExistingUserCompany";
 import ReviewApplication from "./Pages/Employer/ReviewApplication";
+import CheckApplication from "./Pages/User/CheckApplication";
 function App() {
   const { isAuthenticated, isLoading } = useAuth0();
   const [authLoading, setAuthLoading] = useState(false);
@@ -100,7 +101,7 @@ function App() {
             <RequireAuth
               redirectTo={<Login />}
               user={currUser}
-              admin={<Forbidden />}
+              admin={<ReviewApplication />}
               jobseeker={<ReviewApplication />}
             />
           }
@@ -133,7 +134,7 @@ function App() {
             <RequireAuth
               redirectTo={<Login />}
               user={currUser}
-              admin={<Forbidden />}
+              admin={<ResumeList />}
               jobseeker={<ResumeList />}
             />
           }
@@ -166,8 +167,20 @@ function App() {
             <RequireAuth
               redirectTo={<Login />}
               user={currUser}
-              admin={<Forbidden />}
+              admin={<CreateResume />}
               jobseeker={<CreateResume />}
+            />
+          }
+        />
+
+        <Route
+          path="/usercheckapplication"
+          element={
+            <RequireAuth
+              redirectTo={<Login />}
+              user={currUser}
+              admin={<CheckApplication />}
+              jobseeker={<CheckApplication />}
             />
           }
         />
@@ -235,7 +248,7 @@ function App() {
             <RequireAuth
               redirectTo={<Login />}
               user={currUser}
-              admin={<AdminDashboard />}
+              admin={<AdminManageExistingUserCompany />}
               jobseeker={<Forbidden />}
             />
           }
