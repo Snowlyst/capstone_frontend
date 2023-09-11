@@ -30,9 +30,10 @@ import EditProfile from "./Pages/User/EditProfile";
 import Login from "./Components/Login";
 import { useUserContext } from "./Components/UserContext";
 import AdminDashboard from "./Pages/Dashboard";
-
 import AdminManageExistingUserCompany from "./Pages/Administrator/AdminManageExistingUserCompany";
 import ReviewApplication from "./Pages/Employer/ReviewApplication";
+import CompanyList from "./Pages/Employer/CompanyList";
+
 import CheckApplication from "./Pages/User/CheckApplication";
 function App() {
   const { isAuthenticated, isLoading } = useAuth0();
@@ -86,13 +87,13 @@ function App() {
       <Routes>
         {/* unprotected routes */}
         <Route path="/" element={<Homepage />} />
+
         <Route path="/job-categories" element={<Categories />} />
         <Route path="/job-search" element={<Search />} />
+        <Route path="/company-profiles" element={<CompanyList />} />
         <Route path="/company/jobs/:jobId" element={<IndividualJobPage />} />
         <Route path="/companyprofile/:companyId" element={<CompanyProfile />} />
         <Route path="/categories/:categoryId" element={<CategoriesListing />} />
-        <Route path="/companyprofile/:companyId" element={<CompanyProfile />} />
-        <Route path="/joblisting" element={<JobListingOverall />} />
 
         {/* user routes */}
         <Route
@@ -157,7 +158,7 @@ function App() {
               redirectTo={<Login />}
               user={currUser}
               admin={<JobListingOverall />}
-              jobseeker={<JobListingOverall />}
+              jobseeker={<Forbidden />}
             />
           }
         />

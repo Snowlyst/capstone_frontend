@@ -155,12 +155,31 @@ function Navbar() {
                   </Link>
                 ))}
               </Menu>
+              <Box
+                flexDirection="row"
+                justifyContent="center"
+                sx={{ mt: "1vw", ml: "auto", mr: "auto" }}
+                className="verve-logo"
+              >
+                <Link to="/">
+                  <img src={logo} alt="verve logo" width="120px" />
+                </Link>
+              </Box>
             </Box>
-
+            <Box
+              flexDirection="row"
+              justifyContent="center"
+              sx={{ marginTop: "1vw", display: { xs: "none", md: "flex" } }}
+              className="verve-logo"
+            >
+              <Link to="/">
+                <img src={logo} alt="verve logo" width="120px" />
+              </Link>
+            </Box>
             <Box
               sx={{
                 flexGrow: 1,
-
+                ml: 5,
                 display: { xs: "none", md: "flex" },
               }}
             >
@@ -196,14 +215,6 @@ function Navbar() {
                   </Button>
                 </Link>
               ))}
-              <Box
-                sx={{ width: "120px", marginLeft: "16vw", marginTop: "1vw" }}
-                className="verve-logo"
-              >
-                <Link to="/">
-                  <img src={logo} alt="verve logo" width="120px" />
-                </Link>
-              </Box>
             </Box>
 
             <Box sx={{ flexGrow: 0, gap: "20px", display: "flex" }}>
