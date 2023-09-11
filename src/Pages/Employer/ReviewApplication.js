@@ -110,6 +110,23 @@ function ReviewApplication() {
           setUsersData(info.data);
           setSideDisplay(
             info.data.map((info, index) => {
+              let formattedDate;
+              if (info.interviewDate) {
+                const date = new Date(info.interviewDate);
+                formattedDate = `${date
+                  .getDate()
+                  .toString()
+                  .padStart(2, "0")}/${(date.getMonth() + 1)
+                  .toString()
+                  .padStart(2, "0")}/${date.getFullYear()} ${date
+                  .getHours()
+                  .toString()
+                  .padStart(2, "0")}:${date
+                  .getMinutes()
+                  .toString()
+                  .padStart(2, "0")}`;
+              }
+
               return (
                 <Box key={index}>
                   <Grid
@@ -193,7 +210,7 @@ function ReviewApplication() {
                               display: "-webkit-box",
                             }}
                           >
-                            {info.application_stages[0].stage}
+                            {info.application_stage.stage || "No interview set"}
                           </Typography>
                         </Box>
                       </Box>
@@ -394,30 +411,6 @@ function ReviewApplication() {
     }
   };
 
-  // const hireApplicant = () => {
-  //   const idToEdit = usersData[currentEntitySelection].id;
-  //   const dataToSend = {
-  //     idToEdit: idToEdit,
-  //   };
-  //   axios
-  //     .put(`${BACKEND_URL}/application/hireapplicant`, dataToSend, {
-  //       headers: {
-  //         Authorization: `Bearer ${accessToken}`,
-  //       },
-  //     })
-  //     .then((info) => {
-  //       console.log(info);
-  //       return Swal.fire(
-  //         "Success",
-  //         "The event has been created on your Google calendar!",
-  //         "success"
-  //       );
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //     });
-  // };
-
   const hireApplicant = async () => {
     try {
       const idToEdit = usersData[currentEntitySelection].id;
@@ -603,15 +596,23 @@ function ReviewApplication() {
                         width: "44vw",
                       }}
                     >
-                      Application Status:{" "}
+                      Interview Time:{" "}
                       <Typography
                         variant="darkP"
                         sx={{ fontSize: "1.3vw ", width: "44vw" }}
                       >
-                        {
-                          usersData[currentEntitySelection]
-                            .application_stages[0].stage
-                        }
+                        {usersData[currentEntitySelection].interviewDate
+                          ? "Interview set on " +
+                            new Date(
+                              usersData[currentEntitySelection].interviewDate
+                            ).toLocaleString("en-GB", {
+                              day: "2-digit",
+                              month: "2-digit",
+                              year: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })
+                          : "No interview set."}
                       </Typography>
                     </Typography>
                   </Stack>
@@ -640,7 +641,8 @@ function ReviewApplication() {
                       mt: "2vh",
                     }}
                   >
-                    {usersData[currentEntitySelection].status === 1 ? (
+                    {usersData[currentEntitySelection].applicationStageId ===
+                    1 ? (
                       <Box>
                         <Typography
                           variant="h6"
@@ -817,7 +819,8 @@ function ReviewApplication() {
                         )}
                       </Box>
                     ) : null}
-                    {usersData[currentEntitySelection].status === 2 ? (
+                    {usersData[currentEntitySelection].applicationStageId ===
+                    2 ? (
                       <Box>
                         <Typography
                           variant="h6"

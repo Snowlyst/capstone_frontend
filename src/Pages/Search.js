@@ -361,14 +361,16 @@ function Search() {
                   </Stack>
                 </Grid>
                 <Grid item xs={2} sx={{ mt: 4.1 }}>
-                  <Button
-                    variant="contained"
-                    component="span"
-                    style={{ backgroundColor: "#0E0140", color: "white" }}
-                  >
-                    <VisibilityIcon />
-                    View
-                  </Button>
+                  <Link href={`/company/jobs/${info.id}`}>
+                    <Button
+                      variant="contained"
+                      component="span"
+                      style={{ backgroundColor: "#0E0140", color: "white" }}
+                    >
+                      <VisibilityIcon />
+                      View
+                    </Button>
+                  </Link>
                 </Grid>
               </Grid>
             );
