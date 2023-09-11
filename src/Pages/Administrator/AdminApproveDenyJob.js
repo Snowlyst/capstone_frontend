@@ -7,14 +7,13 @@ import {
   Typography,
   Divider,
   Button,
-  Link,
   Modal,
   TextField,
 } from "@mui/material";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { theme } from "../../Assets/Styles/Theme";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 //for auth
 import { useUserContext } from "../../Components/UserContext";
 import IndividualJobPage from "../Employer/IndividualJobPage";
@@ -29,6 +28,7 @@ function AdminApproveDenyJob() {
   const [currentJobSelection, setCurrentJobSelection] = useState("");
   const [openModal, setOpenModal] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
+  const [renderState, setRenderState] = useState(0);
   const navigate = useNavigate();
 
   //for modal
@@ -47,13 +47,13 @@ function AdminApproveDenyJob() {
   //make sure currUser is set or else the navigate gonna boot everyone off the screen
   useEffect(() => {
     console.log(currUser);
-    if (!accessToken) {
-      const localAccess = JSON.parse(localStorage.getItem("verveToken"));
+    if (currUser) {
+      const localAccess = currUser.accessToken;
       console.log("access token ready");
       setAccessToken(localAccess);
       setIsLoaded(true);
     }
-  }, []);
+  }, [currUser]);
 
   //disable jobseekers and non loggedin people from accessing this page
   useEffect(() => {
@@ -116,7 +116,7 @@ function AdminApproveDenyJob() {
                       <Grid item xs={8}>
                         <Box>
                           <Link
-                            href={"#"}
+                            to={"#"}
                             underline="none"
                             sx={{ color: theme.typography.darkP.color }}
                           >
@@ -190,7 +190,7 @@ function AdminApproveDenyJob() {
           });
       }
     }
-  }, [isLoaded, currUser]);
+  }, [isLoaded, currUser, renderState]);
 
   const onAccept = (e) => {
     e.preventDefault();
@@ -212,7 +212,8 @@ function AdminApproveDenyJob() {
         return Swal.fire("Success", "Job has been approved", "success");
       })
       .then(() => {
-        window.location.reload();
+        setRenderState((prev) => prev + 1);
+        setCurrentJobSelection("");
       })
       .catch((error) => {
         console.log(error);
@@ -317,12 +318,11 @@ function AdminApproveDenyJob() {
                     {jobsData.length !== 0 ? (
                       jobsData
                     ) : (
-                      <Typography
-                        variant="darkP"
-                        sx={{ mt: "5vh", width: "10vw", ml: "4vw" }}
-                      >
-                        No Jobs require Approval as of now!
-                      </Typography>
+                      <Box sx={{ mt: "34vh" }}>
+                        <Typography variant="darkP" fontSize="1.65vh">
+                          No Jobs require Approval as of now!
+                        </Typography>
+                      </Box>
                     )}
                   </Box>
                 </Stack>

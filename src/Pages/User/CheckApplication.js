@@ -9,14 +9,13 @@ import {
   ThemeProvider,
   Divider,
   Typography,
-  Link,
   Button,
   TextField,
 } from "@mui/material";
 import IndividualJobPage from "../Employer/IndividualJobPage";
 import { theme } from "../../Assets/Styles/Theme";
 import { useUserContext } from "../../Components/UserContext";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -27,18 +26,19 @@ function CheckApplication() {
   const [applicationData, setApplicationData] = useState("");
   const [applicationDisplay, setApplicationDisplay] = useState("");
   const [currentEntitySelection, setCurrentEntitySelection] = useState("");
+  const [renderData, setRenderData] = useState(0);
 
   const navigate = useNavigate();
 
   useEffect(() => {
     console.log(currUser);
-    if (!accessToken) {
-      const localAccess = JSON.parse(localStorage.getItem("verveToken"));
+    if (currUser) {
+      const localAccess = currUser.accessToken;
       console.log("access token ready");
       setAccessToken(localAccess);
       setIsLoaded(true);
     }
-  }, []);
+  }, [currUser]);
 
   useEffect(() => {
     if (isLoaded && currUser) {
@@ -86,7 +86,7 @@ function CheckApplication() {
                     <Grid item xs={12}>
                       <Box>
                         <Link
-                          href="#"
+                          to="#"
                           onClick={() => setCurrentEntitySelection(index)}
                           underline="none"
                           sx={{ color: theme.typography.darkP.color }}
@@ -154,14 +154,18 @@ function CheckApplication() {
           console.log(error);
         });
     }
-  }, [currUser, isLoaded]);
+  }, [currUser, isLoaded, renderData]);
 
   const handleWithdraw = async () => {
     try {
       const idToDelete = applicationData[currentEntitySelection].id;
+      const dataToSend = {
+        idToDelete: idToDelete,
+      };
       console.log(idToDelete);
-      const response = await axios.delete(
-        `${BACKEND_URL}/application/deleteapplication/${idToDelete}`,
+      const response = await axios.put(
+        `${BACKEND_URL}/application/withdrawapplication/`,
+        dataToSend,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -174,7 +178,8 @@ function CheckApplication() {
         "Your application has been withdrawn!",
         "success"
       ).then(() => {
-        window.location.reload();
+        setRenderData((prev) => prev + 1);
+        setCurrentEntitySelection("");
       });
     } catch (error) {
       console.log(error);
