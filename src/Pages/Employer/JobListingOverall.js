@@ -7,6 +7,7 @@ import {
   Typography,
   Stack,
   Button,
+  Link,
   Table,
   TableBody,
   TableCell,
@@ -18,29 +19,30 @@ import {
 import { theme } from "../../Assets/Styles/Theme";
 import Swal from "sweetalert2";
 import { useUserContext } from "../../Components/UserContext";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import EditIcon from "@mui/icons-material/Edit";
 
 function JobListingOverall() {
+  const { currUser } = useUserContext();
   const [accessToken, setAccessToken] = useState("");
+  const [isLoaded, setIsLoaded] = useState(false);
   const [tableDataDisplay, setTableDataDisplay] = useState([]);
 
-  const { currUser } = useUserContext();
-  const [isLoaded, setIsLoaded] = useState(false);
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
   const navigate = useNavigate();
 
   //make sure currUser is set or else the navigate gonna boot everyone off the screen
   useEffect(() => {
-    console.log("currUser:", currUser);
-    if (currUser) {
-      const localAccess = currUser.accessToken;
+    console.log(currUser);
+    if (!accessToken) {
+      const localAccess = JSON.parse(localStorage.getItem("verveToken"));
+      console.log("access token ready");
       setAccessToken(localAccess);
       setIsLoaded(true);
     }
-  }, [currUser]);
+  }, []);
 
-  // disable jobseekers and non loggedin people from accessing this page
+  //disable jobseekers and non loggedin people from accessing this page
   useEffect(() => {
     if (isLoaded) {
       if (!currUser || currUser.userRoleId === 2) {
@@ -62,9 +64,9 @@ function JobListingOverall() {
       axios
         .get(`${BACKEND_URL}/listings/companysearchbyuserid/${userId}`)
         .then((info) => {
+          console.log(info);
           setTableDataDisplay(
             info.data.map((row, index) => {
-              console.log(row);
               return (
                 <TableRow key={index}>
                   <TableCell align="right">
@@ -114,11 +116,11 @@ function JobListingOverall() {
                         fontWeight: theme.typography.darkP.fontWeightBold,
                       }}
                     >
-                      {row.individual_jobseeker_dashboards.length}
+                      0
                     </Typography>
                   </TableCell>
                   <TableCell align="right">
-                    <Link to={`/company/jobs/${row.id}`}>
+                    <Link href={`/company/jobs/${row.id}`}>
                       <Button
                         variant="contained"
                         component="span"
@@ -208,7 +210,7 @@ function JobListingOverall() {
               </Stack>
             </Grid>
             <Grid item sx={{ mt: "3vh" }}>
-              <Link to="/post-job">
+              <Link href="/jobpost">
                 <Button
                   variant="contained"
                   component="span"

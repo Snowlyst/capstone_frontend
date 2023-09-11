@@ -6,11 +6,12 @@ import {
   Typography,
   ThemeProvider,
   Stack,
+  Link,
   Button,
   Divider,
 } from "@mui/material";
 import { theme } from "../Assets/Styles/Theme";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
 function AdminDashboard() {
@@ -86,7 +87,7 @@ function AdminDashboard() {
                       pl: 2,
                     }}
                   >
-                    Here are the options you may find useful..
+                    These are the jobs that you have listed so far.
                   </Typography>
                   <Typography
                     variant="darkP"
@@ -97,8 +98,8 @@ function AdminDashboard() {
                       pl: 2,
                     }}
                   >
-                    Each of the buttons link to specific main functions that you
-                    will require. Check them out!
+                    You can check each of the job listings for any incoming
+                    applications, or edit the listings as you wish.
                   </Typography>
                 </Stack>
               </Grid>
@@ -131,7 +132,7 @@ function AdminDashboard() {
                   </Grid>
                   <Grid item sx={{ mt: 3, mb: 7 }}>
                     <Stack direction={"row"}>
-                      <Link to="/joblisting">
+                      <Link href="/joblisting">
                         <Button
                           variant="contained"
                           component="span"
@@ -148,7 +149,7 @@ function AdminDashboard() {
                         </Button>
                       </Link>
                       <Divider sx={{ ml: "5vw", mr: "5vw" }} />
-                      <Link to="/admin/checkjobs">
+                      <Link href="/admin/checkjobs">
                         <Button
                           variant="contained"
                           component="span"
@@ -176,7 +177,7 @@ function AdminDashboard() {
                   </Grid>
                   <Grid item sx={{ mt: 3, mb: 7 }}>
                     <Stack direction={"row"}>
-                      <Link to="/post-job">
+                      <Link href="/profile">
                         <Button
                           variant="contained"
                           component="span"
@@ -188,12 +189,12 @@ function AdminDashboard() {
                           }}
                         >
                           <Typography sx={{ fontSize: 14 }}>
-                            Post a Job
+                            Add New User
                           </Typography>
                         </Button>
                       </Link>
                       <Divider sx={{ ml: "5vw", mr: "5vw" }} />
-                      <Link to="/admin/checkusercompanies">
+                      <Link href="/admin/checkusercompanies">
                         <Button
                           variant="contained"
                           component="span"
@@ -213,7 +214,7 @@ function AdminDashboard() {
                   </Grid>
                   <Grid item sx={{ mt: 3, mb: 7 }}>
                     <Stack direction={"row"}>
-                      <Link to="/admin/manageusercompanies">
+                      <Link href="/admin/manageusercompanies">
                         <Button
                           variant="contained"
                           component="span"
@@ -327,7 +328,7 @@ function AdminDashboard() {
                   </Grid>
                   <Grid item sx={{ mt: 3, mb: 7 }}>
                     <Stack direction={"row"}>
-                      <Link to="/resume">
+                      <Link href="/resume">
                         <Button
                           variant="contained"
                           component="span"
@@ -344,7 +345,7 @@ function AdminDashboard() {
                         </Button>
                       </Link>
                       <Divider sx={{ ml: "5vw", mr: "5vw" }} />
-                      <Link to="/createresume">
+                      <Link href="/createresume">
                         <Button
                           variant="contained"
                           component="span"
@@ -372,7 +373,7 @@ function AdminDashboard() {
                   </Grid>
                   <Grid item sx={{ mt: 3, mb: 7 }}>
                     <Stack direction={"row"}>
-                      <Link to="/job-search">
+                      <Link href="/search">
                         <Button
                           variant="contained"
                           component="span"
@@ -389,7 +390,7 @@ function AdminDashboard() {
                         </Button>
                       </Link>
                       <Divider sx={{ ml: "5vw", mr: "5vw" }} />
-                      <Link to="/job-categories">
+                      <Link href="/categories">
                         <Button
                           variant="contained"
                           component="span"
@@ -409,7 +410,7 @@ function AdminDashboard() {
                   </Grid>
                   <Grid item sx={{ mt: 3, mb: 7 }}>
                     <Stack direction={"row"}>
-                      <Link to="/usercheckapplication">
+                      <Link href="#">
                         <Button
                           variant="contained"
                           component="span"
@@ -523,7 +524,7 @@ function AdminDashboard() {
                   </Grid>
                   <Grid item sx={{ mt: 3, mb: 7 }}>
                     <Stack direction={"row"}>
-                      <Link to="/post-job">
+                      <Link href="/post-job">
                         <Button
                           variant="contained"
                           component="span"
@@ -541,7 +542,7 @@ function AdminDashboard() {
                         </Button>
                       </Link>
                       <Divider sx={{ ml: "5vw", mr: "5vw" }} />
-                      <Link to="/joblisting">
+                      <Link href="/joblisting">
                         <Button
                           variant="contained"
                           component="span"

@@ -22,7 +22,7 @@ import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import { useUserContext } from "../../Components/UserContext";
 function CreateResume() {
   // All the states
-  const { currUser } = useUserContext();
+  const { currUser, setCurrUser } = useUserContext();
   const [id, setId] = useState("");
   const [username, setUsername] = useState("");
   useEffect(() => {
