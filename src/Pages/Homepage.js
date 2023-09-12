@@ -123,7 +123,7 @@ function HomepageCopy() {
         direction="row"
         justifyContent="center"
         spacing={0}
-        sx={{ height: isSmallScreen ? "88vh" : "92.2vh" }}
+        sx={{ height: isSmallScreen ? "70vh" : "92.2vh" }}
       >
         {/* row1 */}
         <Grid item xs={12}>
@@ -136,11 +136,11 @@ function HomepageCopy() {
         </Grid>
         {/* row 2 */}
 
-        <Grid item xs={12} p={3}>
+        <Grid item xs={12} pt={0} pl={3} pr={3} mb={1}>
           <Box>
             <Stack
               display="flex"
-              direction={{ xs: "column", lg: "row" }}
+              direction={isMobile ? "column" : "row"}
               justifyContent="center"
               spacing={4}
             >
