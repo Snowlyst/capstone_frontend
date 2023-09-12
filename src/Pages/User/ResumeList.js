@@ -5,7 +5,6 @@ import {
   Grid,
   Stack,
   Typography,
-  Link,
   Button,
   Divider,
   Modal,
@@ -24,13 +23,13 @@ import {
 } from "firebase/storage";
 import Swal from "sweetalert2";
 import axios from "axios";
+import { Link } from "react-router-dom";
 //for auth
 import { useUserContext } from "../../Components/UserContext";
 
 const STORAGE_KEY = "resumes/";
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
-// temporarily hardcoded lines, line 80 and line 138
 function ResumeList() {
   const [fileAdded, setFileAdded] = useState(null);
   const [displayedResume, setDisplayedResume] = useState([]);
@@ -40,17 +39,15 @@ function ResumeList() {
   const [openModal, setOpenModal] = useState(false);
   const [resumeId, setResumeId] = useState(0);
   const [refreshState, setRefreshState] = useState(0);
-  const { currUser, setCurrUser } = useUserContext();
+  const { currUser } = useUserContext();
   const [accessToken, setAccessToken] = useState("");
   const [isCheckboxSelected, setIsCheckboxSelected] = useState(false);
   useEffect(() => {
-    console.log(currUser);
-  }, []);
-
-  useEffect(() => {
     if (!accessToken) {
-      const localAccess = JSON.parse(localStorage.getItem("verveToken"));
-      console.log("accesstoken exists");
+      const localAccess = currUser.accessToken;
+      if (currUser) {
+        console.log("accesstoken exists");
+      }
       setAccessToken(localAccess);
     }
   }, [accessToken]);
@@ -214,7 +211,7 @@ function ResumeList() {
                         }}
                       >
                         <Link
-                          href={information.resumeUrl}
+                          to={information.resumeUrl}
                           underline="none"
                           sx={{ color: theme.typography.darkP.color }}
                           target="_blank"
@@ -367,7 +364,7 @@ function ResumeList() {
             }}
           >
             Please upload your resume. If you do not have one currently, click{" "}
-            <Link href="/createresume">here</Link> to start making one!
+            <Link to="/createresume">here</Link> to start making one!
           </Typography>
           <Typography
             variant="p"

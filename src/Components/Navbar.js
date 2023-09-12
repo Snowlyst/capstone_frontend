@@ -29,40 +29,29 @@ function Navbar() {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
   const { currUser, setCurrUser } = useUserContext();
-
+  const [role, setRole] = useState("");
   // const navigate = useNavigate();
 
   const pages = ["Job Search", "Company Profiles"];
-  const [settings, setSettings] = useState([]);
-  // to retrieve currUser from local storage and to set it for context
+
+  const settings = {
+    nonuser: ["User", "Employer", "Admin"],
+    user: ["Profile", "Resume", "Applications", "Logout"],
+    admin: ["Dashboard", "Post Job", "Logout"],
+  };
+
   useEffect(() => {
     console.log(currUser);
-    let settings = [];
-
-    if (currUser === null && !isAuthenticated) {
-      settings = ["User", "Employer", "Admin"];
-
-      setSettings(settings);
-    }
-
-    // const checkLogin =  () => {
-    if (currUser === null && isAuthenticated) {
-      const localAccess = JSON.parse(localStorage.getItem("verveCurrUser"));
-      const role = JSON.parse(localStorage.getItem("verveRole"));
-      console.log(role);
-      setCurrUser(localAccess);
-
-      if (role === "user") {
-        settings = ["Profile", "Resume", "Job Categories", "Logout"];
-      } else if (role === "admin" || role === "employer") {
-        settings = ["Dashboard", "Post Job", "Logout"];
-      }
-      setSettings(settings);
+    if (currUser && currUser.userRoleId !== null) {
+      const role =
+        currUser.userRoleId === 1 || currUser.userRoleId === 3
+          ? "admin"
+          : currUser.userRoleId === 2
+          ? "user"
+          : "nonuser";
+      setRole(role);
     }
   }, [currUser]);
-
-  // checks if user is logged in or not to display user menu
-  // const login = currUser !== null ? true : false;
 
   // handle user menu click
   const handleUserMenu = async (page) => {
@@ -77,34 +66,17 @@ function Navbar() {
       setCurrUser(null);
       await logout();
       return;
-    } else if (page === "User") {
-      setAnchorElUser(null);
-      user.role = "user";
-      setCurrUser(user);
-      localStorage.setItem("verveRole", JSON.stringify(user.role));
-      await loginWithRedirect({
-        appState: {
-          returnTo: "/",
-        },
-        authorizationParams: {
-          screen_hint: "Login/Register",
-        },
-      });
-    } else if (page === "Employer") {
-      setAnchorElUser(null);
-      user.role = "employer";
-      localStorage.setItem("verveRole", JSON.stringify(user.role));
-      await loginWithRedirect({
-        appState: {
-          returnTo: "/dashboard",
-        },
-        authorizationParams: {
-          screen_hint: "Login/Register",
-        },
-      });
-    } else if (page === "Admin") {
-      setAnchorElUser(null);
-      user.role = "admin";
+    } else if (page === "User" || page === "Employer" || page === "Admin") {
+      if (page === "User") {
+        setAnchorElUser(null);
+        user.role = "user";
+      } else if (page === "Employer") {
+        setAnchorElUser(null);
+        user.role = "employer";
+      } else if (page === "Admin") {
+        setAnchorElUser(null);
+        user.role = "admin";
+      }
       setCurrUser(user);
       localStorage.setItem("verveRole", JSON.stringify(user.role));
       await loginWithRedirect({
@@ -163,7 +135,7 @@ function Navbar() {
               >
                 {pages.map((page) => (
                   <Link
-                    to={page.toLowerCase()}
+                    to={page.toLowerCase().replace(/ /g, `-`)}
                     key={page}
                     style={{ textDecoration: "none" }}
                   >
@@ -183,18 +155,37 @@ function Navbar() {
                   </Link>
                 ))}
               </Menu>
+              <Box
+                flexDirection="row"
+                justifyContent="center"
+                sx={{ mt: "1vw", ml: "auto", mr: "auto" }}
+                className="verve-logo"
+              >
+                <Link to="/">
+                  <img src={logo} alt="verve logo" width="120px" />
+                </Link>
+              </Box>
             </Box>
-
+            <Box
+              flexDirection="row"
+              justifyContent="center"
+              sx={{ marginTop: "1vw", display: { xs: "none", md: "flex" } }}
+              className="verve-logo"
+            >
+              <Link to="/">
+                <img src={logo} alt="verve logo" width="120px" />
+              </Link>
+            </Box>
             <Box
               sx={{
                 flexGrow: 1,
-
+                ml: 5,
                 display: { xs: "none", md: "flex" },
               }}
             >
               {pages.map((page) => (
                 <Link
-                  to={page.toLowerCase().replace(/\s+/g, "-")}
+                  to={page.toLowerCase().replace(/ /g, `-`)}
                   key={page}
                   style={{ textDecoration: "none" }}
                 >
@@ -224,14 +215,6 @@ function Navbar() {
                   </Button>
                 </Link>
               ))}
-              <Box
-                sx={{ width: "120px", marginLeft: "16vw", marginTop: "1vw" }}
-                className="verve-logo"
-              >
-                <Link to="/">
-                  <img src={logo} alt="verve logo" width="120px" />
-                </Link>
-              </Box>
             </Box>
 
             <Box sx={{ flexGrow: 0, gap: "20px", display: "flex" }}>
@@ -243,10 +226,10 @@ function Navbar() {
               </Tooltip>
             </Link> */}
 
-              <Link to="/search">
+              <Link to="/job-search">
                 <Tooltip title="Search">
                   <IconButton sx={{ p: 0 }}>
-                    <SearchIcon sx={{ color: "#0E0140" }} alt="Search" />
+                    <SearchIcon sx={{ color: "#0E0140" }} alt="job-search" />
                   </IconButton>
                 </Tooltip>
               </Link>
@@ -280,30 +263,80 @@ function Navbar() {
                 open={Boolean(anchorElUser)}
                 onClose={() => setAnchorElUser(null)}
               >
-                {settings.map((setting) => (
-                  <Link
-                    to={setting.toLowerCase().replace(/\s+/g, "-")}
-                    key={setting}
-                    style={{ textDecoration: "none" }}
-                  >
-                    <MenuItem
-                      key={setting}
-                      onClick={() => handleUserMenu(setting)}
-                    >
-                      <ThemeProvider theme={theme}>
-                        <Typography
-                          textAlign="center"
-                          variant="p"
-                          sx={{
-                            color: theme.typography.darkP.color,
-                          }}
+                {isAuthenticated
+                  ? role !== null && (role === "admin" || role === "employer")
+                    ? settings.admin.map((setting) => (
+                        <Link
+                          to={setting.toLowerCase().replace(/ /g, `-`)}
+                          key={setting}
+                          style={{ textDecoration: "none" }}
                         >
-                          {setting}
-                        </Typography>
-                      </ThemeProvider>
-                    </MenuItem>
-                  </Link>
-                ))}
+                          <MenuItem
+                            key={setting.admin}
+                            onClick={() => handleUserMenu(setting)}
+                          >
+                            <ThemeProvider theme={theme}>
+                              <Typography
+                                textAlign="center"
+                                variant="p"
+                                sx={{
+                                  color: theme.typography.darkP.color,
+                                }}
+                              >
+                                {setting}
+                              </Typography>
+                            </ThemeProvider>
+                          </MenuItem>
+                        </Link>
+                      ))
+                    : settings.user.map((setting) => (
+                        <Link
+                          to={setting.toLowerCase().replace(/ /g, `-`)}
+                          key={setting}
+                          style={{ textDecoration: "none" }}
+                        >
+                          <MenuItem
+                            key={setting.admin}
+                            onClick={() => handleUserMenu(setting)}
+                          >
+                            <ThemeProvider theme={theme}>
+                              <Typography
+                                textAlign="center"
+                                variant="p"
+                                sx={{
+                                  color: theme.typography.darkP.color,
+                                }}
+                              >
+                                {setting}
+                              </Typography>
+                            </ThemeProvider>
+                          </MenuItem>
+                        </Link>
+                      ))
+                  : settings.nonuser.map((setting) => (
+                      <Link
+                        to={setting.toLowerCase().replace(/ /g, `-`)}
+                        key={setting}
+                        style={{ textDecoration: "none" }}
+                      >
+                        <MenuItem
+                          key={setting.admin}
+                          onClick={() => handleUserMenu(setting)}
+                        >
+                          <ThemeProvider theme={theme}>
+                            <Typography
+                              textAlign="center"
+                              variant="p"
+                              sx={{
+                                color: theme.typography.darkP.color,
+                              }}
+                            >
+                              {setting}
+                            </Typography>
+                          </ThemeProvider>
+                        </MenuItem>
+                      </Link>
+                    ))}
               </Menu>
             </Box>
           </Toolbar>

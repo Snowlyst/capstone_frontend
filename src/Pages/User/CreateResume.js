@@ -30,7 +30,7 @@ import {
 } from "firebase/storage";
 function CreateResume() {
   // All the states
-  const { currUser, setCurrUser } = useUserContext();
+  const { currUser } = useUserContext();
   const [id, setId] = useState("");
   const [username, setUsername] = useState("");
   const [accessToken, setAccessToken] = useState("");
