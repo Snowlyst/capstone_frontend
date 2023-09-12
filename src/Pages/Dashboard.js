@@ -15,7 +15,6 @@ import Swal from "sweetalert2";
 
 function AdminDashboard() {
   const { currUser } = useUserContext();
-  const [isLoaded, setIsLoaded] = useState(false);
   const [accessToken, setAccessToken] = useState(null);
   const [displayMode, setDisplayMode] = useState(0);
   const navigate = useNavigate();
@@ -23,13 +22,12 @@ function AdminDashboard() {
   //make sure currUser is set or else the navigate gonna boot everyone off the screen
   useEffect(() => {
     console.log(currUser);
-    if (!accessToken) {
-      const localAccess = JSON.parse(localStorage.getItem("verveToken"));
+    if (currUser) {
+      const localAccess = currUser.accessToken;
       console.log("access token ready");
       setAccessToken(localAccess);
-      setIsLoaded(true);
     }
-  }, []);
+  }, [currUser]);
 
   //differentiating users
   useEffect(() => {
@@ -177,6 +175,7 @@ function AdminDashboard() {
                   <Grid item sx={{ mt: 3, mb: 7 }}>
                     <Stack direction={"row"}>
                       <Link to="/post-job">
+                        {/* <Link to="/usercheckapplication"> */}
                         <Button
                           variant="contained"
                           component="span"
