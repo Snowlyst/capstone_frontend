@@ -229,7 +229,7 @@ function AdminDashboard() {
                           </Typography>
                         </Button>
                       </Link>
-                      <Divider sx={{ mr: "32.5vw" }} />
+                      <Divider sx={{ ml: "32.5vw" }} />
                     </Stack>
                   </Grid>
                 </Grid>
