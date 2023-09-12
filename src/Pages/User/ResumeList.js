@@ -9,6 +9,7 @@ import {
   Divider,
   Modal,
   TextField,
+  Checkbox,
 } from "@mui/material";
 import ContentPasteSearchIcon from "@mui/icons-material/ContentPasteSearch";
 import DriveFolderUploadIcon from "@mui/icons-material/DriveFolderUpload";
@@ -40,7 +41,7 @@ function ResumeList() {
   const [refreshState, setRefreshState] = useState(0);
   const { currUser } = useUserContext();
   const [accessToken, setAccessToken] = useState("");
-
+  const [isCheckboxSelected, setIsCheckboxSelected] = useState(false);
   useEffect(() => {
     if (!accessToken) {
       const localAccess = currUser.accessToken;
@@ -256,6 +257,9 @@ function ResumeList() {
                       <EditIcon />
                       Edit
                     </Button>
+                    <Checkbox
+                      onClick={() => setIsCheckboxSelected(!isCheckboxSelected)}
+                    />
                     <Modal open={openModal} onClose={() => handleCloseModal()}>
                       <Box sx={style}>
                         <Typography variant="h6">
@@ -447,6 +451,28 @@ function ResumeList() {
               No Resumes Available Yet!
             </Typography>
           )}
+          <Grid container justifyContent="center" sx={{ mt: 2 }}>
+            <Button
+              variant="contained"
+              classes={{ root: "orange" }}
+              style={{
+                width: "12vw",
+              }}
+              onClick={() => {
+                if (isCheckboxSelected) {
+                  Swal.fire({
+                    icon: "success",
+                    title: "Resume Submitted!",
+                    text: "Your resume has been successfully submitted.",
+                  });
+                  setIsCheckboxSelected(false);
+                }
+              }}
+              disabled={!isCheckboxSelected}
+            >
+              Submit Resume
+            </Button>
+          </Grid>
         </Grid>
       </ThemeProvider>
     </Box>
