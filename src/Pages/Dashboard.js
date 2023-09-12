@@ -19,12 +19,9 @@ function AdminDashboard() {
   const [displayMode, setDisplayMode] = useState(0);
   const navigate = useNavigate();
 
-  //make sure currUser is set or else the navigate gonna boot everyone off the screen
   useEffect(() => {
-    console.log(currUser);
     if (currUser) {
       const localAccess = currUser.accessToken;
-      console.log("access token ready");
       setAccessToken(localAccess);
     }
   }, [currUser]);
@@ -175,7 +172,6 @@ function AdminDashboard() {
                   <Grid item sx={{ mt: 3, mb: 7 }}>
                     <Stack direction={"row"}>
                       <Link to="/post-job">
-                        {/* <Link to="/usercheckapplication"> */}
                         <Button
                           variant="contained"
                           component="span"

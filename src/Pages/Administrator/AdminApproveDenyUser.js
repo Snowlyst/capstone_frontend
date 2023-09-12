@@ -51,10 +51,8 @@ function AdminApproveDenyUserCompanies() {
 
   //make sure currUser is set or else the navigate gonna boot everyone off the screen
   useEffect(() => {
-    console.log(currUser);
     if (currUser) {
       const localAccess = currUser.accessToken;
-      console.log("access token ready");
       setAccessToken(localAccess);
       setIsLoaded(true);
     }
@@ -71,7 +69,8 @@ function AdminApproveDenyUserCompanies() {
         );
         navigate("/");
       } else {
-        console.log("User permitted");
+        // console.log("User permitted");
+        return;
       }
     }
   }, [isLoaded]);
@@ -87,7 +86,6 @@ function AdminApproveDenyUserCompanies() {
             },
           })
           .then((info) => {
-            console.log(info);
             setUsersData(info.data[0]);
             setUsersDisplay(
               info.data[0].map((info, index) => {
@@ -309,7 +307,6 @@ function AdminApproveDenyUserCompanies() {
       );
       return;
     }
-    console.log(currentEntitySelection);
     setIsButtonDisabled(true);
 
     setTimeout(() => {
@@ -336,7 +333,6 @@ function AdminApproveDenyUserCompanies() {
       return;
     }
     const selection = usersData[currentEntitySelection].id;
-    console.log(selection);
 
     const dataToSend = {
       entityId: selection,
@@ -374,7 +370,6 @@ function AdminApproveDenyUserCompanies() {
           },
         })
         .then((output) => {
-          console.log(output);
           handleClose();
           setAxiosLoading(false);
           return Swal.fire("Success", "User has been Deleted", "success");
@@ -388,7 +383,6 @@ function AdminApproveDenyUserCompanies() {
         });
     } else {
       const entityId = companyData[currentEntitySelection].id;
-      console.log(entityId);
       axios
         .delete(
           `${BACKEND_URL}/company/admin/deleteunverifiedcompany/${entityId}`,
@@ -399,7 +393,6 @@ function AdminApproveDenyUserCompanies() {
           }
         )
         .then((output) => {
-          console.log(output);
           handleClose();
           setAxiosLoading(false);
           return Swal.fire("Success", "Company has been Deleted", "success");
@@ -422,7 +415,6 @@ function AdminApproveDenyUserCompanies() {
       return;
     }
     const selection = companyData[currentEntitySelection].id;
-    console.log(selection);
     const dataToSend = {
       entityId: selection,
     };
