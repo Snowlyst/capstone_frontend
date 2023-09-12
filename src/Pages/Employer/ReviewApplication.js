@@ -52,10 +52,8 @@ function ReviewApplication() {
 
   //make sure currUser is set or else the navigate gonna boot everyone off the screen
   useEffect(() => {
-    console.log(currUser);
     if (currUser) {
       const localAccess = currUser.accessToken;
-      console.log("access token ready");
       setAccessToken(localAccess);
       setIsLoaded(true);
     }
@@ -72,7 +70,8 @@ function ReviewApplication() {
         );
         navigate("/");
       } else {
-        console.log("User permitted");
+        // console.log("User permitted");
+        return;
       }
     }
   }, [isLoaded]);
@@ -106,7 +105,6 @@ function ReviewApplication() {
           },
         })
         .then((info) => {
-          console.log(info);
           setUsersData(info.data);
           setSideDisplay(
             info.data.map((info, index) => {
@@ -246,7 +244,7 @@ function ReviewApplication() {
           const existingCalendar = existingCalendars.find(
             (calendar) => calendar.summary === calendarTitle
           );
-          console.log(existingCalendar);
+          // console.log(existingCalendar);
           return existingCalendar;
         })
         .then((existingCalendar) => {
@@ -255,10 +253,10 @@ function ReviewApplication() {
             newCalendarId = existingCalendar.id;
             setCalendarId(existingCalendar.id);
 
-            console.log(
-              "Calendar already exists. Using existing id:",
-              newCalendarId
-            );
+            // console.log(
+            //   "Calendar already exists. Using existing id:",
+            //   newCalendarId
+            // );
           } else {
             axios({
               url: "https://www.googleapis.com/calendar/v3/calendars",
@@ -273,7 +271,7 @@ function ReviewApplication() {
             })
               .then((info) => {
                 setCalendarId(info.data.id);
-                console.log("New Calendar created with ID:", info.data.id);
+                // console.log("New Calendar created with ID:", info.data.id);
               })
               .catch((error) => {
                 console.log("second part", error);
@@ -290,7 +288,6 @@ function ReviewApplication() {
   // for retrieving resume
   const goToResume = () => {
     const resumeToFind = usersData[currentEntitySelection].resumeId;
-    console.log(resumeToFind);
     axios
       .get(`${BACKEND_URL}/resumes/getspecific/${resumeToFind}`, {
         headers: {
@@ -326,28 +323,6 @@ function ReviewApplication() {
     }
   }
 
-  async function getEvents() {
-    console.log("trying to get events..");
-    const timeMin = new Date().toISOString();
-    console.log(timeMin);
-    await axios({
-      url: `https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events`,
-      method: "get",
-      headers: {
-        Authorization: "Bearer " + session.provider_token,
-      },
-      params: {
-        timeMin: timeMin,
-      },
-    })
-      .then((info) => {
-        console.log(info);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }
-
   const scheduleMeeting = async () => {
     if (!eventName || !eventDescription) {
       return Swal.fire(SwalMsgs.missingFormInfoGentle);
@@ -361,7 +336,6 @@ function ReviewApplication() {
     };
 
     try {
-      console.log(dataToSend);
       await axios.put(
         `${BACKEND_URL}/application/scheduleinterview`,
         dataToSend,
@@ -372,7 +346,7 @@ function ReviewApplication() {
         }
       );
 
-      console.log("creating calendar event");
+      // console.log("creating calendar event");
       const event = {
         summary: eventName,
         description: eventDescription,
@@ -754,14 +728,10 @@ function ReviewApplication() {
                               >
                                 Event Information
                               </Typography>
-
-                              <Box
-                                sx={{ width: "15vw", ml: "5vw", mt: "0.5vh" }}
-                              ></Box>
                             </Box>
                             <Stack
                               direction="row"
-                              sx={{ mt: "0.5vh", ml: "10.6vw" }}
+                              sx={{ mt: "0.5vh", ml: "6.6vw" }}
                               spacing={1}
                             >
                               <TextField
@@ -798,6 +768,7 @@ function ReviewApplication() {
                               <Button
                                 classes={{ root: "red" }}
                                 variant="contained"
+                                onClick={rejectApplicant}
                                 style={{
                                   width: "18vw",
                                   borderTopLeftRadius: 0,
@@ -853,20 +824,25 @@ function ReviewApplication() {
                               direction="row"
                               sx={{ width: "44vw", mt: "9vh", ml: "3vw" }}
                             >
-                              <Button
-                                classes={{ root: "green" }}
-                                variant="contained"
+                              <a
                                 href="https://calendar.google.com"
-                                style={{
-                                  width: "18vw",
-                                  height: "12vh",
-                                  borderTopRightRadius: 0,
-                                  borderBottomRightRadius: 0,
-                                  borderBottomLeftRadius: 0,
-                                }}
+                                target="_blank"
+                                rel="noopener noreferrer"
                               >
-                                Check Calendar Events!
-                              </Button>
+                                <Button
+                                  classes={{ root: "green" }}
+                                  variant="contained"
+                                  style={{
+                                    width: "18vw",
+                                    height: "12vh",
+                                    borderTopRightRadius: 0,
+                                    borderBottomRightRadius: 0,
+                                    borderBottomLeftRadius: 0,
+                                  }}
+                                >
+                                  Check Calendar Events!
+                                </Button>
+                              </a>
                               <Button
                                 classes={{ root: "purple" }}
                                 variant="contained"

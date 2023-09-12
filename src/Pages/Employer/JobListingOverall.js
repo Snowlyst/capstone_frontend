@@ -32,10 +32,8 @@ function JobListingOverall() {
 
   //make sure currUser is set or else the navigate gonna boot everyone off the screen
   useEffect(() => {
-    console.log(currUser);
     if (currUser) {
       const localAccess = currUser.accessToken;
-      console.log("access token ready");
       setAccessToken(localAccess);
       setIsLoaded(true);
     }
@@ -52,7 +50,8 @@ function JobListingOverall() {
         );
         navigate("/");
       } else {
-        console.log("User permitted");
+        // console.log("User permitted");
+        return;
       }
     }
   }, [isLoaded]);
@@ -63,7 +62,6 @@ function JobListingOverall() {
       axios
         .get(`${BACKEND_URL}/listings/companysearchbyuserid/${userId}`)
         .then((info) => {
-          console.log(info.data);
           setTableDataDisplay(
             info.data.map((row, index) => {
               return (

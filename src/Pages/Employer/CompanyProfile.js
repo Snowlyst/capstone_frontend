@@ -28,10 +28,8 @@ function CompanyProfile() {
   }
 
   useEffect(() => {
-    console.log(currUser);
     if (currUser) {
       const localAccess = currUser.accessToken;
-      console.log("access token ready");
       setAccessToken(localAccess);
     }
   }, [currUser]);
@@ -41,7 +39,6 @@ function CompanyProfile() {
       axios
         .get(`${BACKEND_URL}/company/company/${companyId}`)
         .then((info) => {
-          console.log(info);
           setCompanyData(info.data[0]);
           return info.data[0].companyLogo;
         })
@@ -56,7 +53,6 @@ function CompanyProfile() {
           axios
             .get(`${BACKEND_URL}/listings/company/${companyId}`)
             .then((info) => {
-              console.log(info);
               setCompanyJobs(
                 info.data.map((info, index) => {
                   return (
@@ -144,13 +140,6 @@ function CompanyProfile() {
         });
     }
   }, []);
-
-  //for consolelogging only, to remove
-  useEffect(() => {
-    if (companyData) {
-      console.log(companyData);
-    }
-  }, [companyData]);
 
   return (
     <Box>

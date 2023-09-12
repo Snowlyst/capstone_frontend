@@ -46,10 +46,8 @@ function AdminApproveDenyJob() {
 
   //make sure currUser is set or else the navigate gonna boot everyone off the screen
   useEffect(() => {
-    console.log(currUser);
     if (currUser) {
       const localAccess = currUser.accessToken;
-      console.log("access token ready");
       setAccessToken(localAccess);
       setIsLoaded(true);
     }
@@ -66,7 +64,8 @@ function AdminApproveDenyJob() {
         );
         navigate("/");
       } else {
-        console.log("User permitted");
+        // console.log("User permitted");
+        return;
       }
     }
   }, [isLoaded]);
@@ -81,7 +80,6 @@ function AdminApproveDenyJob() {
             },
           })
           .then((info) => {
-            console.log(info.data);
             setJobsInfo(info.data);
             setJobsData(
               info.data.map((info, index) => {
@@ -194,7 +192,6 @@ function AdminApproveDenyJob() {
 
   const onAccept = (e) => {
     e.preventDefault();
-    console.log(currentJobSelection);
     if (currentJobSelection === "") {
       Swal.fire("Error", "You have not selected Any Job to Accept!", "error");
       return;
@@ -222,7 +219,6 @@ function AdminApproveDenyJob() {
 
   const onRequestChange = (e) => {
     e.preventDefault();
-    console.log(currentJobSelection);
     if (currentJobSelection === "") {
       Swal.fire("Error", "You have not selected Any Job to Accept!", "error");
       return;
@@ -246,7 +242,6 @@ function AdminApproveDenyJob() {
       jobId: jobsInfo[currentJobSelection].id,
       rejectReason: rejectReason,
     };
-    console.log(dataToSend);
     axios
       .put(`${BACKEND_URL}/listings/admin/requestchangetojob`, dataToSend, {
         headers: {
@@ -254,7 +249,6 @@ function AdminApproveDenyJob() {
         },
       })
       .then((info) => {
-        console.log(info);
         handleClose();
         return Swal.fire(
           "Success",
