@@ -24,6 +24,7 @@
     "draft-js-import-html": "^1.4.1",
     "draftjs-to-html": "^0.9.1",
     "firebase": "^10.3.0",
+    "jspdf": "^2.5.1",
     "localforage": "^1.10.0",
     "match-sorter": "^6.3.1",
     "react": "^18.2.0",
