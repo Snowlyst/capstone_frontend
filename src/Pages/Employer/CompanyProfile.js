@@ -29,14 +29,12 @@ function CompanyProfile() {
 
   useEffect(() => {
     console.log(currUser);
-  }, []);
-
-  useEffect(() => {
-    if (!accessToken) {
-      const localAccess = JSON.parse(localStorage.getItem("verveToken"));
+    if (currUser) {
+      const localAccess = currUser.accessToken;
+      console.log("access token ready");
       setAccessToken(localAccess);
     }
-  }, [accessToken]);
+  }, [currUser]);
 
   useEffect(() => {
     if (companyId) {
@@ -48,6 +46,13 @@ function CompanyProfile() {
           return info.data[0].companyLogo;
         })
         .then((logo) => {
+          let avatar;
+          if (!logo || logo === "null") {
+            avatar =
+              "https://firebasestorage.googleapis.com/v0/b/verve-55239.appspot.com/o/images%2FImage_not_available.png?alt=media&token=0a5a0495-5de3-4fea-93a2-3b4b95b22f64";
+          } else {
+            avatar = logo;
+          }
           axios
             .get(`${BACKEND_URL}/listings/company/${companyId}`)
             .then((info) => {
@@ -69,10 +74,7 @@ function CompanyProfile() {
                         <Grid item xs={4}>
                           <img
                             alt="Company Logo"
-                            src={
-                              logo ||
-                              "https://firebasestorage.googleapis.com/v0/b/verve-55239.appspot.com/o/images%2FImage_not_available.png?alt=media&token=0a5a0495-5de3-4fea-93a2-3b4b95b22f64"
-                            }
+                            src={avatar}
                             style={{
                               width: "3.5vw",
                               height: "3.5vh",
@@ -88,8 +90,6 @@ function CompanyProfile() {
                               to={`/company/jobs/${info.id}`}
                               underline="none"
                               sx={{ color: theme.typography.darkP.color }}
-                              target="_blank"
-                              rel="noreferrer"
                             >
                               <Box
                                 component="div"
@@ -323,7 +323,7 @@ function CompanyProfile() {
                       fontSize: theme.typography.h6.fontSize,
                       overflow: "auto",
                       textOverflow: "ellipsis",
-                      WebkitLineClamp: "8",
+                      WebkitLineClamp: "20",
                       WebkitBoxOrient: "vertical",
                       display: "-webkit-box",
                     }}

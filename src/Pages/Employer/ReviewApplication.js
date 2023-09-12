@@ -126,6 +126,13 @@ function ReviewApplication() {
                   .toString()
                   .padStart(2, "0")}`;
               }
+              let userAvatar;
+              if (!info.user.avatarUrl || info.user.avatarUrl === "null") {
+                userAvatar =
+                  "https://firebasestorage.googleapis.com/v0/b/verve-55239.appspot.com/o/images%2FImage_not_available.png?alt=media&token=0a5a0495-5de3-4fea-93a2-3b4b95b22f64";
+              } else {
+                userAvatar = info.user.avatarUrl;
+              }
 
               return (
                 <Box key={index}>
@@ -142,10 +149,7 @@ function ReviewApplication() {
                     <Grid item xs={4}>
                       <img
                         alt="Avatar"
-                        src={
-                          info.user.avatarUrl ||
-                          "https://firebasestorage.googleapis.com/v0/b/verve-55239.appspot.com/o/images%2FImage_not_available.png?alt=media&token=0a5a0495-5de3-4fea-93a2-3b4b95b22f64"
-                        }
+                        src={userAvatar}
                         style={{
                           width: "3.5vw",
                           height: "3.5vh",
@@ -498,13 +502,7 @@ function ReviewApplication() {
               }}
             >
               Checking Applications for{" "}
-              <Link
-                to={`/company/jobs/${jobData.id}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {jobData.title}
-              </Link>
+              <Link to={`/company/jobs/${jobData.id}`}>{jobData.title}</Link>
             </Typography>
           </Box>
           <Stack direction="row">
@@ -671,18 +669,24 @@ function ReviewApplication() {
                               direction="row"
                               sx={{ width: "44vw", mt: "2vh", ml: "3vw" }}
                             >
-                              <Button
-                                classes={{ root: "green" }}
-                                variant="contained"
+                              <a
                                 href="https://calendar.google.com"
-                                style={{
-                                  width: "18vw",
-                                  borderTopRightRadius: 0,
-                                  borderBottomRightRadius: 0,
-                                }}
+                                target="_blank"
+                                rel="noopener noreferrer"
                               >
-                                Check Calendar Events!
-                              </Button>
+                                <Button
+                                  classes={{ root: "green" }}
+                                  variant="contained"
+                                  style={{
+                                    width: "18vw",
+                                    borderTopRightRadius: 0,
+                                    borderBottomRightRadius: 0,
+                                  }}
+                                >
+                                  Check Calendar Events!
+                                </Button>
+                              </a>
+
                               <Button
                                 classes={{ root: "purple" }}
                                 variant="contained"
