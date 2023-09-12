@@ -32,16 +32,11 @@ function JobListingOverall() {
 
   //make sure currUser is set or else the navigate gonna boot everyone off the screen
   useEffect(() => {
-<<<<<<< HEAD
     console.log(currUser);
     if (currUser) {
       const localAccess = currUser.accessToken;
       console.log("access token ready");
-=======
-    console.log("currUser:", currUser);
-    if (currUser) {
-      const localAccess = currUser.accessToken;
->>>>>>> a3378ee54891f7b54c6b4e6405245d4026976de6
+
       setAccessToken(localAccess);
       setIsLoaded(true);
     }
