@@ -62,9 +62,9 @@ function JobListingOverall() {
       axios
         .get(`${BACKEND_URL}/listings/companysearchbyuserid/${userId}`)
         .then((info) => {
+          console.log(info.data);
           setTableDataDisplay(
             info.data.map((row, index) => {
-              console.log(row);
               return (
                 <TableRow key={index}>
                   <TableCell align="right">
