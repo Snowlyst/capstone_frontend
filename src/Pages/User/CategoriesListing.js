@@ -24,9 +24,11 @@ function CategoriesListing() {
   const params = useParams();
   const [jobId, setJobId] = useState(params.jobId);
 
+  const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+
   useEffect(() => {
     axios
-      .get(`http://localhost:8080/listings/categories/bycategory/${categoryId}`)
+      .get(`${BACKEND_URL}/listings/categories/bycategory/${categoryId}`)
       .then((response) => {
         if (response.data.success) {
           console.log(response.data.output);
