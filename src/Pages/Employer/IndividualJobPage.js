@@ -33,6 +33,7 @@ function IndividualJobPage(props) {
   const { currUser } = useUserContext();
   const [description, setDescription] = useState("");
   const [displayAdminButtons, setDisplayAdminButtons] = useState(false);
+  const [displayUserButtons, setDisplayUserButtons] = useState(false);
   const [jobToApply, setJobToApply] = useState("");
 
   const navigate = useNavigate();
@@ -92,8 +93,10 @@ function IndividualJobPage(props) {
 
       if (!currUser || props.jobsId || currUser.userRoleId === 2) {
         setDisplayAdminButtons(false);
+        setDisplayUserButtons(true);
       } else {
         setDisplayAdminButtons(true);
+        setDisplayUserButtons(false);
       }
     }
   }, [jobInfo]);
@@ -243,6 +246,20 @@ function IndividualJobPage(props) {
                         </Button>
                       </Stack>
                     </Box>
+                  ) : displayUserButtons ? (
+                    <Box
+                      mt={4}
+                      mb={4}
+                      sx={theme.customStyles.displayFlexRowCenter}
+                    >
+                      <Button
+                        className="orange"
+                        variant="contained"
+                        onClick={handleApply}
+                      >
+                        Apply for this Job
+                      </Button>
+                    </Box>
                   ) : (
                     ""
                   )}
@@ -280,14 +297,6 @@ function IndividualJobPage(props) {
                       />
                     </Stack>
                   </Box>
-                  <Button
-                    className="orange"
-                    variant="contained"
-                    sx={{ ml: "25vw" }}
-                    onClick={handleApply}
-                  >
-                    Apply for this Job
-                  </Button>
 
                   {/* row 5 - 1 button to check current applicants */}
                   <Box
