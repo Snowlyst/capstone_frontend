@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-import { Route, Routes, Navigate } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useEffect, useState } from "react";
 import PageLoader from "./Components/PageLoader";
@@ -8,12 +8,10 @@ import Homepage from "./Pages/Homepage";
 import Categories from "./Pages/Categories";
 import CategoriesListing from "./Pages/User/CategoriesListing";
 import Forbidden from "./Pages/Forbidden";
-import Dashboard from "./Pages/Dashboard";
 import IndividualListing from "./Pages/IndividualListing";
 import Profile from "./Pages/User/Profile";
 import Search from "./Pages/Search";
 import UpdateProfile from "./Pages/UpdateProfile";
-// import Error from "./Pages/Error";
 import JobPost from "./Pages/Employer/JobPost";
 import OnemapApiTest from "./TestPages(TO_BE_DELETED)/OnemapApiTest";
 import PDFReadingTest from "./TestPages(TO_BE_DELETED)/PDFReaderTest";
@@ -26,7 +24,6 @@ import JobListingOverall from "./Pages/Employer/JobListingOverall";
 import IndividualJobPage from "./Pages/Employer/IndividualJobPage";
 import AdminApproveDenyJob from "./Pages/Administrator/AdminApproveDenyJob";
 import AdminApproveDenyUserCompanies from "./Pages/Administrator/AdminApproveDenyUser";
-import EditProfile from "./Pages/User/EditProfile";
 import Login from "./Components/Login";
 import { useUserContext } from "./Components/UserContext";
 import AdminDashboard from "./Pages/Dashboard";
@@ -61,7 +58,7 @@ function App() {
   }
 
   function RequireAuth({ redirectTo, user, admin, jobseeker }) {
-    console.log("In require Auth: ", currUser);
+    console.log("In require Auth: ", user);
 
     const role =
       isAuthenticated && user !== null && user.userRoleId !== null
@@ -119,17 +116,6 @@ function App() {
           }
         />
         <Route
-          path="/editprofile/:userId"
-          element={
-            <RequireAuth
-              redirectTo={<Login />}
-              user={currUser}
-              admin={<Forbidden />}
-              jobseeker={<EditProfile />}
-            />
-          }
-        />
-        <Route
           path="/resume"
           element={
             <RequireAuth
@@ -175,7 +161,7 @@ function App() {
         />
 
         <Route
-          path="/usercheckapplication"
+          path="/applications"
           element={
             <RequireAuth
               redirectTo={<Login />}

@@ -3,19 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useUserContext } from "../../Components/UserContext";
 import { theme } from "../../Assets/Styles/Theme";
-import { Editor } from "react-draft-wysiwyg";
-import draftToHtml from "draftjs-to-html";
-import * as SwalMsgs from "../../Utils/SwalMsgs";
-import Loading from "../../Components/AxiosLoader";
-import {
-  EditorState,
-  ContentState,
-  convertFromHTML,
-  convertToRaw,
-} from "draft-js";
-import { stateFromHTML } from "draft-js-import-html";
 import "draft-js/dist/Draft.css";
-import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import AxiosLoader from "../../Components/AxiosLoader";
 import {
   Container,
@@ -28,8 +16,7 @@ import {
   Stack,
   Avatar,
 } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
-import Swal from "sweetalert2";
+
 import WorkHistoryIcon from "@mui/icons-material/WorkHistory";
 import PlaceIcon from "@mui/icons-material/Place";
 import UpdateIcon from "@mui/icons-material/Update";
@@ -37,7 +24,6 @@ import { ThemeProvider } from "@emotion/react";
 import "../../Assets/Styles/Homepage.css";
 
 function IndividualJobPage(props) {
-  const [modalOpen, setModalOpen] = useState(true);
   const [axiosLoading, setAxiosLoading] = useState(false);
   const [jobInfo, setJobInfo] = useState(null);
   const params = useParams();
@@ -104,7 +90,7 @@ function IndividualJobPage(props) {
       console.log(jobInfo.description);
       setDescription(jobInfo.description);
 
-      if (props.jobsId || currUser.userRoleId === 2) {
+      if (!currUser || props.jobsId || currUser.userRoleId === 2) {
         setDisplayAdminButtons(false);
       } else {
         setDisplayAdminButtons(true);
