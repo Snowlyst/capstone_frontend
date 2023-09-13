@@ -144,7 +144,8 @@ function AdminManageExistingUserCompany() {
                             }}
                           >
                             <Typography variant="p" sx={{ fontSize: "1.4vh" }}>
-                              {info.user_personal_detail.identificationNumber}
+                              {info.user_personal_detail.identificationNumber ||
+                                null}
                             </Typography>
                           </Box>
                           <Box>
@@ -694,10 +695,9 @@ function AdminManageExistingUserCompany() {
                             variant="darkP"
                             sx={{ fontSize: "1.3vw ", width: "22.5vw" }}
                           >
-                            {
-                              usersData[currentEntitySelection]
-                                .user_personal_detail.identificationNumber
-                            }
+                            {usersData[currentEntitySelection]
+                              .user_personal_detail.identificationNumber ||
+                              null}
                           </Typography>
                         </Typography>
                         <Typography
