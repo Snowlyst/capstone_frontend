@@ -17,7 +17,6 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Link,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import { useState, useEffect } from "react";
@@ -28,12 +27,12 @@ import { useUserContext } from "../Components/UserContext";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { styled } from "@mui/material/styles";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
 function Search() {
-  const { currUser, setCurrUser } = useUserContext();
+  const { currUser } = useUserContext();
   const [accessToken, setAccessToken] = useState("");
   const [categoryExpand, setCategoryExpand] = useState(false);
   const [typeExpand, setTypeExpand] = useState(false);
@@ -55,8 +54,6 @@ function Search() {
   );
   const portedTypeQuery = new URLSearchParams(useLocation().search).get("type");
 
-  //useEffects for access cookies n stuff
-
   useEffect(() => {
     if (!accessToken) {
       const localAccess = currUser.accessToken;
@@ -73,7 +70,6 @@ function Search() {
       axios
         .post(`${BACKEND_URL}/listings/search/mount`, dataToSend)
         .then((info) => {
-          console.log(info);
           setJobsData(info.data);
           setJobsDisplay(
             info.data.map((info, index) => {
@@ -93,7 +89,7 @@ function Search() {
                 >
                   <Grid item xs={1.3}>
                     <Link
-                      href={`/companyprofile/${info.companyId}`}
+                      to={`/companyprofile/${info.companyId}`}
                       target="_blank"
                       rel="noreferrer"
                     >
@@ -168,7 +164,7 @@ function Search() {
                     </Stack>
                   </Grid>
                   <Grid item xs={2} sx={{ mt: 4.1 }}>
-                    <Link href={`/company/jobs/${info.id}`}>
+                    <Link to={`/company/jobs/${info.id}`}>
                       <Button
                         variant="contained"
                         component="span"
@@ -263,7 +259,6 @@ function Search() {
     axios
       .post(`${BACKEND_URL}/listings/search/`, dataToSend)
       .then((info) => {
-        console.log(info);
         setJobsData(info.data);
         setJobsDisplay(
           info.data.map((info, index) => {
@@ -282,11 +277,7 @@ function Search() {
                 }}
               >
                 <Grid item xs={1.3}>
-                  <Link
-                    href={`/companyprofile/${info.companyId}`}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
+                  <Link to={`/companyprofile/${info.companyId}`}>
                     {
                       <img
                         alt="Company Logo"
@@ -358,7 +349,7 @@ function Search() {
                   </Stack>
                 </Grid>
                 <Grid item xs={2} sx={{ mt: 4.1 }}>
-                  <Link href={`/company/jobs/${info.id}`}>
+                  <Link to={`/company/jobs/${info.id}`}>
                     <Button
                       variant="contained"
                       component="span"

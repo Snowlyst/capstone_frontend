@@ -43,6 +43,14 @@ function HomepageCopy() {
     },
   };
 
+  useEffect(() => {
+    console.log("component running");
+    const url = window.location.href;
+    if (url === "http://localhost:3000/#") {
+      navigate("/joblisting");
+    }
+  }, []);
+
   const handleChange = (e, index) => {
     if (index === 0) {
       setLocation(e.target.value);
@@ -51,7 +59,7 @@ function HomepageCopy() {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    navigate(`/search?location=${location}&type=${type}`);
+    navigate(`/job-search?location=${location}&type=${type}`);
   };
 
   const handleBrowseAll = (e) => {

@@ -36,10 +36,8 @@ function AdminManageExistingUserCompany() {
 
   //make sure currUser is set or else the navigate gonna boot everyone off the screen
   useEffect(() => {
-    console.log(currUser);
     if (currUser) {
       const localAccess = currUser.accessToken;
-      console.log("access token ready");
       setAccessToken(localAccess);
       setIsLoaded(true);
     }
@@ -56,7 +54,7 @@ function AdminManageExistingUserCompany() {
         );
         navigate("/");
       } else {
-        console.log("User permitted");
+        return;
       }
     }
   }, [isLoaded]);
@@ -72,7 +70,6 @@ function AdminManageExistingUserCompany() {
             },
           })
           .then((info) => {
-            console.log(info);
             setUsersData(info.data[0]);
             setUsersDisplay(
               info.data[0].map((info, index) => {
@@ -287,7 +284,6 @@ function AdminManageExistingUserCompany() {
   //unverifying a user (removing verify perms)
   const unverifyUser = () => {
     const userId = usersData[currentEntitySelection].id;
-    console.log(userId);
     const dataToSend = {
       userId: userId,
     };
@@ -298,7 +294,6 @@ function AdminManageExistingUserCompany() {
         },
       })
       .then((info) => {
-        console.log(info);
         return Swal.fire("Success", "User has been unverified", "success");
       })
       .catch((error) => {
@@ -313,7 +308,6 @@ function AdminManageExistingUserCompany() {
   //unverifying a company (removing verify perms)
   const unverifyCompany = () => {
     const companyId = companyData[currentEntitySelection].id;
-    console.log(companyId);
     const dataToSend = {
       companyId: companyId,
     };
@@ -324,7 +318,6 @@ function AdminManageExistingUserCompany() {
         },
       })
       .then((info) => {
-        console.log(info);
         return Swal.fire("Success", "Company has been unverified", "success");
       })
       .catch((error) => {
