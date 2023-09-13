@@ -27,14 +27,13 @@ function CheckApplication() {
   const [applicationDisplay, setApplicationDisplay] = useState("");
   const [currentEntitySelection, setCurrentEntitySelection] = useState("");
   const [renderData, setRenderData] = useState(0);
+  const [interviewTime, setInterviewTime] = useState("");
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log(currUser);
     if (currUser) {
       const localAccess = currUser.accessToken;
-      console.log("access token ready");
       setAccessToken(localAccess);
       setIsLoaded(true);
     }
@@ -50,7 +49,6 @@ function CheckApplication() {
           },
         })
         .then((info) => {
-          console.log(info);
           setApplicationData(info.data);
           setApplicationDisplay(
             info.data.map((info, index) => {
@@ -104,7 +102,7 @@ function CheckApplication() {
                               display: "-webkit-box",
                             }}
                           >
-                            {info.job_listings[0].title}
+                            {info.job_listing.title}
                           </Box>
                         </Link>
                         <Box>
@@ -162,7 +160,6 @@ function CheckApplication() {
       const dataToSend = {
         idToDelete: idToDelete,
       };
-      console.log(idToDelete);
       const response = await axios.put(
         `${BACKEND_URL}/application/withdrawapplication/`,
         dataToSend,
@@ -185,6 +182,26 @@ function CheckApplication() {
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    if (applicationData) {
+      const timeToDisplay =
+        applicationData[currentEntitySelection].interviewDate;
+      let formattedDate;
+      if (timeToDisplay) {
+        const date = new Date(timeToDisplay);
+        formattedDate = `${date.getDate().toString().padStart(2, "0")}/${(
+          date.getMonth() + 1
+        )
+          .toString()
+          .padStart(2, "0")}/${date.getFullYear()} ${date
+          .getHours()
+          .toString()
+          .padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
+      }
+      setInterviewTime(formattedDate);
+    }
+  }, [currentEntitySelection]);
 
   return (
     <Grid
@@ -334,9 +351,7 @@ function CheckApplication() {
                               fontSize: "1.6vh",
                             }}
                           >
-                            {applicationData[currentEntitySelection]
-                              .interviewDate ||
-                              "No interview time available yet"}
+                            {interviewTime || "No interview time available yet"}
                           </Typography>
                         </Typography>
                       </Box>

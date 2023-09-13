@@ -47,6 +47,7 @@ function IndividualJobPage(props) {
   const { currUser } = useUserContext();
   const [description, setDescription] = useState("");
   const [displayAdminButtons, setDisplayAdminButtons] = useState(false);
+  const [jobToApply, setJobToApply] = useState("");
 
   const navigate = useNavigate();
 
@@ -67,6 +68,7 @@ function IndividualJobPage(props) {
             .then((response) => {
               console.log(response.data);
               setJobInfo(response.data[0]);
+              setJobToApply(response.data[0].id);
             })
             .catch((error) => {
               console.log("Error fetching job info: ", error);
@@ -110,6 +112,11 @@ function IndividualJobPage(props) {
     }
   }, [jobInfo]);
 
+  const handleApply = (e) => {
+    e.preventDefault();
+    const applyJobId = jobToApply;
+    navigate(`/resume?jobId=${applyJobId}`);
+  };
   return (
     <ThemeProvider theme={theme}>
       <Grid container sx={theme.customStyles.centered.container}>
@@ -287,6 +294,14 @@ function IndividualJobPage(props) {
                       />
                     </Stack>
                   </Box>
+                  <Button
+                    className="orange"
+                    variant="contained"
+                    sx={{ ml: "25vw" }}
+                    onClick={handleApply}
+                  >
+                    Apply for this Job
+                  </Button>
 
                   {/* row 5 - 1 button to check current applicants */}
                   <Box

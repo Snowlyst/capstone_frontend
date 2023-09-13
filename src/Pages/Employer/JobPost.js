@@ -602,8 +602,8 @@ function JobPost() {
                               <MenuItem value="any">
                                 <em>Any</em>
                               </MenuItem>
-                              <MenuItem value="Full-Time">Full-Time</MenuItem>
-                              <MenuItem value="Part-Time">Part-Time</MenuItem>
+                              <MenuItem value="Full Time">Full-Time</MenuItem>
+                              <MenuItem value="Part Time">Part-Time</MenuItem>
                               <MenuItem value="Contract">Contract</MenuItem>
                               <MenuItem value="Remote">Remote</MenuItem>
                             </Select>
