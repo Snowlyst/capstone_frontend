@@ -15,21 +15,16 @@ import Swal from "sweetalert2";
 
 function AdminDashboard() {
   const { currUser } = useUserContext();
-  const [isLoaded, setIsLoaded] = useState(false);
   const [accessToken, setAccessToken] = useState(null);
   const [displayMode, setDisplayMode] = useState(0);
   const navigate = useNavigate();
 
-  //make sure currUser is set or else the navigate gonna boot everyone off the screen
   useEffect(() => {
-    console.log(currUser);
-    if (!accessToken) {
-      const localAccess = JSON.parse(localStorage.getItem("verveToken"));
-      console.log("access token ready");
+    if (currUser) {
+      const localAccess = currUser.accessToken;
       setAccessToken(localAccess);
-      setIsLoaded(true);
     }
-  }, []);
+  }, [currUser]);
 
   //differentiating users
   useEffect(() => {
@@ -229,7 +224,7 @@ function AdminDashboard() {
                           </Typography>
                         </Button>
                       </Link>
-                      <Divider sx={{ mr: "32.5vw" }} />
+                      <Divider sx={{ ml: "32.5vw" }} />
                     </Stack>
                   </Grid>
                 </Grid>

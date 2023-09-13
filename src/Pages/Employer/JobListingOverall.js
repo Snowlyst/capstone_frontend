@@ -32,11 +32,8 @@ function JobListingOverall() {
 
   //make sure currUser is set or else the navigate gonna boot everyone off the screen
   useEffect(() => {
-    console.log(currUser);
     if (currUser) {
       const localAccess = currUser.accessToken;
-      console.log("access token ready");
-
       setAccessToken(localAccess);
       setIsLoaded(true);
     }
@@ -53,7 +50,8 @@ function JobListingOverall() {
         );
         navigate("/");
       } else {
-        console.log("User permitted");
+        // console.log("User permitted");
+        return;
       }
     }
   }, [isLoaded]);
@@ -66,7 +64,6 @@ function JobListingOverall() {
         .then((info) => {
           setTableDataDisplay(
             info.data.map((row, index) => {
-              console.log(row);
               return (
                 <TableRow key={index}>
                   <TableCell align="right">
