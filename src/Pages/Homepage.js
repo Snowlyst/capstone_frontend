@@ -17,8 +17,6 @@ import { useAuth0 } from "@auth0/auth0-react";
 import axios from "axios";
 import { theme } from "../Assets/Styles/Theme";
 import { useUserContext } from "../Components/UserContext";
-// import PlaceIcon from "@mui/icons-material/Place";
-// import WorkHistoryIcon from "@mui/icons-material/WorkHistory";
 import SearchIcon from "@mui/icons-material/Search";
 
 import desktop from "../Assets/Images/homeBackground/desktop2.png";
@@ -123,7 +121,7 @@ function HomepageCopy() {
         direction="row"
         justifyContent="center"
         spacing={0}
-        sx={{ height: isSmallScreen ? "70vh" : "92.2vh" }}
+        sx={{ height: isSmallScreen ? "88vh" : "92.2vh" }}
       >
         {/* row1 */}
         <Grid item xs={12}>
