@@ -14,9 +14,9 @@ import {
   Checkbox,
   IconButton,
   FormControl,
-  Link,
 } from "@mui/material";
 import { theme } from "../../Assets/Styles/Theme";
+import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import axios from "axios";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
@@ -181,7 +181,6 @@ function CreateResume() {
     "Languages",
     "Additional Info",
     "About me",
-    "Privacy Setting(?)",
   ];
   const user = {
     name: username,
@@ -407,7 +406,7 @@ function CreateResume() {
           //   const educations = response.data.output;
           //   setDatabaseEducations(educations, databaseEducationIds);
           //   console.log(databaseEducationIds);
-          setAllEducations(response.data.output)
+          setAllEducations(response.data.output);
           // });
         })
         .catch((error) => {
@@ -579,7 +578,7 @@ function CreateResume() {
           //   setDatabaseSkills(skills, databaseSkillIds);
           //   console.log(databaseSkillIds);
           // });
-          setAllSkills(response.data.output)
+          setAllSkills(response.data.output);
         })
         .catch((error) => {
           console.error("Error with GET request:", error);
@@ -703,7 +702,7 @@ function CreateResume() {
           //   setDatabaseLanguages(languages, databaseLanguageIds);
           //   console.log(databaseLanguageIds);
           // });
-          setAllLanguages(response.data.output)
+          setAllLanguages(response.data.output);
         })
         .catch((error) => {
           console.error("Error with GET request:", error);
@@ -827,7 +826,7 @@ function CreateResume() {
       axios
         .get(`${backendUrl}/createresume/additionalinfo/${id}`)
         .then((response) => {
-           console.log("GET request successful:", response.data);
+          console.log("GET request successful:", response.data);
           // response.data.output.forEach((entry) => {
           //   console.log("Additonal Info Database ID:", entry.id);
           //   setDatabaseAdditionalInfoIds(entry.id);
@@ -838,7 +837,7 @@ function CreateResume() {
           //   );
           //   console.log(databaseAdditionalInfoIds);
           // });
-          setAllAdditionalInfo(response.data.output)
+          setAllAdditionalInfo(response.data.output);
         })
         .catch((error) => {
           console.error("Error with GET request:", error);
@@ -963,8 +962,7 @@ function CreateResume() {
           //   console.log(databaseAboutMe);
           //   console.log(databaseAboutMeIds);
           // });
-          setAllAboutMe(response.data.output)
-          
+          setAllAboutMe(response.data.output);
         })
         .catch((error) => {
           console.error("Error with GET request:", error);
@@ -1010,7 +1008,7 @@ function CreateResume() {
           }
         );
         const entryId = aboutmeList.data;
-        console.log("All ABout Me",allAboutMe)
+        console.log("All ABout Me", allAboutMe);
         if (entryId !== null) {
           const combinedAboutMe = [aboutMe];
           setAllAboutMe(combinedAboutMe);
@@ -1388,7 +1386,7 @@ function CreateResume() {
                   color="#FF682C"
                   fontSize="16px"
                 >
-                  <Link href="/resume">here</Link>
+                  <Link to="/resume">here</Link>
                 </Typography>
               </Typography>
               <br />
@@ -1412,17 +1410,7 @@ function CreateResume() {
                   marginLeft: "10px",
                 }}
               >
-                Your current resume has not been updated since (Year). To apply
-                for jobs, please ensure that your resume is up-to-date. If your
-                resume since the last update, click {"\n"}
-                <Typography
-                  variant="button"
-                  sx={{ cursor: "pointer", textTransform: "lowercase" }}
-                  color="#FF682C"
-                  fontSize="10px"
-                >
-                  here
-                </Typography>
+                To apply for jobs, please ensure that your resume is up-to-date.
               </Typography>
               <br />
               <Typography
@@ -2729,12 +2717,9 @@ function CreateResume() {
 
               {selectedContent === "About me" && (
                 <div>
-                  
                   {isEditingAboutMe ? (
                     <div>
-                      <Typography variant="p">
-                        Name: {aboutMe.name}
-                      </Typography>
+                      <Typography variant="p">Name: {aboutMe.name}</Typography>
                       <br />
                       <Typography variant="p">
                         Contact Number: {aboutMe.contactNumber}

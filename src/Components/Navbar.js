@@ -56,7 +56,7 @@ function Navbar() {
   // handle user menu click
   const handleUserMenu = async (page) => {
     let user = {};
-
+    // setAnchorElUser(false);
     if (page === "Logout") {
       localStorage.removeItem("verveRole");
       localStorage.removeItem("verveToken");
@@ -264,55 +264,56 @@ function Navbar() {
                 onClose={() => setAnchorElUser(null)}
               >
                 {isAuthenticated
-                  ? role !== null && (role === "admin" || role === "employer")
-                    ? settings.admin.map((setting) => (
-                        <Link
-                          to={setting.toLowerCase().replace(/ /g, `-`)}
-                          key={setting}
-                          style={{ textDecoration: "none" }}
-                        >
-                          <MenuItem
-                            key={setting.admin}
-                            onClick={() => handleUserMenu(setting)}
+                  ? role !== null &&
+                    (role === "admin" || role === "employer"
+                      ? settings.admin.map((setting) => (
+                          <Link
+                            to={setting.toLowerCase().replace(/ /g, `-`)}
+                            key={setting}
+                            style={{ textDecoration: "none" }}
                           >
-                            <ThemeProvider theme={theme}>
-                              <Typography
-                                textAlign="center"
-                                variant="p"
-                                sx={{
-                                  color: theme.typography.darkP.color,
-                                }}
-                              >
-                                {setting}
-                              </Typography>
-                            </ThemeProvider>
-                          </MenuItem>
-                        </Link>
-                      ))
-                    : settings.user.map((setting) => (
-                        <Link
-                          to={setting.toLowerCase().replace(/ /g, `-`)}
-                          key={setting}
-                          style={{ textDecoration: "none" }}
-                        >
-                          <MenuItem
-                            key={setting.admin}
-                            onClick={() => handleUserMenu(setting)}
+                            <MenuItem
+                              key={setting.admin}
+                              onClick={() => handleUserMenu(setting)}
+                            >
+                              <ThemeProvider theme={theme}>
+                                <Typography
+                                  textAlign="center"
+                                  variant="p"
+                                  sx={{
+                                    color: theme.typography.darkP.color,
+                                  }}
+                                >
+                                  {setting}
+                                </Typography>
+                              </ThemeProvider>
+                            </MenuItem>
+                          </Link>
+                        ))
+                      : settings.user.map((setting) => (
+                          <Link
+                            to={setting.toLowerCase().replace(/ /g, `-`)}
+                            key={setting}
+                            style={{ textDecoration: "none" }}
                           >
-                            <ThemeProvider theme={theme}>
-                              <Typography
-                                textAlign="center"
-                                variant="p"
-                                sx={{
-                                  color: theme.typography.darkP.color,
-                                }}
-                              >
-                                {setting}
-                              </Typography>
-                            </ThemeProvider>
-                          </MenuItem>
-                        </Link>
-                      ))
+                            <MenuItem
+                              key={setting.admin}
+                              onClick={() => handleUserMenu(setting)}
+                            >
+                              <ThemeProvider theme={theme}>
+                                <Typography
+                                  textAlign="center"
+                                  variant="p"
+                                  sx={{
+                                    color: theme.typography.darkP.color,
+                                  }}
+                                >
+                                  {setting}
+                                </Typography>
+                              </ThemeProvider>
+                            </MenuItem>
+                          </Link>
+                        )))
                   : settings.nonuser.map((setting) => (
                       <Link
                         to={setting.toLowerCase().replace(/ /g, `-`)}
