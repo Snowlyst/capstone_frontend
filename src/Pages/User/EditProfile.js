@@ -116,6 +116,7 @@ function EditProfile() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log(currUser);
     const newFieldErrors = {};
     Object.keys(fieldValues).forEach((fieldName) => {
       if (typeof fieldValues[fieldName] === "string") {
@@ -133,6 +134,7 @@ function EditProfile() {
 
       const profile = { fieldValues: fieldValues };
       console.log(profile);
+
       try {
         const userProfile = await axios.put(
           `${BACKEND_URL}/users/editpersonalinfo/${currUser.id}`,
@@ -143,18 +145,23 @@ function EditProfile() {
             },
           }
         );
-
-        setUserInfo(userProfile.data.user_personal_detail);
-        setCurrUser(userProfile.data);
+        const userObject = userProfile.data;
+        userObject.accessToken = currUser.accessToken;
+        console.log("userObject after adding access Token: ", userObject);
         setAxiosLoading(false);
-        await Swal.fire(
+        setOpen(false);
+        setUserInfo(userObject.user_personal_detail);
+        setCurrUser(userObject);
+        console.log("CurrUser after setting after db update: ", currUser);
+
+        Swal.fire(
           "Submission Successful",
           "Your profile has been updated.",
           "success"
-        ).then(() => {
-          setOpen(false); // Close the dialog or modal after the user acknowledges the success message.
-        });
-        console.log(userProfile.data);
+        );
+        // .then(() => {
+        //   ; // Close the dialog or modal after the user acknowledges the success message.
+        // });
       } catch (error) {
         // console.log(error);
         Swal.fire(SwalMsgs.errorPosting);
@@ -164,6 +171,7 @@ function EditProfile() {
 
   useEffect(() => {
     setPrevCurrUser(currUser);
+    console.log("curruser in use effect setPrevCurrUser: ", currUser);
   }, [currUser]);
 
   useEffect(() => {

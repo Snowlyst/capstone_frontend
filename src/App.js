@@ -161,7 +161,7 @@ function App() {
         />
 
         <Route
-          path="/usercheckapplication"
+          path="/applications"
           element={
             <RequireAuth
               redirectTo={<Login />}
