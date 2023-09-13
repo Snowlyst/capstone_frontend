@@ -15,7 +15,6 @@
 #card-body {
   display: flex;
   justify-content: center;
-  align-items: center;
   height: 87vh;
   font-family: "Roboto", Arial, sans-serif;
   color: #222;
@@ -34,7 +33,7 @@
 #login-container .profile-img {
   height: 100px;
   width: 100px;
-  background: url("https://images.unsplash.com/photo-1504933350103-e840ede978d4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=564&q=80");
+
   background-size: cover;
   background-position: center;
   position: absolute;
@@ -47,6 +46,7 @@
 #login-container h1 {
   font-family: "Sriracha", Arial, sans-serif;
   text-align: center;
+  margin-left: 8px;
   margin-bottom: 20px;
   color: #ffc145;
 }
@@ -138,20 +138,29 @@
   padding-right: 10px;
 }
 
-@-webkit-keyframes gradientBG {
-  0% {
-    background-position: 0% 50%;
-  }
-  100% {
-    background-position: 100% 50%;
-  }
+.gradient-button:hover {
+  /* Styles for the button when hovered */
+  box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.5);
+  transform: translateY(2px);
+  -webkit-animation: gradientBG 1.5s ease-in-out forwards;
+  animation: gradientBG 1.5s ease-in-out forwards;
+  cursor: pointer;
 }
 
-@keyframes gradientBG {
-  0% {
-    background-position: 0% 50%;
-  }
-  100% {
-    background-position: 100% 50%;
-  }
+.blue-button {
+  background-color: #0e0140;
+  color: #ffffff;
+}
+
+/* Button styles for orange buttons */
+.orange-button {
+  background-color: #ff6b2c;
+  color: #ffffff;
+}
+.blue-button:hover {
+  background-color: #2802ba;
+}
+
+.orange-button:hover {
+  background-color: #f79568;
 }

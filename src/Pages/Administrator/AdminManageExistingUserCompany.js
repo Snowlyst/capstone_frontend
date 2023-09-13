@@ -73,6 +73,13 @@ function AdminManageExistingUserCompany() {
             setUsersData(info.data[0]);
             setUsersDisplay(
               info.data[0].map((info, index) => {
+                let avatar;
+                if (!info.avatarUrl || info.avatarUrl === "null") {
+                  avatar =
+                    "https://firebasestorage.googleapis.com/v0/b/verve-55239.appspot.com/o/images%2FImage_not_available.png?alt=media&token=0a5a0495-5de3-4fea-93a2-3b4b95b22f64";
+                } else {
+                  avatar = info.avatarUrl;
+                }
                 return (
                   <Box key={index}>
                     <Grid
@@ -88,10 +95,7 @@ function AdminManageExistingUserCompany() {
                       <Grid item xs={4}>
                         <img
                           alt="Logo"
-                          src={
-                            info.avatarUrl ||
-                            "https://firebasestorage.googleapis.com/v0/b/verve-55239.appspot.com/o/images%2FImage_not_available.png?alt=media&token=0a5a0495-5de3-4fea-93a2-3b4b95b22f64"
-                          }
+                          src={avatar}
                           style={{
                             width: "3.5vw",
                             height: "3.5vh",
@@ -608,20 +612,34 @@ function AdminManageExistingUserCompany() {
                   <>
                     <Grid item xs={2.5} sx={{ ml: "2.5vw" }}>
                       <Box sx={{ ml: "13.5vw", mt: "3vh" }}>
-                        <img
-                          src={
-                            usersData[currentEntitySelection].avatarUrl ||
-                            "https://firebasestorage.googleapis.com/v0/b/verve-55239.appspot.com/o/images%2FImage_not_available.png?alt=media&token=0a5a0495-5de3-4fea-93a2-3b4b95b22f64"
-                          }
-                          alt="Alt"
-                          style={{
-                            height: "10vh",
-                            width: "10vw",
-                            objectFit: "fill",
-                            borderTopLeftRadius: "40px",
-                            borderTopRightRadius: "40px",
-                          }}
-                        />
+                        {!usersData[currentEntitySelection].avatarUrl ||
+                        usersData[currentEntitySelection].avatarUrl ===
+                          "null" ||
+                        usersData[currentEntitySelection].avatarUrl === "" ? (
+                          <img
+                            src="https://firebasestorage.googleapis.com/v0/b/verve-55239.appspot.com/o/images%2FImage_not_available.png?alt=media&token=0a5a0495-5de3-4fea-93a2-3b4b95b22f64"
+                            alt="Alt"
+                            style={{
+                              height: "10vh",
+                              width: "10vw",
+                              objectFit: "fill",
+                              borderTopLeftRadius: "40px",
+                              borderTopRightRadius: "40px",
+                            }}
+                          />
+                        ) : (
+                          <img
+                            src={usersData[currentEntitySelection].avatarUrl}
+                            alt="Alt"
+                            style={{
+                              height: "10vh",
+                              width: "10vw",
+                              objectFit: "fill",
+                              borderTopLeftRadius: "40px",
+                              borderTopRightRadius: "40px",
+                            }}
+                          />
+                        )}
                       </Box>
                     </Grid>
                     <Grid item xs={9.5} sx={{ ml: "2.5vw", width: "20vw" }}>

@@ -156,7 +156,9 @@ function CheckApplication() {
 
   const handleWithdraw = async () => {
     try {
+      console.log("In withdraw: ");
       const idToDelete = applicationData[currentEntitySelection].id;
+      console.log("Id to delete: ", idToDelete);
       const dataToSend = {
         idToDelete: idToDelete,
       };
@@ -169,6 +171,7 @@ function CheckApplication() {
           },
         }
       );
+      setCurrentEntitySelection("");
       console.log(response);
       Swal.fire(
         "Success",
@@ -176,7 +179,6 @@ function CheckApplication() {
         "success"
       ).then(() => {
         setRenderData((prev) => prev + 1);
-        setCurrentEntitySelection("");
       });
     } catch (error) {
       console.log(error);
@@ -184,7 +186,7 @@ function CheckApplication() {
   };
 
   useEffect(() => {
-    if (applicationData) {
+    if (currentEntitySelection && applicationData) {
       const timeToDisplay =
         applicationData[currentEntitySelection].interviewDate;
       let formattedDate;

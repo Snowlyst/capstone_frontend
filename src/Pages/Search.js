@@ -55,13 +55,6 @@ function Search() {
   const portedTypeQuery = new URLSearchParams(useLocation().search).get("type");
 
   useEffect(() => {
-    if (!accessToken) {
-      const localAccess = currUser.accessToken;
-      setAccessToken(localAccess);
-    }
-  }, [accessToken]);
-
-  useEffect(() => {
     if (portedLocationQuery && portedTypeQuery) {
       const dataToSend = {
         typeQuery: portedTypeQuery,
