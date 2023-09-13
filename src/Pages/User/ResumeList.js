@@ -23,6 +23,8 @@ import {
 import Swal from "sweetalert2";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+
 //for auth
 import { useUserContext } from "../../Components/UserContext";
 
@@ -40,14 +42,24 @@ function ResumeList() {
   const [refreshState, setRefreshState] = useState(0);
   const { currUser } = useUserContext();
   const [accessToken, setAccessToken] = useState("");
+  const [applyingMode, setApplyingMode] = useState(false);
+  const [jobToApply, setJobToApply] = useState(0);
+  const [currentResumeSelection, setCurrentResumeSelection] = useState("");
+
+  const portedJobQuery = new URLSearchParams(useLocation().search).get("jobId");
+  useEffect(() => {
+    if (portedJobQuery) {
+      setJobToApply(Number(portedJobQuery));
+      setApplyingMode(true);
+    }
+  }, [portedJobQuery]);
 
   useEffect(() => {
     if (!accessToken) {
       const localAccess = currUser.accessToken;
       if (currUser) {
-        console.log("accesstoken exists");
+        setAccessToken(localAccess);
       }
-      setAccessToken(localAccess);
     }
   }, [accessToken]);
 
@@ -88,7 +100,6 @@ function ResumeList() {
     uploadBytes(fullStorageRef, fileAdded).then(() => {
       getDownloadURL(fullStorageRef).then((url) => {
         setFileAdded(null);
-        console.log(url);
         const userId = currUser.id;
         if (!currUser) {
           Swal.fire("Error!", "Cannot find user", "error");
@@ -106,7 +117,6 @@ function ResumeList() {
             },
           })
           .then((info) => {
-            console.log(info);
             Swal.fire("Success!", "Your posting was successful.", "success");
             setRefreshState((prev) => prev + 1);
           })
@@ -119,10 +129,6 @@ function ResumeList() {
 
   // edit a resume detail fn
   const handleEdit = () => {
-    console.log(resumeName);
-    console.log(resumeDescription);
-    console.log(resumeUrl);
-    console.log(resumeId);
     if (accessToken) {
       axios
         .put(
@@ -139,7 +145,6 @@ function ResumeList() {
           }
         )
         .then((response) => {
-          console.log(response);
           Swal.fire("Success!", "Your edit was successful.", "success");
           handleCloseModal();
         })
@@ -150,7 +155,6 @@ function ResumeList() {
   };
   // delete 1 resume fn
   const handleDelete = () => {
-    console.log(resumeId);
     axios
       .delete(`${BACKEND_URL}/resumes/resume/${resumeId}`, {
         headers: {
@@ -158,7 +162,6 @@ function ResumeList() {
         },
       })
       .then((info) => {
-        console.log(info);
         handleCloseModal();
       })
       .catch((error) => {
@@ -177,7 +180,6 @@ function ResumeList() {
           },
         })
         .then((info) => {
-          console.log(info);
           setDisplayedResume(
             info.data.output.map((information, index) => {
               const createdTime = new Date(
@@ -206,6 +208,7 @@ function ResumeList() {
                       <Typography
                         variant="h6"
                         sx={{
+                          fontSize: "2vh",
                           fontWeight: theme.typography.h6.fontWeight,
                         }}
                       >
@@ -219,43 +222,70 @@ function ResumeList() {
                           {information.resumeTitle}
                         </Link>
                       </Typography>
-                      <Typography variant="p" sx={{ fontSize: 14 }}>
+                      <Typography variant="p" sx={{ fontSize: "1.45vh" }}>
                         {information.resumeDescription}
                       </Typography>
                     </Stack>
                   </Grid>
                   <Grid item xs={2}>
                     <Stack direction="column" sx={{ mt: 1 }}>
-                      <Typography variant="p" sx={{ mb: 1 }}>
+                      <Typography
+                        variant="p"
+                        sx={{ mb: 1, fontSize: "1.45vh" }}
+                      >
                         Date Edited
                       </Typography>
-                      <Typography variant="darkP">{updatedTime}</Typography>
+                      <Typography variant="darkP" sx={{ fontSize: "1.45vh" }}>
+                        {updatedTime}
+                      </Typography>
                     </Stack>
                   </Grid>
                   <Grid item xs={2}>
                     <Stack direction="column" sx={{ mt: 1 }}>
-                      <Typography variant="p" sx={{ mb: 1 }}>
+                      <Typography
+                        variant="p"
+                        sx={{ mb: 1, fontSize: "1.45vh" }}
+                      >
                         Date Created
                       </Typography>
-                      <Typography variant="darkP">{createdTime}</Typography>
+                      <Typography variant="darkP" sx={{ fontSize: "1.45vh" }}>
+                        {createdTime}
+                      </Typography>
                     </Stack>
                   </Grid>
                   <Grid item xs={2} sx={{ mt: 2.1 }}>
-                    <Button
-                      variant="contained"
-                      component="span"
-                      style={{ backgroundColor: "#0E0140", color: "white" }}
-                      onClick={() => {
-                        handleOpenModal();
-                        setResumeName(information.resumeTitle);
-                        setResumeUrl(information.resumeUrl);
-                        setResumeDescription(information.resumeDescription);
-                        setResumeId(information.id);
-                      }}
-                    >
-                      <EditIcon />
-                      Edit
-                    </Button>
+                    {!applyingMode ? (
+                      <Button
+                        variant="contained"
+                        component="span"
+                        style={{
+                          backgroundColor: "#0E0140",
+                          color: "white",
+                          height: "4vh",
+                        }}
+                        onClick={() => {
+                          handleOpenModal();
+                          setResumeName(information.resumeTitle);
+                          setResumeUrl(information.resumeUrl);
+                          setResumeDescription(information.resumeDescription);
+                          setResumeId(information.id);
+                        }}
+                      >
+                        <EditIcon />
+                        Edit
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="contained"
+                        component="span"
+                        style={{ backgroundColor: "#0E0140", color: "white" }}
+                        onClick={() => selectResume(information.id)}
+                      >
+                        <EditIcon />
+                        Select
+                      </Button>
+                    )}
+
                     <Modal open={openModal} onClose={() => handleCloseModal()}>
                       <Box sx={style}>
                         <Typography variant="h6">
@@ -327,6 +357,41 @@ function ResumeList() {
     accessToken,
   ]);
 
+  const applyJob = () => {
+    const resumeToSend = currentResumeSelection;
+    const jobToSend = jobToApply;
+    const userToSend = currUser.id;
+    const dataToSend = {
+      resumeId: resumeToSend,
+      userId: userToSend,
+      jobId: jobToSend,
+    };
+    axios
+      .post(`${BACKEND_URL}/application/submitapplication`, dataToSend, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      .then((info) => {
+        Swal.fire(
+          "Success",
+          "Your Job Application has been sent with your chosen Resume.",
+          "success"
+        );
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const selectResume = (id) => {
+    setCurrentResumeSelection(id);
+    Swal.fire(
+      "Success",
+      "Selected Resume has been chosen, please proceed with application.",
+      "success"
+    );
+  };
   return (
     <Box>
       <ThemeProvider theme={theme}>
@@ -365,8 +430,8 @@ function ResumeList() {
           <Typography
             variant="p"
             sx={{
-              fontSize: 13,
-              pr: 74,
+              fontSize: "1.33vh",
+              pr: "50vw",
             }}
           >
             Resume Requirements?
@@ -385,6 +450,7 @@ function ResumeList() {
                     variant="h6"
                     sx={{
                       fontWeight: theme.typography.h6.fontWeightBold,
+                      fontSize: "2.1vh",
                     }}
                   >
                     Upload Resume
@@ -395,7 +461,12 @@ function ResumeList() {
                   {fileAdded ? (
                     <Typography variant="p">{fileAdded.name}</Typography>
                   ) : (
-                    <Typography variant="p">
+                    <Typography
+                      variant="p"
+                      sx={{
+                        fontSize: "1.4vh",
+                      }}
+                    >
                       Click here to select the file to upload
                     </Typography>
                   )}
@@ -411,19 +482,27 @@ function ResumeList() {
                 </label>
               </Stack>
             </Grid>
-            <Grid item xs={2.7} sx={{ mt: 2.5 }}>
+            <Grid item xs={2.7} sx={{ mt: "1.7vh" }}>
               <Button
                 variant="contained"
                 component="span"
                 style={{
                   backgroundColor: "#FF6B2C",
                   color: "white",
+                  height: "4vh",
                   width: "12vw",
                 }}
                 onClick={submitData}
               >
                 <DriveFolderUploadIcon sx={{ mr: 1 }} />
-                Upload
+                <Typography
+                  sx={{
+                    fontSize: "1.5vh",
+                    fontWeight: theme.typography.h6.fontWeightBold,
+                  }}
+                >
+                  Upload
+                </Typography>
               </Button>
             </Grid>
           </Grid>
@@ -447,6 +526,20 @@ function ResumeList() {
               No Resumes Available Yet!
             </Typography>
           )}
+          <Grid container justifyContent="center" sx={{ mt: 2 }}>
+            {applyingMode ? (
+              <Button
+                variant="contained"
+                classes={{ root: "orange" }}
+                style={{
+                  width: "12vw",
+                }}
+                onClick={applyJob}
+              >
+                Submit Resume
+              </Button>
+            ) : null}
+          </Grid>
         </Grid>
       </ThemeProvider>
     </Box>
