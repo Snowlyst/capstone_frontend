@@ -40,6 +40,18 @@ export const successPostingAwaitApprovalWButtons = (
   };
 };
 
+export const successPostingWButtons = (infoName, denyText, confirmText) => {
+  return {
+    title: "Success!",
+    text: `Your ${infoName} has been successfully submitted. `,
+    icon: "success",
+    showDenyButton: true,
+    confirmButtonColor: "LightSeaGreen",
+    denyButtonText: `Return to ${denyText}`,
+    confirmButtonText: `Return to ${confirmText}`,
+  };
+};
+
 // form checks
 
 export const missingFormInfo = {
