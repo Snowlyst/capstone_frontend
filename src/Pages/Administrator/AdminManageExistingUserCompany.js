@@ -71,6 +71,7 @@ function AdminManageExistingUserCompany() {
           })
           .then((info) => {
             setUsersData(info.data[0]);
+            console.log(info.data[0]);
             setUsersDisplay(
               info.data[0].map((info, index) => {
                 let avatar;
@@ -144,8 +145,9 @@ function AdminManageExistingUserCompany() {
                             }}
                           >
                             <Typography variant="p" sx={{ fontSize: "1.4vh" }}>
-                              {info.user_personal_detail.identificationNumber ||
-                                null}
+                              {info.user_personal_detail
+                                ? info.user_personal_detail.identificationNumber
+                                : null}
                             </Typography>
                           </Box>
                           <Box>
@@ -674,10 +676,11 @@ function AdminManageExistingUserCompany() {
                             variant="darkP"
                             sx={{ fontSize: "1.3vw", width: "22.5vh" }}
                           >
-                            {
-                              usersData[currentEntitySelection]
-                                .user_personal_detail.dateOfBirth
-                            }
+                            {usersData[currentEntitySelection]
+                              .user_personal_detail
+                              ? usersData[currentEntitySelection]
+                                  .user_personal_detail.dateOfBirth
+                              : null}
                           </Typography>
                         </Typography>
                       </Stack>
@@ -696,8 +699,10 @@ function AdminManageExistingUserCompany() {
                             sx={{ fontSize: "1.3vw ", width: "22.5vw" }}
                           >
                             {usersData[currentEntitySelection]
-                              .user_personal_detail.identificationNumber ||
-                              null}
+                              .user_personal_detail
+                              ? usersData[currentEntitySelection]
+                                  .user_personal_detail.identificationNumber
+                              : null}
                           </Typography>
                         </Typography>
                         <Typography
@@ -712,10 +717,11 @@ function AdminManageExistingUserCompany() {
                             variant="darkP"
                             sx={{ fontSize: "1.3vw" }}
                           >
-                            {
-                              usersData[currentEntitySelection]
-                                .user_personal_detail.gender
-                            }
+                            {usersData[currentEntitySelection]
+                              .user_personal_detail
+                              ? usersData[currentEntitySelection]
+                                  .user_personal_detail.gender
+                              : null}
                           </Typography>
                         </Typography>
                       </Stack>
@@ -733,10 +739,11 @@ function AdminManageExistingUserCompany() {
                             variant="darkP"
                             sx={{ fontSize: "1.3vw ", width: "22.5vw" }}
                           >
-                            {
-                              usersData[currentEntitySelection]
-                                .user_personal_detail.mobileNumber
-                            }
+                            {usersData[currentEntitySelection]
+                              .user_personal_detail
+                              ? usersData[currentEntitySelection]
+                                  .user_personal_detail.mobileNumber
+                              : null}
                           </Typography>
                         </Typography>
                         <Typography
@@ -775,10 +782,11 @@ function AdminManageExistingUserCompany() {
                               width: "45vw",
                             }}
                           >
-                            {
-                              usersData[currentEntitySelection]
-                                .user_personal_detail.streetAddress
-                            }
+                            {usersData[currentEntitySelection]
+                              .user_personal_detail
+                              ? usersData[currentEntitySelection]
+                                  .user_personal_detail.streetAddress
+                              : null}
                           </Typography>
                         </Typography>
                       </Stack>
@@ -800,10 +808,11 @@ function AdminManageExistingUserCompany() {
                               height: "7vh",
                             }}
                           >
-                            {
-                              usersData[currentEntitySelection]
-                                .user_personal_detail.currentWorkStatus
-                            }
+                            {usersData[currentEntitySelection]
+                              .user_personal_detail
+                              ? usersData[currentEntitySelection]
+                                  .user_personal_detail.currentWorkStatus
+                              : null}
                           </Typography>
                         </Typography>
                       </Stack>
@@ -825,10 +834,11 @@ function AdminManageExistingUserCompany() {
                               height: "7vh",
                             }}
                           >
-                            {
-                              usersData[currentEntitySelection]
-                                .user_personal_detail.readinessToRtw
-                            }
+                            {usersData[currentEntitySelection]
+                              .user_personal_detail
+                              ? usersData[currentEntitySelection]
+                                  .user_personal_detail.readinessToRtw
+                              : null}
                           </Typography>
                         </Typography>
                       </Stack>
@@ -850,10 +860,11 @@ function AdminManageExistingUserCompany() {
                               height: "7vh",
                             }}
                           >
-                            {
-                              usersData[currentEntitySelection]
-                                .user_personal_detail.physicalBarriersToRtw
-                            }
+                            {usersData[currentEntitySelection]
+                              .user_personal_detail
+                              ? usersData[currentEntitySelection]
+                                  .user_personal_detail.physicalBarriersToRtw
+                              : null}
                           </Typography>
                         </Typography>
                       </Stack>
@@ -875,10 +886,11 @@ function AdminManageExistingUserCompany() {
                               height: "7vh",
                             }}
                           >
-                            {
-                              usersData[currentEntitySelection]
-                                .user_personal_detail.timeFrameToRtw
-                            }
+                            {usersData[currentEntitySelection]
+                              .user_personal_detail
+                              ? usersData[currentEntitySelection]
+                                  .user_personal_detail.timeFrameToRtw
+                              : null}
                           </Typography>
                         </Typography>
                       </Stack>
@@ -900,10 +912,11 @@ function AdminManageExistingUserCompany() {
                               height: "7vh",
                             }}
                           >
-                            {
-                              usersData[currentEntitySelection]
-                                .user_personal_detail.activeTreatment
-                            }
+                            {usersData[currentEntitySelection]
+                              .user_personal_detail
+                              ? usersData[currentEntitySelection]
+                                  .user_personal_detail.activeTreatment
+                              : null}
                           </Typography>
                         </Typography>
                       </Stack>

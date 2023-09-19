@@ -89,6 +89,13 @@ function AdminApproveDenyUserCompanies() {
             setUsersData(info.data[0]);
             setUsersDisplay(
               info.data[0].map((info, index) => {
+                let avatar;
+                if (!info.avatarUrl || info.avatarUrl === "null") {
+                  avatar =
+                    "https://firebasestorage.googleapis.com/v0/b/verve-55239.appspot.com/o/images%2FImage_not_available.png?alt=media&token=0a5a0495-5de3-4fea-93a2-3b4b95b22f64";
+                } else {
+                  avatar = info.avatarUrl;
+                }
                 return (
                   <Box key={index}>
                     <Grid
@@ -156,8 +163,9 @@ function AdminApproveDenyUserCompanies() {
                             }}
                           >
                             <Typography variant="p" sx={{ fontSize: "1.4vh" }}>
-                              {info.user_personal_detail.identificationNumber ||
-                                null}
+                              {info.user_personal_detail
+                                ? info.user_personal_detail.identificationNumber
+                                : null}
                             </Typography>
                           </Box>
                           <Box>
@@ -721,8 +729,11 @@ function AdminApproveDenyUserCompanies() {
                       <Box sx={{ ml: "13.5vw", mt: "3vh" }}>
                         <img
                           src={
-                            usersData[currentEntitySelection].avatarUrl ||
-                            "https://firebasestorage.googleapis.com/v0/b/verve-55239.appspot.com/o/images%2FImage_not_available.png?alt=media&token=0a5a0495-5de3-4fea-93a2-3b4b95b22f64"
+                            !usersData[currentEntitySelection].avatarUrl ||
+                            usersData[currentEntitySelection].avatarUrl ===
+                              "null"
+                              ? "https://firebasestorage.googleapis.com/v0/b/verve-55239.appspot.com/o/images%2FImage_not_available.png?alt=media&token=0a5a0495-5de3-4fea-93a2-3b4b95b22f64"
+                              : usersData[currentEntitySelection].avatarUrl
                           }
                           alt="Alt"
                           style={{
@@ -768,7 +779,10 @@ function AdminApproveDenyUserCompanies() {
                             sx={{ fontSize: "1.3vw", width: "22.5vh" }}
                           >
                             {usersData[currentEntitySelection]
-                              .user_personal_detail.dateOfBirth || null}
+                              .user_personal_detail
+                              ? usersData[currentEntitySelection]
+                                  .user_personal_detail.dateOfBirth
+                              : null}
                           </Typography>
                         </Typography>
                       </Stack>
@@ -787,8 +801,10 @@ function AdminApproveDenyUserCompanies() {
                             sx={{ fontSize: "1.3vw ", width: "22.5vw" }}
                           >
                             {usersData[currentEntitySelection]
-                              .user_personal_detail.identificationNumber ||
-                              null}
+                              .user_personal_detail
+                              ? usersData[currentEntitySelection]
+                                  .user_personal_detail.identificationNumber
+                              : null}
                           </Typography>
                         </Typography>
                         <Typography
@@ -804,7 +820,10 @@ function AdminApproveDenyUserCompanies() {
                             sx={{ fontSize: "1.3vw" }}
                           >
                             {usersData[currentEntitySelection]
-                              .user_personal_detail.gender || null}
+                              .user_personal_detail
+                              ? usersData[currentEntitySelection]
+                                  .user_personal_detail.gender
+                              : null}
                           </Typography>
                         </Typography>
                       </Stack>
@@ -823,7 +842,10 @@ function AdminApproveDenyUserCompanies() {
                             sx={{ fontSize: "1.3vw ", width: "22.5vw" }}
                           >
                             {usersData[currentEntitySelection]
-                              .user_personal_detail.mobileNumber || null}
+                              .user_personal_detail
+                              ? usersData[currentEntitySelection]
+                                  .user_personal_detail.mobileNumber
+                              : null}
                           </Typography>
                         </Typography>
                         <Typography
@@ -863,7 +885,10 @@ function AdminApproveDenyUserCompanies() {
                             }}
                           >
                             {usersData[currentEntitySelection]
-                              .user_personal_detail.streetAddress || null}
+                              .user_personal_detail
+                              ? usersData[currentEntitySelection]
+                                  .user_personal_detail.streetAddress
+                              : null}
                           </Typography>
                         </Typography>
                       </Stack>
@@ -886,7 +911,10 @@ function AdminApproveDenyUserCompanies() {
                             }}
                           >
                             {usersData[currentEntitySelection]
-                              .user_personal_detail.currentWorkStatus || null}
+                              .user_personal_detail
+                              ? usersData[currentEntitySelection]
+                                  .user_personal_detail.currentWorkStatus
+                              : null}
                           </Typography>
                         </Typography>
                       </Stack>
@@ -909,7 +937,10 @@ function AdminApproveDenyUserCompanies() {
                             }}
                           >
                             {usersData[currentEntitySelection]
-                              .user_personal_detail.readinessToRtw || null}
+                              .user_personal_detail
+                              ? usersData[currentEntitySelection]
+                                  .user_personal_detail.readinessToRtw
+                              : null}
                           </Typography>
                         </Typography>
                       </Stack>
@@ -932,8 +963,10 @@ function AdminApproveDenyUserCompanies() {
                             }}
                           >
                             {usersData[currentEntitySelection]
-                              .user_personal_detail.physicalBarriersToRtw ||
-                              null}
+                              .user_personal_detail
+                              ? usersData[currentEntitySelection]
+                                  .user_personal_detail.physicalBarriersToRtw
+                              : null}
                           </Typography>
                         </Typography>
                       </Stack>
@@ -956,7 +989,10 @@ function AdminApproveDenyUserCompanies() {
                             }}
                           >
                             {usersData[currentEntitySelection]
-                              .user_personal_detail.timeFrameToRtw || null}
+                              .user_personal_detail
+                              ? usersData[currentEntitySelection]
+                                  .user_personal_detail.timeFrameToRtw
+                              : null}
                           </Typography>
                         </Typography>
                       </Stack>
@@ -979,7 +1015,10 @@ function AdminApproveDenyUserCompanies() {
                             }}
                           >
                             {usersData[currentEntitySelection]
-                              .user_personal_detail.activeTreatment || null}
+                              .user_personal_detail
+                              ? usersData[currentEntitySelection]
+                                  .user_personal_detail.activeTreatment
+                              : null}
                           </Typography>
                         </Typography>
                       </Stack>
