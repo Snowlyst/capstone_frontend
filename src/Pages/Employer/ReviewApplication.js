@@ -731,7 +731,7 @@ function ReviewApplication() {
                             </Box>
                             <Stack
                               direction="row"
-                              sx={{ mt: "0.5vh", ml: "6.6vw" }}
+                              sx={{ mt: "0.5vh", ml: "10.6vw" }}
                               spacing={1}
                             >
                               <TextField
