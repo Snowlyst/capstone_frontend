@@ -61,7 +61,7 @@ function CompanyProfile() {
                         container
                         sx={{
                           width: "10vw",
-                          height: "10vh",
+                          height: "15vh",
                           borderRadius: "20px",
                           mt: 1.5,
                           mb: 1.5,
@@ -91,7 +91,6 @@ function CompanyProfile() {
                                 component="div"
                                 sx={{
                                   width: "14vw",
-                                  height: "7vh",
                                   ml: 2,
                                   overflow: "hidden",
                                   textOverflow: "ellipsis",
