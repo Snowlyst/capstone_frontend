@@ -540,6 +540,18 @@ function EditProfile() {
                                 </Box>{" "}
                                 {userInfo.monthlySalary}
                               </Typography>
+                              <Typography
+                                variant="p"
+                                sx={{ font: theme.typography.p.fontFamily }}
+                              >
+                                <Box
+                                  component="span"
+                                  fontWeight={theme.typography.p.fontWeightBold}
+                                >
+                                  Linkedin Profile URL:
+                                </Box>{" "}
+                                {userInfo.linkedin}
+                              </Typography>
                             </Stack>
                           </div>
                         ) : (
