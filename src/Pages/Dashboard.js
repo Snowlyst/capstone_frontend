@@ -555,6 +555,27 @@ function AdminDashboard() {
                       </Link>
                     </Stack>
                   </Grid>
+                  <Grid item sx={{ mt: 3, mb: 7 }}>
+                    <Stack direction={"row"}>
+                      <Link to="/create-company">
+                        <Button
+                          variant="contained"
+                          component="span"
+                          style={{
+                            backgroundColor: "#FF6B2C",
+                            color: "white",
+                            width: "22.5vw",
+                            height: "10vh",
+                            borderRadius: "7px",
+                          }}
+                        >
+                          <Typography sx={{ fontSize: "1.4vh" }}>
+                            Add Company Information!
+                          </Typography>
+                        </Button>
+                      </Link>
+                    </Stack>
+                  </Grid>
                 </Grid>
               </Grid>
             </Grid>
