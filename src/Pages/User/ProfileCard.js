@@ -135,7 +135,7 @@ const EditProfile = () => {
               )}
 
               <Box className="social">
-                <a href=" " target="_blank" rel="noreferrer">
+                <a href="  " target="_blank" rel="noreferrer">
                   Resume
                 </a>
 
