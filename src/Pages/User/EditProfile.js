@@ -159,9 +159,6 @@ function EditProfile() {
           "Your profile has been updated.",
           "success"
         );
-        // .then(() => {
-        //   ; // Close the dialog or modal after the user acknowledges the success message.
-        // });
       } catch (error) {
         // console.log(error);
         Swal.fire(SwalMsgs.errorPosting);
@@ -198,6 +195,7 @@ function EditProfile() {
     uploadBytes(fullStorageRef, fileAdded).then(() => {
       getDownloadURL(fullStorageRef).then((url) => {
         setReturnedUrl(url);
+        handleChange("avatarUrl", url);
         setFileAdded(null);
         console.log(url);
       });
@@ -220,6 +218,7 @@ function EditProfile() {
         occupation: userInfo.occupation,
         currentWorkStatus: userInfo.currentWorkStatus,
         monthlySalary: userInfo.monthlySalary,
+        linkedIn: userInfo.linkedIn,
       };
       setFieldValues(fields);
     }
@@ -381,15 +380,7 @@ function EditProfile() {
                                 {userInfo.cancerDiagnosis}
                               </Typography>
                             </Stack>
-                            <Stack
-                              direction="column"
-                              spacing={2}
-                              pt={3}
-                              // sx={{
-                              //   justifyContent: "flex-start",
-                              //   alignItems: { xs: "flex-start", sm: "center" },
-                              // }}
-                            >
+                            <Stack direction="column" spacing={2} pt={3}>
                               <Stack direction="row">
                                 <Typography
                                   textAlign="left"
@@ -540,6 +531,7 @@ function EditProfile() {
                                 </Box>{" "}
                                 {userInfo.monthlySalary}
                               </Typography>
+
                               <Typography
                                 variant="p"
                                 sx={{ font: theme.typography.p.fontFamily }}
@@ -550,7 +542,9 @@ function EditProfile() {
                                 >
                                   Linkedin Profile URL:
                                 </Box>{" "}
-                                {userInfo.linkedin}
+                                {userInfo.linkedIn
+                                  ? userInfo.linkedIn
+                                  : "No URL provided"}
                               </Typography>
                             </Stack>
                           </div>
@@ -759,6 +753,17 @@ function EditProfile() {
                 </Select>
               </Tooltip>
             </FormControl>
+            <TextField
+              label="Linkedin Profile URL"
+              fullWidth
+              required
+              {...theme.textbox.common}
+              value={fieldValues.linkedIn}
+              sx={{
+                flex: 2,
+              }}
+              onChange={(e) => handleChange("linkedIn", e.target.value)}
+            />
           </Stack>
         </DialogContent>
         <DialogActions>
