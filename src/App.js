@@ -30,6 +30,7 @@ import AdminDashboard from "./Pages/Dashboard";
 import AdminManageExistingUserCompany from "./Pages/Administrator/AdminManageExistingUserCompany";
 import ReviewApplication from "./Pages/Employer/ReviewApplication";
 import CompanyList from "./Pages/Employer/CompanyList";
+import CreateCompany from "./Pages/Employer/CreateCompany";
 
 import CheckApplication from "./Pages/User/CheckApplication";
 function App() {
@@ -84,14 +85,12 @@ function App() {
       <Routes>
         {/* unprotected routes */}
         <Route path="/" element={<Homepage />} />
-
         <Route path="/job-categories" element={<Categories />} />
         <Route path="/job-search" element={<Search />} />
         <Route path="/company-profiles" element={<CompanyList />} />
         <Route path="/company/jobs/:jobId" element={<IndividualJobPage />} />
         <Route path="/companyprofile/:companyId" element={<CompanyProfile />} />
         <Route path="/categories/:categoryId" element={<CategoriesListing />} />
-
         {/* user routes */}
         <Route
           path="/checkapplication/:jobId"
@@ -159,7 +158,6 @@ function App() {
             />
           }
         />
-
         <Route
           path="/applications"
           element={
@@ -190,6 +188,17 @@ function App() {
               redirectTo={<Login />}
               user={currUser}
               admin={<AdminDashboard />}
+              jobseeker={<Forbidden />}
+            />
+          }
+        />
+        <Route
+          path="/create-company"
+          element={
+            <RequireAuth
+              redirectTo={<Login />}
+              user={currUser}
+              admin={<CreateCompany />}
               jobseeker={<Forbidden />}
             />
           }
@@ -240,7 +249,6 @@ function App() {
             />
           }
         />
-
         {/* These 4 Pages are Test pages, to be deleted near the end */}
         <Route path="/onemap" element={<OnemapApiTest />} />
         <Route path="/pdf" element={<PDFReadingTest />} />

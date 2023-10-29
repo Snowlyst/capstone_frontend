@@ -62,7 +62,7 @@ function ReviewApplication() {
   //disable jobseekers and non loggedin people from accessing this page
   useEffect(() => {
     if (isLoaded && !isLoading) {
-      if (!currUser || currUser.userRoleId !== 1) {
+      if (!currUser || currUser.userRoleId === 2) {
         Swal.fire(
           "Error",
           "You do not have permissions to act on that page",
