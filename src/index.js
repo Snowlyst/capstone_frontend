@@ -19,7 +19,7 @@ root.render(
       domain={process.env.REACT_APP_DOMAIN}
       clientId={process.env.REACT_APP_CLIENTID}
       authorizationParams={{
-        redirect_uri: window.location.origin,
+        redirect_uri: process.env.REACT_APP_REDIRECT_URI,
         audience: process.env.REACT_APP_AUDIENCE,
         scope: process.env.REACT_APP_SCOPE,
       }}
