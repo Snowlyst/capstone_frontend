@@ -460,7 +460,7 @@ function ReviewApplication() {
       sx={{
         backgroundColor: "#F3F1FF",
         width: "100vw",
-        height: "92vh",
+        height: "110vh",
       }}
     >
       <ThemeProvider theme={theme}>
@@ -633,7 +633,7 @@ function ReviewApplication() {
                               display: "flex",
                               backgroundColor: "white",
                               width: "42vw",
-                              height: "45.5vh",
+                              height: "55.5vh",
                               borderRadius: "40px",
                               flexDirection: "column",
                               mt: "1vh",
