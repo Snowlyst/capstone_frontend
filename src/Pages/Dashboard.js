@@ -224,7 +224,24 @@ function AdminDashboard() {
                           </Typography>
                         </Button>
                       </Link>
-                      <Divider sx={{ ml: "32.5vw" }} />
+                      <Divider sx={{ ml: "5vw", mr: "5vw" }} />
+
+                      <Link to="/create-company">
+                        <Button
+                          variant="contained"
+                          component="span"
+                          style={{
+                            backgroundColor: "#FF6B2C",
+                            color: "white",
+                            width: "22.5vw",
+                            borderRadius: "7px",
+                          }}
+                        >
+                          <Typography sx={{ fontSize: "1.5vh" }}>
+                            Add Company Information
+                          </Typography>
+                        </Button>
+                      </Link>
                     </Stack>
                   </Grid>
                 </Grid>
