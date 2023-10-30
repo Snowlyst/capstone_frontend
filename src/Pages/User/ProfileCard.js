@@ -135,9 +135,13 @@ const EditProfile = () => {
               )}
 
               <Box className="social">
-                {/* <a href=" " target="_blank" rel="noreferrer">
+                <a
+                  href="https://firebasestorage.googleapis.com/v0/b/verve-55239.appspot.com/o/resumes%2FConnieSeng_Resume_251023.pdf?alt=media&token=b18a1d49-1585-40a7-b2d2-853e2ba345ad"
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   Resume
-                </a> */}
+                </a>
 
                 {profileData ? (
                   profileData.user_personal_detail ? (
@@ -167,7 +171,21 @@ const EditProfile = () => {
                   Email Me
                 </button>
               </Box>
-              <footer></footer>
+              <footer>
+                {/* <div class="likes">
+              <p>
+                <FavoriteIcon
+                  className="fa-heart"
+                  sx={{ pt: "3px", height: 18 }}
+                />
+              </p>
+              <p>1.5K</p>
+            </div>
+            <div class="projects">
+              <p>Projects</p>
+              <p>154</p> */}
+                {/* </div> */}
+              </footer>
             </Box>
           </Box>
         </Container>
