@@ -4,9 +4,10 @@ import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../../Components/UserContext";
 import { theme } from "../../Assets/Styles/Theme";
 import { Editor } from "react-draft-wysiwyg";
+import htmlToDraft from "html-to-draftjs";
+import { ContentState, EditorState, convertToRaw } from "draft-js";
 import draftToHtml from "draftjs-to-html";
-import { EditorState, convertToRaw } from "draft-js";
-import { stateFromHTML } from "draft-js-import-html";
+// import { stateFromHTML } from "draft-js-import-html";
 import "draft-js/dist/Draft.css";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import AxiosLoader from "../../Components/AxiosLoader";
@@ -154,28 +155,42 @@ function JobPost() {
         setDisplayBanner(false);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currUser]);
 
   useEffect(() => {
     if (jobInfo !== "") {
-      handleChange("jobTitle", jobInfo[0].mainTitle);
-      handleChange("jobDescription", jobInfo[0].description);
-      const convertedDescription = stateFromHTML(jobInfo[0].description);
-      onEditorStateChange(EditorState.createWithContent(convertedDescription));
-      setDescriptionError(false);
-    }
+      handleChange("jobTitle", jobInfo.mainTitle);
+      handleChange("jobDescription", jobInfo.description);
+      console.log("JobInfo Description", jobInfo.description);
+      // const convertedDescription = stringToEditorState(jobInfo.description);
+      // console.log(convertedDescription);
+      //       onEditorStateChange(jobInfo.description);
+      const contentBlock = htmlToDraft(jobInfo.description);
+      if (contentBlock) {
+        const contentState = ContentState.createFromBlockArray(
+          contentBlock.contentBlocks
+        );
+        const editorState = EditorState.createWithContent(contentState);
+        onEditorStateChange(editorState);
+        setDescriptionError(false);
+      }
+    } // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [jobInfo]);
 
-  const onEditorStateChange = (newEditorState) => {
+  const onEditorStateChange = (editorState) => {
     const editorHasText = editorState.getCurrentContent().hasText();
     if (!editorHasText) {
       setDescriptionError(true);
     } else {
       setDescriptionError(false);
     }
-    setEditorState(newEditorState);
+
+    setEditorState(editorState);
+
+    // setEditorState(newEditorState);
     const htmlMessage = draftToHtml(
-      convertToRaw(newEditorState.getCurrentContent())
+      convertToRaw(editorState.getCurrentContent())
     );
     setRawMessage(htmlMessage);
     handleChange("jobDescription", htmlMessage);
@@ -192,6 +207,19 @@ function JobPost() {
       setDescriptionError(false);
     }
     const newFieldErrors = {};
+    // Object.keys(fieldValues).forEach((fieldName) => {
+    //   const value = fieldValues[fieldName];
+    //   if (
+    //     (typeof value === "string" && value.trim() === "") ||
+    //     (typeof value === "object" &&
+    //       value &&
+    //       value.hasOwnProperty("name") &&
+    //       value.name.trim() === "")
+    //   ) {
+    //     newFieldErrors[fieldName] = true;
+    //     error = true;
+    //   }
+    // });
     Object.keys(fieldValues).forEach((fieldName) => {
       if (
         typeof fieldValues[fieldName] === "string" &&
@@ -257,6 +285,7 @@ function JobPost() {
       const info = response.data;
       if (info !== null) {
         setJobInfo(info);
+        console.log("Line 263 info", info);
         setUrl("");
 
         Swal.fire(SwalMsgs.importInfoSuccessful("job information"));
