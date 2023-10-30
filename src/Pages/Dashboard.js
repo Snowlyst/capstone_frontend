@@ -11,11 +11,13 @@ import {
 } from "@mui/material";
 import { theme } from "../Assets/Styles/Theme";
 import { useNavigate, Link } from "react-router-dom";
+import Swal from "sweetalert2";
 
 function AdminDashboard() {
   const { currUser } = useUserContext();
   const [accessToken, setAccessToken] = useState(null);
   const [displayMode, setDisplayMode] = useState(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (currUser) {
@@ -222,7 +224,24 @@ function AdminDashboard() {
                           </Typography>
                         </Button>
                       </Link>
-                      <Divider sx={{ ml: "32.5vw" }} />
+                      <Divider sx={{ ml: "5vw", mr: "5vw" }} />
+
+                      <Link to="/create-company">
+                        <Button
+                          variant="contained"
+                          component="span"
+                          style={{
+                            backgroundColor: "#FF6B2C",
+                            color: "white",
+                            width: "22.5vw",
+                            borderRadius: "7px",
+                          }}
+                        >
+                          <Typography sx={{ fontSize: "1.5vh" }}>
+                            Add Company Information
+                          </Typography>
+                        </Button>
+                      </Link>
                     </Stack>
                   </Grid>
                 </Grid>
@@ -548,6 +567,27 @@ function AdminDashboard() {
                         >
                           <Typography sx={{ fontSize: "1.4vh" }}>
                             Check your Job Listings!
+                          </Typography>
+                        </Button>
+                      </Link>
+                    </Stack>
+                  </Grid>
+                  <Grid item sx={{ mt: 3, mb: 7 }}>
+                    <Stack direction={"row"}>
+                      <Link to="/create-company">
+                        <Button
+                          variant="contained"
+                          component="span"
+                          style={{
+                            backgroundColor: "#FF6B2C",
+                            color: "white",
+                            width: "22.5vw",
+                            height: "10vh",
+                            borderRadius: "7px",
+                          }}
+                        >
+                          <Typography sx={{ fontSize: "1.4vh" }}>
+                            Add Company Information!
                           </Typography>
                         </Button>
                       </Link>
