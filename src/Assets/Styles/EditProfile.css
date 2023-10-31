@@ -72,19 +72,21 @@
   text-decoration: none;
 }
 
-.social-button {
-  text-align: center;
-  border: solid 2px #ff6b6c;
-  width: 75px;
-  padding: 5px 0;
-  border-radius: 5px;
-  text-decoration: none;
-}
-
 #login-container .social a:hover {
   background: #ff6b6c;
   color: white;
   cursor: pointer;
+}
+
+.social-button {
+  /* background: #ff6b6c; */
+  text-align: center;
+  border: solid 2px #ff6b6c;
+  color: white;
+  width: 75px;
+  padding: 5px 0;
+  border-radius: 5px;
+  text-decoration: none;
 }
 
 #login-container .align-center {
