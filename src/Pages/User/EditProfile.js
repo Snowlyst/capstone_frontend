@@ -1,3 +1,4 @@
+import * as React from "react";
 import { useState, useEffect } from "react";
 import {
   Avatar,
@@ -38,6 +39,7 @@ import * as SwalMsgs from "../../Utils/SwalMsgs";
 import { useUserContext } from "../../Components/UserContext";
 import AxiosLoader from "../../Components/AxiosLoader";
 import ProfileCard from "./ProfileCard";
+import ResumeList from "./ResumeList";
 import "../../Assets/Styles/EditProfile.css";
 
 function EditProfile() {
@@ -47,6 +49,7 @@ function EditProfile() {
   const [userInfo, setUserInfo] = useState({});
   const [open, setOpen] = useState(false);
   const [cardOpen, setCardOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [fieldValues, setFieldValues] = useState({});
   const [fileAdded, setFileAdded] = useState(null);
   const [returnedUrl, setReturnedUrl] = useState("");
@@ -54,8 +57,9 @@ function EditProfile() {
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
   const STORAGE_KEY = "images/";
 
-  const handleClickOpen = () => {
-    setOpen(true);
+  const handleResumeSelect = (url) => {
+    handleChange("defaultResumeUrl", url);
+    setDialogOpen(false);
   };
 
   const handleClose = () => {
@@ -178,7 +182,6 @@ function EditProfile() {
           const userProfile = await axios.get(
             `${BACKEND_URL}/users/personalinfo/${currUser.id}`
           );
-          console.log(userProfile.data.user_personal_detail);
           setUserInfo(userProfile.data.user_personal_detail);
         } catch (error) {
           console.error("API call failed: ", error);
@@ -197,7 +200,6 @@ function EditProfile() {
         setReturnedUrl(url);
         handleChange("avatarUrl", url);
         setFileAdded(null);
-        console.log(url);
       });
     });
   };
@@ -219,6 +221,7 @@ function EditProfile() {
         currentWorkStatus: userInfo.currentWorkStatus,
         monthlySalary: userInfo.monthlySalary,
         linkedIn: userInfo.linkedIn,
+        defaultResumeUrl: userInfo.defaultResumeUrl,
       };
       setFieldValues(fields);
     }
@@ -412,7 +415,7 @@ function EditProfile() {
                                   <Button
                                     classes={{ root: "blue" }}
                                     variant="contained"
-                                    onClick={handleClickOpen}
+                                    onClick={() => setOpen(true)}
                                     sx={{
                                       borderTopLeftRadius: 0,
                                       borderBottomLeftRadius: 0,
@@ -546,6 +549,39 @@ function EditProfile() {
                                   ? userInfo.linkedIn
                                   : "No URL provided"}
                               </Typography>
+                              {userInfo.defaultResumeUrl ? (
+                                <Button
+                                  classes={{ root: "orange" }}
+                                  variant="contained"
+                                  onClick={() =>
+                                    window.open(
+                                      userInfo.defaultResumeUrl,
+                                      "_blank"
+                                    )
+                                  }
+                                  sx={{
+                                    width: "180px",
+                                  }}
+                                >
+                                  View Default Resume
+                                </Button>
+                              ) : (
+                                <Typography
+                                  variant="p"
+                                  sx={{ font: theme.typography.p.fontFamily }}
+                                >
+                                  <Box
+                                    component="span"
+                                    fontWeight={
+                                      theme.typography.p.fontWeightBold
+                                    }
+                                  >
+                                    You do not have a default resume on your
+                                    profile card. Please click edit profile to
+                                    add one.
+                                  </Box>
+                                </Typography>
+                              )}
                             </Stack>
                           </div>
                         ) : (
@@ -764,6 +800,28 @@ function EditProfile() {
               }}
               onChange={(e) => handleChange("linkedIn", e.target.value)}
             />
+            <TextField
+              label="Resume URL"
+              fullWidth
+              required
+              {...theme.textbox.common}
+              value={fieldValues.defaultResumeUrl}
+              sx={{
+                flex: 2,
+              }}
+              onChange={(e) => handleChange("defaultResumeUrl", e.target.value)}
+            />
+            <Button
+              classes={{ root: "orange" }}
+              variant="contained"
+              onClick={() => setDialogOpen(true)}
+              sx={{
+                width: "140px",
+              }}
+            >
+              Select Resume
+            </Button>
+            {/* )} */}
           </Stack>
         </DialogContent>
         <DialogActions>
@@ -771,24 +829,22 @@ function EditProfile() {
           <Button onClick={handleSubmit}>Submit</Button>
         </DialogActions>
       </Dialog>
-      <Dialog onClose={() => setCardOpen(false)} open={cardOpen}>
-        <DialogTitle>
-          <Typography
-            variant="h5"
-            sx={{
-              font: theme.typography.h5.fontFamily,
-              fontWeight: theme.typography.h5.fontWeightBold,
-            }}
-          >
-            Profile Card
-          </Typography>
-        </DialogTitle>
+      <Dialog
+        onClose={() => setCardOpen(false)}
+        open={cardOpen}
+        sx={{ width: "100%" }}
+      >
         <DialogContent>
           <ProfileCard />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setCardOpen(false)}>Close</Button>
         </DialogActions>
+      </Dialog>
+      <Dialog fullScreen open={dialogOpen} onClose={() => setDialogOpen(false)}>
+        <div>
+          <ResumeList selectMode={true} onResumeSelect={handleResumeSelect} />
+        </div>
       </Dialog>
     </ThemeProvider>
   );
