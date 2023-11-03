@@ -135,13 +135,23 @@ const EditProfile = () => {
               )}
 
               <Box className="social">
-                <a
-                  href="https://firebasestorage.googleapis.com/v0/b/verve-55239.appspot.com/o/resumes%2FConnieSeng_Resume_251023.pdf?alt=media&token=b18a1d49-1585-40a7-b2d2-853e2ba345ad"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Resume
-                </a>
+                {profileData ? (
+                  profileData.user_personal_detail ? (
+                    <a
+                      href={profileData.user_personal_detail.defaultResumeUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Resume
+                    </a>
+                  ) : (
+                    <button className="social-button" disabled>
+                      No Default Resume
+                    </button>
+                  )
+                ) : (
+                  ""
+                )}
 
                 {profileData ? (
                   profileData.user_personal_detail ? (
@@ -153,7 +163,7 @@ const EditProfile = () => {
                       LinkedIn
                     </a>
                   ) : (
-                    <button class="social-button" disabled>
+                    <button className="social-button" disabled>
                       No Url
                     </button>
                   )
