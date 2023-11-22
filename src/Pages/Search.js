@@ -254,6 +254,7 @@ function Search() {
       .post(`${BACKEND_URL}/listings/search/`, dataToSend)
       .then((info) => {
         setJobsData(info.data);
+        setSearchDone(true);
         setJobsDisplay(
           info.data.map((info, index) => {
             return (
@@ -359,7 +360,6 @@ function Search() {
             );
           })
         );
-        setSearchDone(true);
       })
       .catch((error) => {
         console.log(error);
@@ -528,11 +528,14 @@ function Search() {
                   {jobsDisplay}
                 </Box>
               ) : null}
-              {/* {jobsData.length === 0 && searchDone ? (
-                <Typography variant="h5" sx={{ ml: "10vw", mt: "20vh" }}>
+              {jobsData.length === 0 && searchDone ? (
+                <Typography
+                  variant="h5"
+                  sx={{ ml: "10vw", mt: "20vh", fontSize: "1.3vw" }}
+                >
                   No available listings from search parameters provided!
                 </Typography>
-              ) : null} */}
+              ) : null}
               {searchDone ? null : (
                 <Typography variant="h5" sx={{ ml: "10vw", mt: "20vh" }}>
                   Start a search to get listings here!

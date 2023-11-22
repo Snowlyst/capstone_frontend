@@ -31,7 +31,7 @@ import { useUserContext } from "../../Components/UserContext";
 const STORAGE_KEY = "resumes/";
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
-function ResumeList() {
+function ResumeList({ selectMode = false, onResumeSelect = () => {} }) {
   const [fileAdded, setFileAdded] = useState(null);
   const [displayedResume, setDisplayedResume] = useState([]);
   const [resumeName, setResumeName] = useState("");
@@ -47,6 +47,7 @@ function ResumeList() {
   const [currentResumeSelection, setCurrentResumeSelection] = useState("");
 
   const portedJobQuery = new URLSearchParams(useLocation().search).get("jobId");
+
   useEffect(() => {
     if (portedJobQuery) {
       setJobToApply(Number(portedJobQuery));
@@ -73,6 +74,11 @@ function ResumeList() {
     border: "2px solid #000",
     boxShadow: 24,
     p: 4,
+  };
+
+  // handle resume click for edit profile mode (selectedMode)
+  const handleResumeClick = (value) => {
+    onResumeSelect(value);
   };
 
   // open modal
@@ -188,6 +194,7 @@ function ResumeList() {
               const updatedTime = new Date(
                 information.updatedAt
               ).toLocaleDateString();
+
               return (
                 <Grid
                   key={index}
@@ -200,7 +207,13 @@ function ResumeList() {
                     borderRadius: "20px",
                     mt: 1.5,
                     mb: 1.5,
+                    cursor: selectMode ? "pointer" : "default",
                   }}
+                  onClick={
+                    selectMode
+                      ? () => handleResumeClick(information.resumeUrl)
+                      : null
+                  }
                 >
                   <Grid item xs={0.3} />
                   <Grid item xs={5.7} sx={{ pt: 1 }}>
@@ -254,7 +267,7 @@ function ResumeList() {
                     </Stack>
                   </Grid>
                   <Grid item xs={2} sx={{ mt: 2.1 }}>
-                    {!applyingMode ? (
+                    {!applyingMode && !selectMode ? (
                       <Button
                         variant="contained"
                         component="span"
@@ -274,16 +287,20 @@ function ResumeList() {
                         <EditIcon />
                         Edit
                       </Button>
-                    ) : (
+                    ) : applyingMode ? (
                       <Button
                         variant="contained"
                         component="span"
                         style={{ backgroundColor: "#0E0140", color: "white" }}
-                        onClick={() => selectResume(information.id)}
+                        onClick={() => {
+                          selectResume(information.id);
+                        }}
                       >
                         <EditIcon />
                         Select
                       </Button>
+                    ) : (
+                      ""
                     )}
 
                     <Modal open={openModal} onClose={() => handleCloseModal()}>
@@ -385,13 +402,16 @@ function ResumeList() {
   };
 
   const selectResume = (id) => {
-    setCurrentResumeSelection(id);
-    Swal.fire(
-      "Success",
-      "Selected Resume has been chosen, please proceed with application.",
-      "success"
-    );
+    if (applyingMode) {
+      setCurrentResumeSelection(id);
+      Swal.fire(
+        "Success",
+        "Selected Resume has been chosen, please proceed with application.",
+        "success"
+      );
+    }
   };
+
   return (
     <Box>
       <ThemeProvider theme={theme}>
@@ -405,107 +425,113 @@ function ResumeList() {
             alignItems: "center",
           }}
         >
-          <Typography
-            variant="h4"
-            sx={{
-              fontWeight: theme.typography.h4.fontWeightBold,
-              mt: 3,
-              mb: 1.5,
-            }}
-          >
-            Resume
-          </Typography>
-          {/* URL to change later when page is up */}
-          <Typography
-            variant="darkP"
-            sx={{
-              fontWeight: theme.typography.darkP.fontWeight,
-              color: theme.typography.darkP.color,
-              mb: 4,
-            }}
-          >
-            Please upload your resume. If you do not have one currently, click{" "}
-            <Link to="/createresume">here</Link> to start making one!
-          </Typography>
-          <Typography
-            variant="p"
-            sx={{
-              fontSize: "1.33vh",
-              pr: "50vw",
-            }}
-          >
-            Resume Requirements?
-          </Typography>
-          <Grid
-            container
-            justifyContent="center"
-            backgroundColor="white"
-            sx={{ minHeight: "8vh", width: "65vw", borderRadius: "20px" }}
-          >
-            <Grid item xs={0.3} />
-            <Grid item xs={9.0} sx={{ pt: 0.7 }}>
-              <Stack direction="column">
-                <Stack direction="row">
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontWeight: theme.typography.h6.fontWeightBold,
-                      fontSize: "2.1vh",
+          {!selectMode ? (
+            <div>
+              <Typography
+                variant="h4"
+                sx={{
+                  fontWeight: theme.typography.h4.fontWeightBold,
+                  mt: 3,
+                  mb: 1.5,
+                }}
+              >
+                Resume
+              </Typography>
+
+              <Typography
+                variant="darkP"
+                sx={{
+                  fontWeight: theme.typography.darkP.fontWeight,
+                  color: theme.typography.darkP.color,
+                  mb: 4,
+                }}
+              >
+                Please upload your resume. If you do not have one currently,
+                click <Link to="/createresume">here</Link> to start making one!
+              </Typography>
+              <Typography
+                variant="p"
+                sx={{
+                  fontSize: "1.33vh",
+                  pr: "50vw",
+                }}
+              >
+                Resume Requirements?
+              </Typography>
+              <Grid
+                container
+                justifyContent="center"
+                backgroundColor="white"
+                sx={{ minHeight: "8vh", width: "65vw", borderRadius: "20px" }}
+              >
+                <Grid item xs={0.3} />
+                <Grid item xs={9.0} sx={{ pt: 0.7 }}>
+                  <Stack direction="column">
+                    <Stack direction="row">
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          fontWeight: theme.typography.h6.fontWeightBold,
+                          fontSize: "2.1vh",
+                        }}
+                      >
+                        Upload Resume
+                      </Typography>
+                      <ContentPasteSearchIcon sx={{ ml: 0.5 }} />
+                    </Stack>
+                    <label>
+                      {fileAdded ? (
+                        <Typography variant="p">{fileAdded.name}</Typography>
+                      ) : (
+                        <Typography
+                          variant="p"
+                          sx={{
+                            fontSize: "1.4vh",
+                          }}
+                        >
+                          Click here to select the file to upload
+                        </Typography>
+                      )}
+
+                      <input
+                        hidden
+                        accept="application/pdf"
+                        type="file"
+                        onChange={(e) => {
+                          setFileAdded(e.target.files[0]);
+                        }}
+                      />
+                    </label>
+                  </Stack>
+                </Grid>
+                <Grid item xs={2.7} sx={{ mt: "1.7vh" }}>
+                  <Button
+                    variant="contained"
+                    component="span"
+                    style={{
+                      backgroundColor: "#FF6B2C",
+                      color: "white",
+                      height: "4vh",
+                      width: "12vw",
                     }}
+                    onClick={submitData}
                   >
-                    Upload Resume
-                  </Typography>
-                  <ContentPasteSearchIcon sx={{ ml: 0.5 }} />
-                </Stack>
-                <label>
-                  {fileAdded ? (
-                    <Typography variant="p">{fileAdded.name}</Typography>
-                  ) : (
+                    <DriveFolderUploadIcon sx={{ mr: 1 }} />
                     <Typography
-                      variant="p"
                       sx={{
-                        fontSize: "1.4vh",
+                        fontSize: "1.5vh",
+                        fontWeight: theme.typography.h6.fontWeightBold,
                       }}
                     >
-                      Click here to select the file to upload
+                      Upload
                     </Typography>
-                  )}
-
-                  <input
-                    hidden
-                    accept="application/pdf"
-                    type="file"
-                    onChange={(e) => {
-                      setFileAdded(e.target.files[0]);
-                    }}
-                  />
-                </label>
-              </Stack>
-            </Grid>
-            <Grid item xs={2.7} sx={{ mt: "1.7vh" }}>
-              <Button
-                variant="contained"
-                component="span"
-                style={{
-                  backgroundColor: "#FF6B2C",
-                  color: "white",
-                  height: "4vh",
-                  width: "12vw",
-                }}
-                onClick={submitData}
-              >
-                <DriveFolderUploadIcon sx={{ mr: 1 }} />
-                <Typography
-                  sx={{
-                    fontSize: "1.5vh",
-                    fontWeight: theme.typography.h6.fontWeightBold,
-                  }}
-                >
-                  Upload
-                </Typography>
-              </Button>
-            </Grid>
-          </Grid>
+                  </Button>
+                </Grid>
+              </Grid>
+            </div>
+          ) : (
+            ""
+          )}
           <Divider sx={{ width: "50vw", mt: 5 }} />
           <Typography
             variant="h4"

@@ -62,7 +62,7 @@ function ReviewApplication() {
   //disable jobseekers and non loggedin people from accessing this page
   useEffect(() => {
     if (isLoaded && !isLoading) {
-      if (!currUser || currUser.userRoleId !== 1) {
+      if (!currUser || currUser.userRoleId === 2) {
         Swal.fire(
           "Error",
           "You do not have permissions to act on that page",
@@ -460,7 +460,7 @@ function ReviewApplication() {
       sx={{
         backgroundColor: "#F3F1FF",
         width: "100vw",
-        height: "92vh",
+        height: "110vh",
       }}
     >
       <ThemeProvider theme={theme}>
@@ -633,7 +633,7 @@ function ReviewApplication() {
                               display: "flex",
                               backgroundColor: "white",
                               width: "42vw",
-                              height: "45.5vh",
+                              height: "55.5vh",
                               borderRadius: "40px",
                               flexDirection: "column",
                               mt: "1vh",
