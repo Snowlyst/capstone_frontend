@@ -532,41 +532,45 @@ function AdminDashboard() {
                   </Grid>
                   <Grid item sx={{ mt: 3, mb: 7 }}>
                     <Grid container width={"57.5vw"}>
-                      <Link to="/post-job">
-                        <Button
-                          variant="contained"
-                          component="span"
-                          style={{
-                            backgroundColor: "#FF6B2C",
-                            color: "white",
-                            width: "22.5vw",
-                            height: "10vh",
-                            borderRadius: "7px",
-                          }}
-                        >
-                          <Typography sx={{ fontSize: "1.4vh" }}>
-                            Post a New Job!
-                          </Typography>
-                        </Button>
-                      </Link>
-                      <Divider sx={{ ml: "5vw", mr: "5vw" }} />
-                      <Link to="/joblisting">
-                        <Button
-                          variant="contained"
-                          component="span"
-                          style={{
-                            backgroundColor: "#FF6B2C",
-                            color: "white",
-                            width: "22.5vw",
-                            height: "10vh",
-                            borderRadius: "7px",
-                          }}
-                        >
-                          <Typography sx={{ fontSize: "1.4vh" }}>
-                            Check your Job Listings!
-                          </Typography>
-                        </Button>
-                      </Link>
+                      <Grid item xs={12} sm={4}>
+                        <Link to="/post-job">
+                          <Button
+                            variant="contained"
+                            component="span"
+                            style={{
+                              backgroundColor: "#FF6B2C",
+                              color: "white",
+                              width: "100%",
+                              minHeight: "10vh",
+                              borderRadius: "7px",
+                            }}
+                          >
+                            <Typography sx={{ fontSize: "1.4vh" }}>
+                              Post a New Job!
+                            </Typography>
+                          </Button>
+                        </Link>
+                      </Grid>
+                      <Grid item xs={12} sm={4}></Grid>
+                      <Grid item xs={12} sm={4}>
+                        <Link to="/joblisting">
+                          <Button
+                            variant="contained"
+                            component="span"
+                            style={{
+                              backgroundColor: "#FF6B2C",
+                              color: "white",
+                              width: "100%",
+                              minHeight: "10vh",
+                              borderRadius: "7px",
+                            }}
+                          >
+                            <Typography sx={{ fontSize: "1.4vh" }}>
+                              Check your Job Listings!
+                            </Typography>
+                          </Button>
+                        </Link>
+                      </Grid>
                     </Grid>
                   </Grid>
                 </Grid>
