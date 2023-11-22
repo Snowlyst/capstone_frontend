@@ -73,8 +73,9 @@ function Search() {
                   justifyContent="center"
                   backgroundColor="white"
                   sx={{
-                    height: "10vh",
-                    width: "45vw",
+                    minHeight: "10vh",
+                    minWidth: "45vw",
+                    maxWidth: "60vw",
                     borderRadius: "20px",
                     mt: 1.5,
                     mb: 1.5,
@@ -262,8 +263,9 @@ function Search() {
                 justifyContent="center"
                 backgroundColor="white"
                 sx={{
-                  height: "10vh",
-                  width: "45vw",
+                  minHeight: "10vh",
+                  minWidth: "45vw",
+                  maxWidth: "60vw",
                   borderRadius: "20px",
                   mt: 1.5,
                   mb: 1.5,
@@ -384,7 +386,7 @@ function Search() {
           sx={{
             backgroundColor: "#F3F1FF",
             width: "100vw",
-            height: "93vh",
+            minHeight: "93vh",
             flexDirection: "row",
           }}
         >
@@ -465,7 +467,7 @@ function Search() {
                 justifyContent="center"
                 backgroundColor="white"
                 sx={{
-                  height: "8vh",
+                  minHeight: "8vh",
                   width: "45vw",
                   borderRadius: "20px",
                   mt: "4vh",
