@@ -8,10 +8,8 @@ import {
   Divider,
 } from "@mui/material";
 import axios from "axios";
-import Swal from "sweetalert2";
 import { theme } from "../../Assets/Styles/Theme";
 import { useParams, Link } from "react-router-dom";
-//for auth
 import { useUserContext } from "../../Components/UserContext";
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -19,7 +17,7 @@ function CompanyProfile() {
   const [companyId, setCompanyId] = useState(null);
   const [companyData, setCompanyData] = useState("");
   const [companyJobs, setCompanyJobs] = useState("");
-  const { currUser, setCurrUser } = useUserContext();
+  const { currUser } = useUserContext();
   const [accessToken, setAccessToken] = useState("");
 
   const param = useParams();

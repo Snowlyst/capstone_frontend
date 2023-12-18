@@ -81,7 +81,7 @@ function HomepageCopy() {
             currentUser.role = ROLES.employer;
             console.log("Role: ", role);
           } else if (role === "admin") {
-            currentUser.role = ROLES.employer;
+            currentUser.role = ROLES.admin;
             console.log("Role: ", role);
           }
         }

@@ -465,7 +465,7 @@ function Search() {
                 justifyContent="center"
                 backgroundColor="white"
                 sx={{
-                  height: "8vh",
+                  height: "16vh",
                   width: "45vw",
                   borderRadius: "20px",
                   mt: "4vh",
