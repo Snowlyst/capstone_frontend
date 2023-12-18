@@ -202,7 +202,7 @@ function ResumeList({ selectMode = false, onResumeSelect = () => {} }) {
                   justifyContent="center"
                   backgroundColor="white"
                   sx={{
-                    height: "8vh",
+                    minHeight: "8vh",
                     width: "65vw",
                     borderRadius: "20px",
                     mt: 1.5,
@@ -462,7 +462,7 @@ function ResumeList({ selectMode = false, onResumeSelect = () => {} }) {
                 container
                 justifyContent="center"
                 backgroundColor="white"
-                sx={{ height: "8vh", width: "65vw", borderRadius: "20px" }}
+                sx={{ minHeight: "8vh", width: "65vw", borderRadius: "20px" }}
               >
                 <Grid item xs={0.3} />
                 <Grid item xs={9.0} sx={{ pt: 0.7 }}>

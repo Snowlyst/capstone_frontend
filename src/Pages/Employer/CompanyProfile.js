@@ -306,7 +306,7 @@ function CompanyProfile() {
                   <Typography
                     variant="p"
                     sx={{
-                      fontSize: theme.typography.h6.fontSize,
+                      fontSize: "2.3vw",
                       overflow: "auto",
                       textOverflow: "ellipsis",
                       WebkitLineClamp: "20",

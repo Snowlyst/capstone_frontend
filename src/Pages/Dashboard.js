@@ -42,13 +42,13 @@ function AdminDashboard() {
             sx={{
               backgroundColor: "#F3F1FF",
               width: "100vw",
-              height: "110vh",
+              minHeight: "110vh",
             }}
           >
             <Grid
               container
               sx={{
-                height: "92vh",
+                minHeight: "92vh",
                 flexDirection: "column",
                 alignItems: "center",
               }}
@@ -65,7 +65,7 @@ function AdminDashboard() {
                 item
                 sx={{
                   backgroundColor: "white",
-                  height: "11vh",
+                  minHeight: "11vh",
                   width: "55vw",
                   borderRadius: "20px",
                   mt: "3vh",
@@ -76,7 +76,7 @@ function AdminDashboard() {
                     variant="darkP"
                     sx={{
                       fontWeight: theme.typography.darkP.fontWeightBold,
-                      fontSize: 15,
+                      fontSize: "1.5vh",
                       pt: 1.3,
                       pl: 2,
                     }}
@@ -87,7 +87,7 @@ function AdminDashboard() {
                     variant="darkP"
                     sx={{
                       fontWeight: theme.typography.darkP.fontWeightBold,
-                      fontSize: 15,
+                      fontSize: "1.5vh",
                       pt: 3,
                       pl: 2,
                     }}
@@ -101,7 +101,7 @@ function AdminDashboard() {
               <Grid
                 item
                 sx={{
-                  height: "59vh",
+                  minHeight: "59vh",
                   width: "55vw",
                   borderRadius: "20px",
                   mt: "3vh",
@@ -111,7 +111,7 @@ function AdminDashboard() {
                   container
                   sx={{
                     flexDirection: "column",
-                    height: "59vh",
+                    minHeight: "59vh",
                     width: "55vw",
                     alignItems: "center",
                   }}
@@ -125,41 +125,47 @@ function AdminDashboard() {
                     </Typography>
                   </Grid>
                   <Grid item sx={{ mt: 3, mb: 7 }}>
-                    <Stack direction={"row"}>
-                      <Link to="/joblisting">
-                        <Button
-                          variant="contained"
-                          component="span"
-                          style={{
-                            backgroundColor: "#FF6B2C",
-                            color: "white",
-                            width: "22.5vw",
-                            borderRadius: "7px",
-                          }}
-                        >
-                          <Typography sx={{ fontSize: 14 }}>
-                            To your Job Listings
-                          </Typography>
-                        </Button>
-                      </Link>
-                      <Divider sx={{ ml: "5vw", mr: "5vw" }} />
-                      <Link to="/admin/checkjobs">
-                        <Button
-                          variant="contained"
-                          component="span"
-                          style={{
-                            backgroundColor: "#FF6B2C",
-                            color: "white",
-                            width: "22.5vw",
-                            borderRadius: "7px",
-                          }}
-                        >
-                          <Typography sx={{ fontSize: 14 }}>
-                            Approve/Deny Job Listing Applications
-                          </Typography>
-                        </Button>
-                      </Link>
-                    </Stack>
+                    <Grid container width={"57.5vw"}>
+                      <Grid item xs={12} sm={4}>
+                        <Link to="/joblisting">
+                          <Button
+                            variant="contained"
+                            component="span"
+                            style={{
+                              backgroundColor: "#FF6B2C",
+                              color: "white",
+                              width: "100%",
+                              borderRadius: "7px",
+                              minHeight: "7vh",
+                            }}
+                          >
+                            <Typography sx={{ fontSize: "1.4vh" }}>
+                              To your Job Listings
+                            </Typography>
+                          </Button>
+                        </Link>
+                      </Grid>
+                      <Grid item xs={0} sm={4}></Grid>
+                      <Grid item xs={12} sm={4}>
+                        <Link to="/admin/checkjobs">
+                          <Button
+                            variant="contained"
+                            component="span"
+                            style={{
+                              backgroundColor: "#FF6B2C",
+                              color: "white",
+                              width: "100%",
+                              borderRadius: "7px",
+                              minHeight: "7vh",
+                            }}
+                          >
+                            <Typography sx={{ fontSize: "1.4vh" }}>
+                              Approve/Deny Job Listing Applications
+                            </Typography>
+                          </Button>
+                        </Link>
+                      </Grid>
+                    </Grid>
                   </Grid>
                   <Grid item>
                     <Typography
@@ -170,79 +176,70 @@ function AdminDashboard() {
                     </Typography>
                   </Grid>
                   <Grid item sx={{ mt: 3, mb: 7 }}>
-                    <Stack direction={"row"}>
-                      <Link to="/post-job">
-                        <Button
-                          variant="contained"
-                          component="span"
-                          style={{
-                            backgroundColor: "#FF6B2C",
-                            color: "white",
-                            width: "22.5vw",
-                            borderRadius: "7px",
-                          }}
-                        >
-                          <Typography sx={{ fontSize: 14 }}>
-                            Post a Job
-                          </Typography>
-                        </Button>
-                      </Link>
-                      <Divider sx={{ ml: "5vw", mr: "5vw" }} />
-                      <Link to="/admin/checkusercompanies">
-                        <Button
-                          variant="contained"
-                          component="span"
-                          style={{
-                            backgroundColor: "#FF6B2C",
-                            color: "white",
-                            width: "22.5vw",
-                            borderRadius: "7px",
-                          }}
-                        >
-                          <Typography sx={{ fontSize: "1.25vh" }}>
-                            Approve/Reject Unapproved Users/Companies
-                          </Typography>
-                        </Button>
-                      </Link>
-                    </Stack>
+                    <Grid container width={"57.5vw"}>
+                      <Grid item xs={12} sm={4}>
+                        <Link to="/post-job">
+                          <Button
+                            variant="contained"
+                            component="span"
+                            style={{
+                              backgroundColor: "#FF6B2C",
+                              color: "white",
+                              minHeight: "7vh",
+                              width: "100%",
+                              borderRadius: "7px",
+                            }}
+                          >
+                            <Typography sx={{ fontSize: "1.4vh" }}>
+                              Post a Job
+                            </Typography>
+                          </Button>
+                        </Link>
+                      </Grid>
+                      <Grid item xs={0} sm={4}></Grid>
+                      <Grid item xs={12} sm={4}>
+                        <Link to="/admin/checkusercompanies">
+                          <Button
+                            variant="contained"
+                            component="span"
+                            style={{
+                              backgroundColor: "#FF6B2C",
+                              color: "white",
+                              width: "100%",
+                              minHeight: "7vh",
+                              borderRadius: "7px",
+                            }}
+                          >
+                            <Typography sx={{ fontSize: "1.25vh" }}>
+                              Approve/Reject Unapproved Users/Companies
+                            </Typography>
+                          </Button>
+                        </Link>
+                      </Grid>
+                    </Grid>
                   </Grid>
                   <Grid item sx={{ mt: 3, mb: 7 }}>
-                    <Stack direction={"row"}>
-                      <Link to="/admin/manageusercompanies">
-                        <Button
-                          variant="contained"
-                          component="span"
-                          style={{
-                            backgroundColor: "#FF6B2C",
-                            color: "white",
-                            width: "22.5vw",
-                            borderRadius: "7px",
-                          }}
-                        >
-                          <Typography sx={{ fontSize: "1.4vh" }}>
-                            Manage Existing Users/Companies
-                          </Typography>
-                        </Button>
-                      </Link>
-                      <Divider sx={{ ml: "5vw", mr: "5vw" }} />
-
-                      <Link to="/create-company">
-                        <Button
-                          variant="contained"
-                          component="span"
-                          style={{
-                            backgroundColor: "#FF6B2C",
-                            color: "white",
-                            width: "22.5vw",
-                            borderRadius: "7px",
-                          }}
-                        >
-                          <Typography sx={{ fontSize: "1.5vh" }}>
-                            Add Company Information
-                          </Typography>
-                        </Button>
-                      </Link>
-                    </Stack>
+                    <Grid container width={"57.5vw"}>
+                      <Grid item xs={12}>
+                        <Link to="/admin/manageusercompanies">
+                          <Button
+                            variant="contained"
+                            component="span"
+                            style={{
+                              backgroundColor: "#FF6B2C",
+                              color: "white",
+                              width: "100%",
+                              minHeight: "7vh",
+                              borderRadius: "7px",
+                            }}
+                          >
+                            <Typography sx={{ fontSize: "1.4vh" }}>
+                              Manage Existing Users/Companies
+                            </Typography>
+                          </Button>
+                        </Link>
+                      </Grid>
+                    </Grid>
                   </Grid>
                 </Grid>
               </Grid>
@@ -254,13 +251,13 @@ function AdminDashboard() {
             sx={{
               backgroundColor: "#F3F1FF",
               width: "100vw",
-              height: "110vh",
+              minHeight: "110vh",
             }}
           >
             <Grid
               container
               sx={{
-                height: "92vh",
+                minHeight: "92vh",
                 flexDirection: "column",
                 alignItems: "center",
               }}
@@ -450,7 +447,7 @@ function AdminDashboard() {
             sx={{
               backgroundColor: "#F3F1FF",
               width: "100vw",
-              height: "110vh",
+              minHeight: "110vh",
             }}
           >
             <Grid
@@ -534,64 +531,47 @@ function AdminDashboard() {
                     </Typography>
                   </Grid>
                   <Grid item sx={{ mt: 3, mb: 7 }}>
-                    <Stack direction={"row"}>
-                      <Link to="/post-job">
-                        <Button
-                          variant="contained"
-                          component="span"
-                          style={{
-                            backgroundColor: "#FF6B2C",
-                            color: "white",
-                            width: "22.5vw",
-                            height: "10vh",
-                            borderRadius: "7px",
-                          }}
-                        >
-                          <Typography sx={{ fontSize: "1.4vh" }}>
-                            Post a New Job!
-                          </Typography>
-                        </Button>
-                      </Link>
-                      <Divider sx={{ ml: "5vw", mr: "5vw" }} />
-                      <Link to="/joblisting">
-                        <Button
-                          variant="contained"
-                          component="span"
-                          style={{
-                            backgroundColor: "#FF6B2C",
-                            color: "white",
-                            width: "22.5vw",
-                            height: "10vh",
-                            borderRadius: "7px",
-                          }}
-                        >
-                          <Typography sx={{ fontSize: "1.4vh" }}>
-                            Check your Job Listings!
-                          </Typography>
-                        </Button>
-                      </Link>
-                    </Stack>
-                  </Grid>
-                  <Grid item sx={{ mt: 3, mb: 7 }}>
-                    <Stack direction={"row"}>
-                      <Link to="/create-company">
-                        <Button
-                          variant="contained"
-                          component="span"
-                          style={{
-                            backgroundColor: "#FF6B2C",
-                            color: "white",
-                            width: "22.5vw",
-                            height: "10vh",
-                            borderRadius: "7px",
-                          }}
-                        >
-                          <Typography sx={{ fontSize: "1.4vh" }}>
-                            Add Company Information!
-                          </Typography>
-                        </Button>
-                      </Link>
-                    </Stack>
+                    <Grid container width={"57.5vw"}>
+                      <Grid item xs={12} sm={4}>
+                        <Link to="/post-job">
+                          <Button
+                            variant="contained"
+                            component="span"
+                            style={{
+                              backgroundColor: "#FF6B2C",
+                              color: "white",
+                              width: "100%",
+                              minHeight: "10vh",
+                              borderRadius: "7px",
+                            }}
+                          >
+                            <Typography sx={{ fontSize: "1.4vh" }}>
+                              Post a New Job!
+                            </Typography>
+                          </Button>
+                        </Link>
+                      </Grid>
+                      <Grid item xs={12} sm={4}></Grid>
+                      <Grid item xs={12} sm={4}>
+                        <Link to="/joblisting">
+                          <Button
+                            variant="contained"
+                            component="span"
+                            style={{
+                              backgroundColor: "#FF6B2C",
+                              color: "white",
+                              width: "100%",
+                              minHeight: "10vh",
+                              borderRadius: "7px",
+                            }}
+                          >
+                            <Typography sx={{ fontSize: "1.4vh" }}>
+                              Check your Job Listings!
+                            </Typography>
+                          </Button>
+                        </Link>
+                      </Grid>
+                    </Grid>
                   </Grid>
                 </Grid>
               </Grid>
