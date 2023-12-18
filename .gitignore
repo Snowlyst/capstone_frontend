@@ -6,6 +6,8 @@
 .pnp.js
 /Test
 .env
+/TestPages(TO_BE_DELETED)
+
 # testing
 /coverage
 
